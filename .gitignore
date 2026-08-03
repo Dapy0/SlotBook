@@ -1,0 +1,13 @@
+backlog.md
+ROADMAP.md
+node_modules/
+dist/
+build/
+.vite/
+.env
+.env.local
+*.env
+*.log
+.DS_Store
+.idea/
+.vscode/

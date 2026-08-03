@@ -1,12 +1,10 @@
 {
-  "name": "slotbook",
-  "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
-  "type": "module",
-  "main": "index.js",
+  "name": "slotbook-monorepo",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:frontend": "npm run dev --workspace=apps/frontend"
+  },
+  "workspaces": [
+    "apps/*"
+  ]
 }
