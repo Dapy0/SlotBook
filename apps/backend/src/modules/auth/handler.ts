@@ -11,5 +11,5 @@ export const postAuthRegister = async (
 ) => {
   const { email, name, passwordHash, role } = request.body;
 
-  const result = registerUser();
+  const result = registerUser(request.server.drizzle);
 };

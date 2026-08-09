@@ -3,7 +3,7 @@ import { postAuthRegister } from './handler.ts';
 import { registerUserSchema, selectUserSchema } from '../../db/schema.ts';
 
 export async function authRoutes(fastify: FastifyInstance) {
-  fastify.get(
+  fastify.post(
     '/register',
     {
       schema: {

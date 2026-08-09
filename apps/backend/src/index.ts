@@ -1,15 +1,15 @@
-import { createServer } from './server.js';
-import { checkDBConnection } from './db/index.js';
+import { createServer } from './server.ts';
 
-const app = createServer();
+async function main() {
+  const app = await createServer();
 
-try {
-  await checkDBConnection();
-  app.log.info('DB connected');
-  app.listen({ port: app.config.PORT }, () => {
-    app.log.info(`Listening on ${app.config.PORT}...`);
-  });
-} catch (err) {
-  app.log.error(err);
-  process.exit(1);
+  try {
+    await app.listen({ port: app.config.PORT, host: '127.0.0.1' });
+    // console.log(`Listening on 127.0.0.1:${app.config.PORT}...`);
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
 }
+
+main();

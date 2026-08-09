@@ -1,4 +1,5 @@
-import { db } from '../../db/index.ts';
-export const registerUser = async ()=> {
-  const result = await db.select()
-}
+import type { DB } from '../../db/drizzlePlugin.ts';
+
+export const registerUser = async (db: DB) => {
+  const result = await db.select();
+};

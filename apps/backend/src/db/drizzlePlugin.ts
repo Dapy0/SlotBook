@@ -5,9 +5,10 @@ import type { FastifyInstance } from 'fastify';
 import { users, pgRoleEnums } from './schema.ts';
 import { relations } from './relations.ts';
 
+export type DB = NodePgDatabase<typeof relations>;
 declare module 'fastify' {
   interface FastifyInstance {
-    drizzle: NodePgDatabase<typeof relations>;
+    drizzle: DB;
   }
 }
 
