@@ -6,8 +6,6 @@ const app = createServer();
 try {
   await checkDBConnection();
   app.log.info('DB connected');
-
-
   app.listen({ port: app.config.PORT }, () => {
     app.log.info(`Listening on ${app.config.PORT}...`);
   });

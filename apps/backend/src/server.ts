@@ -1,6 +1,8 @@
 import Fastify from 'fastify';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import fastifyEnv, { type FastifyEnvOptions } from '@fastify/env';
+import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from 'fastify-type-provider-zod';
+import drizzlePlugin from './db/drizzlePlugin.ts';
 
 const schema = {
   type: 'object',
@@ -34,12 +36,15 @@ declare module 'fastify' {
 export function createServer() {
   const app = Fastify({
     logger: true,
-  });
+  }).withTypeProvider<ZodTypeProvider>();
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
   app.register(fastifyEnv, options).after((err) => {
     if (err) console.error(err);
     console.log(app.getEnvs());
   });
+  app.register(drizzlePlugin);
 
   app.get('/health', async (req, res) => res.send('All is ok'));
 
