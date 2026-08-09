@@ -7,9 +7,9 @@ try {
   await checkDBConnection();
   app.log.info('DB connected');
 
-  const PORT = Number(process.env.PORT) || 3001;
-  app.listen({ port: PORT }, () => {
-    app.log.info(`Listening on ${PORT}...`);
+
+  app.listen({ port: app.config.PORT }, () => {
+    app.log.info(`Listening on ${app.config.PORT}...`);
   });
 } catch (err) {
   app.log.error(err);

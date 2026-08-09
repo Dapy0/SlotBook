@@ -1,19 +1,49 @@
 import Fastify from 'fastify';
 import { authRoutes } from './modules/auth/auth.routes.js';
+import fastifyEnv, { type FastifyEnvOptions } from '@fastify/env';
+
+const schema = {
+  type: 'object',
+  required: ['PORT', 'DATABASE_URL'],
+  properties: {
+    PORT: {
+      type: 'number',
+    },
+    DATABASE_URL: {
+        type: 'string'
+    },
+  },
+};
+const options: FastifyEnvOptions = {
+  confKey: 'config',
+  schema: schema,
+  dotenv: true
+};
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    config: {
+      PORT: number;
+      DATABASE_URL: string;
+    };
+  }
+}
 
 
-export function createServer(){
+
+export function createServer() {
   const app = Fastify({
-    logger: true
-  })
+    logger: true,
+  });
 
-  // app.register(cookie)
+  app.register(fastifyEnv, options).after((err) => {
+    if (err) console.error(err);
+    console.log(app.getEnvs());
+  });
 
-  app.get('/health', async (req,res)=> res.send("All is ok"))
+  app.get('/health', async (req, res) => res.send('All is ok'));
 
+  app.register(authRoutes, { prefix: '/auth' });
 
-  app.register(authRoutes, {prefix: '/auth'})
-
-
-  return app
+  return app;
 }
