@@ -1,6 +1,7 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { postAuthRegister } from './handler.ts';
-import { registerUserSchema, selectUserSchema } from '../../db/schema.ts';
+import { postAuthRegister, postAuthSignIn } from './handler.ts';
+import { authResponseSchema, registerUserSchema, selectUserSchema, signInUserSchema } from './auth.schema.ts';
+
 
 export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -9,14 +10,23 @@ export async function authRoutes(fastify: FastifyInstance) {
       schema: {
         body: registerUserSchema,
         response: {
-          201: selectUserSchema.omit({ passwordHash: true }),
+          201: authResponseSchema,
         },
       },
     },
     postAuthRegister,
   );
 
-  fastify.get('/login', async function (request: FastifyRequest, response: FastifyReply) {
-    return 'Login Route';
-  });
+  fastify.post(
+    '/login',
+    {
+      schema: {
+        body: signInUserSchema,
+        response: {
+          201: authResponseSchema,
+        },
+      },
+    },
+    postAuthSignIn,
+  );
 }

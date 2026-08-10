@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@fastify/env": "^7.0.0",
+    "@fastify/jwt": "^10.2.1",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
     "fastify": "^5.11.2",

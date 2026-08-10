@@ -2,21 +2,17 @@ import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
-import { users, pgRoleEnums } from './schema.ts';
 import { relations } from './relations.ts';
 
 export type DB = NodePgDatabase<typeof relations>;
-declare module 'fastify' {
-  interface FastifyInstance {
-    drizzle: DB;
-  }
-}
+
 
 function drizzlePlugin(fastify: FastifyInstance, options = {}, done: any) {
+  console.log('CHECK DATABASE_URL:', process.env.DATABASE_URL!);
   if (!fastify.drizzle) {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL!,
-      ssl: true,
+      ssl: false,
     });
     const db = drizzle({ client: pool, relations });
     fastify.decorate('drizzle', db);
