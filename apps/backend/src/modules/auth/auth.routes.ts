@@ -4,6 +4,7 @@ import { authResponseSchema, registerUserSchema, selectUserSchema, signInUserSch
 
 
 export async function authRoutes(fastify: FastifyInstance) {
+
   fastify.post(
     '/register',
     {
@@ -25,7 +26,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         response: {
           201: authResponseSchema,
         },
-      },
+      }
     },
     postAuthSignIn,
   );
