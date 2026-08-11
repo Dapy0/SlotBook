@@ -13,10 +13,11 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 function setAuthCookie(response: FastifyReply, token: string) {
   response.setCookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false,
     sameSite: 'lax',
     path: '/',
     maxAge: COOKIE_MAX_AGE,
+    signed: false
   });
 }
 

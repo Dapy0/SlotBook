@@ -70,16 +70,18 @@ export async function createServer() {
   });
   await app.register(fastifyEnv, options);
   await app.register(drizzlePlugin);
-  await app.register(cookie);
+  await app.register(cookie, {
+    secret: app.config.JWT_SECRET_KEY,
+  });
   await app.register(fastifyJwt, {
     secret: app.config.JWT_SECRET_KEY ?? process.env.JWT_SECRET_KEY,
     cookie: {
       cookieName: 'token',
-      signed: true
-    }
+      signed: false,
+    },
   });
-  await app.register(authRoutes, { prefix: '/auth' });
   await app.register(jwtVerification);
+  await app.register(authRoutes, { prefix: '/auth' });
   await app.register(bookingRoutes, { prefix: '/booking' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));
