@@ -21,11 +21,15 @@ export const registerUser = async (db: DB, userData: RegisterDbParams) => {
       passwordHash,
       role,
     })
-    .returning(); 
+    .returning();
   return newUser;
 };
 
 export const findUserByEmail = async (db: DB, email: string) => {
   const [newUser] = await db.select().from(users).where(eq(users.email, email));
+  return newUser;
+};
+export const findUserById = async (db: DB, id: string) => {
+  const [newUser] = await db.select().from(users).where(eq(users.id, id));
   return newUser;
 };

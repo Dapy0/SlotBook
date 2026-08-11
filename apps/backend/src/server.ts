@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import Fastify, { fastify, type FastifyReply } from 'fastify';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import fastifyEnv, { type FastifyEnvOptions } from '@fastify/env';
+import cookie from '@fastify/cookie';
 import {
   serializerCompiler,
   validatorCompiler,
@@ -65,15 +66,20 @@ export async function createServer() {
   app.setSerializerCompiler(serializerCompiler);
   await app.register(cors, {
     origin: 'http://localhost:3000',
-    credentials: true, 
+    credentials: true,
   });
   await app.register(fastifyEnv, options);
   await app.register(drizzlePlugin);
+  await app.register(cookie);
   await app.register(fastifyJwt, {
     secret: app.config.JWT_SECRET_KEY ?? process.env.JWT_SECRET_KEY,
+    cookie: {
+      cookieName: 'token',
+      signed: true
+    }
   });
-  await app.register(jwtVerification);
   await app.register(authRoutes, { prefix: '/auth' });
+  await app.register(jwtVerification);
   await app.register(bookingRoutes, { prefix: '/booking' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));

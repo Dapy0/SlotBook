@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
+import { authApi } from '@/services/auth';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -25,21 +26,17 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
-      const res = await fetch('http://127.0.0.1:3001/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setServerError(data?.message ?? 'Unable to sign in. Check your details.');
-        return;
-      }
+      const res = await authApi.login(values);
+      console.log(res);
+      // if (!res.ok) {
+      //   const data = await res.json();
+      //   setServerError(data?.message ?? 'Unable to sign in. Check your details.');
+      //   return;
+      // }
 
       // window.location.href = '/';
-    } catch {
-      setServerError('Server unavailable. Please try again later.');
+    } catch (err) {
+      setServerError('Server unavailable. Please try again later.' + err);
     }
   };
 
@@ -48,9 +45,7 @@ export default function LoginPage() {
       <p className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">
         Session
       </p>
-      <h2 className="mt-3 font-heading text-3xl font-medium text-foreground">
-        Sign in
-      </h2>
+      <h2 className="mt-3 font-heading text-3xl font-medium text-foreground">Sign in</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
         <Link href="/register" className="font-medium text-foreground underline underline-offset-4">

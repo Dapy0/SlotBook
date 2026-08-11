@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { registerSchema, type RegisterFormValues } from '@/lib/validations/auth';
+import { authApi } from '@/services/auth';
 
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -25,17 +26,13 @@ export default function RegisterPage() {
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError(null);
     try {
-      const res = await fetch('http://127.0.0.1:3001/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setServerError(data?.message ?? 'Unable to create account.');
-        return;
-      }
+      const res = await authApi.register(values);
+      console.log(res);
+      // if (!res.ok) {
+      //   const data = await res.json().catch(() => null);
+      //   setServerError(data?.message ?? 'Unable to create account.');
+      //   return;
+      // }
 
       // window.location.href = '/';
     } catch {
