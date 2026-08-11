@@ -1,6 +1,7 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './handler.ts';
-import { authResponseSchema, registerUserSchema, selectUserSchema, signInUserSchema } from './auth.schema.ts';
+
+import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
 
 
 export async function authRoutes(fastify: FastifyInstance) {
@@ -9,7 +10,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     '/register',
     {
       schema: {
-        body: registerUserSchema,
+        body: registerSchema,
         response: {
           201: authResponseSchema,
         },
@@ -22,11 +23,11 @@ export async function authRoutes(fastify: FastifyInstance) {
     '/login',
     {
       schema: {
-        body: signInUserSchema,
+        body: loginSchema,
         response: {
-          201: authResponseSchema,
+          200: authResponseSchema,
         },
-      }
+      },
     },
     postAuthSignIn,
   );

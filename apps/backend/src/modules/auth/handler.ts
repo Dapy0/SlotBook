@@ -1,12 +1,13 @@
 import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
-import type z from 'zod';
 import { findUserByEmail, findUserById, registerUser } from './db.ts';
-import type { registerUserSchema, signInUserSchema } from './auth.schema.ts';
-import { roleEnums, users } from '../../db/schema.ts';
-
-type RegisterBody = z.infer<typeof registerUserSchema>;
-type SignInBody = z.infer<typeof signInUserSchema>;
+import {
+  authResponseSchema,
+  type AuthResponse,
+  type LoginRequest,
+  type RegisterRequest,
+} from '@slotbook/shared/auth';
+import type { UserResponse } from '@slotbook/shared/user';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -17,21 +18,19 @@ function setAuthCookie(response: FastifyReply, token: string) {
     sameSite: 'lax',
     path: '/',
     maxAge: COOKIE_MAX_AGE,
-    signed: false
+    signed: false,
   });
 }
 
 export const postAuthRegister = async (
-  request: FastifyRequest<{ Body: RegisterBody }>,
+  request: FastifyRequest<{ Body: RegisterRequest }>,
   response: FastifyReply,
 ) => {
-  const { email, name, password } = request.body;
-
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(request.body.password, 10);
 
   const user = await registerUser(request.server.drizzle, {
-    email,
-    name,
+    email: request.body.email,
+    name: request.body.name,
     passwordHash,
     role: 'CLIENT',
   }).catch((err) => console.log('Failed to Create User'));
@@ -39,22 +38,29 @@ export const postAuthRegister = async (
     return response.code(400).send({ message: 'Failed to create user' });
   }
   const token = request.server.jwt.sign({ id: user.id, role: user.role });
-  const { passwordHash: _, ...userWithoutPassword } = user;
-
+  const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
   setAuthCookie(response, token);
+  const responseData: AuthResponse = {
+    user: {
+      name,
+      createdAt,
+      email,
+      id,
+      role,
+      updatedAt,
+    },
+  };
 
-  return response.status(200).send({
-    ...userWithoutPassword,
-  });
+  return response.code(201).send(responseData);
 };
 export const postAuthSignIn = async (
-  request: FastifyRequest<{ Body: SignInBody }>,
+  request: FastifyRequest<{ Body: LoginRequest }>,
   response: FastifyReply,
 ) => {
-  const { email, password } = request.body;
+  const { email: typedEmail, password } = request.body;
 
   try {
-    const user = await findUserByEmail(request.server.drizzle, email).catch((err) =>
+    const user = await findUserByEmail(request.server.drizzle, typedEmail).catch((err) =>
       console.log('Failed to Find User'),
     );
 
@@ -68,13 +74,21 @@ export const postAuthSignIn = async (
     }
 
     const token = request.server.jwt.sign({ id: user.id, role: user.role });
-    const { passwordHash: _, ...userWithoutPassword } = user;
+    const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
 
     setAuthCookie(response, token);
 
-    return response.status(200).send({
-      ...userWithoutPassword,
-    });
+    const responseData: AuthResponse = {
+      user: {
+        name,
+        createdAt,
+        email,
+        id,
+        role,
+        updatedAt,
+      },
+    };
+    return response.code(200).send(responseData);
   } catch (e) {
     throw e;
   }
