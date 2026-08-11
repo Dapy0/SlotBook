@@ -43,7 +43,7 @@ export const postAuthRegister = async (
   setAuthCookie(response, token);
 
   return response.status(200).send({
-    ...userWithoutPassword
+    ...userWithoutPassword,
   });
 };
 export const postAuthSignIn = async (
@@ -72,7 +72,7 @@ export const postAuthSignIn = async (
     setAuthCookie(response, token);
 
     return response.status(200).send({
-      ...userWithoutPassword
+      ...userWithoutPassword,
     });
   } catch (e) {
     throw e;
@@ -87,4 +87,8 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
 
   const { passwordHash: _, ...safeUser } = user;
   return response.status(200).send(safeUser);
+};
+export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
+  response.clearCookie('token', { path: '/' });
+  return response.status(200).send({ message: 'Logged out' });
 };

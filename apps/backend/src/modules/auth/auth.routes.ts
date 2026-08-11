@@ -1,5 +1,5 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { getAuthMe, postAuthRegister, postAuthSignIn } from './handler.ts';
+import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './handler.ts';
 import { authResponseSchema, registerUserSchema, selectUserSchema, signInUserSchema } from './auth.schema.ts';
 
 
@@ -31,4 +31,5 @@ export async function authRoutes(fastify: FastifyInstance) {
     postAuthSignIn,
   );
   fastify.get('/me', { onRequest: [fastify.authenticate] }, getAuthMe);
+  fastify.get('/logout', postAuthLogout);
 }
