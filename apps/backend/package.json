@@ -1,5 +1,5 @@
 {
-  "name": "slotbook-backend",
+  "name": "@slotbook/backend",
   "version": "1.0.0",
   "license": "ISC",
   "type": "module",
@@ -21,7 +21,8 @@
     "fastify": "^5.11.2",
     "fastify-type-provider-zod": "^7.0.0",
     "pg": "^8.22.0",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@slotbook/shared": "*"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
