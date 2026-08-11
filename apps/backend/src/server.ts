@@ -1,5 +1,5 @@
 import 'dotenv/config';
-
+import cors from '@fastify/cors';
 import Fastify, { fastify, type FastifyReply } from 'fastify';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import fastifyEnv, { type FastifyEnvOptions } from '@fastify/env';
@@ -63,7 +63,10 @@ export async function createServer() {
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
-
+  await app.register(cors, {
+    origin: 'http://localhost:3000',
+    credentials: true, 
+  });
   await app.register(fastifyEnv, options);
   await app.register(drizzlePlugin);
   await app.register(fastifyJwt, {
