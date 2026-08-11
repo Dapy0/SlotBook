@@ -14,7 +14,7 @@ const BACKEND_PORT = backendEnv.PORT;
 
 const nextConfig: NextConfig = {
   env: {
-    BACKEND_URL: `http://127.0.0.1:${BACKEND_PORT}`,
+    BACKEND_URL: `http://localhost:${BACKEND_PORT}`,
   },
 };
 
