@@ -1,15 +1,11 @@
 'use client';
 
+import type { UserResponse } from '@slotbook/shared/user';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-};
+
 type AuthContextValue = {
-  user: User | null;
+  user: UserResponse | null;
   isLoading: boolean;
   logout: () => Promise<void>;
   refetch: () => Promise<void>;
@@ -17,14 +13,15 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const fetchUser = async () => {
     try {
       const res = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
         credentials: 'include',
       });
-      setUser(res.ok ? await res.json() : null);
+      const resp:{user:UserResponse} = await res.json()
+      setUser(res.ok ? resp.user : null);
     } catch {
       setUser(null);
     } finally {
