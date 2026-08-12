@@ -15,6 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import jwtVerification from './plugins/jwtVerification.ts';
 import { bookingRoutes } from './modules/booking/booking.routes.ts';
+import { facilityRoutes } from './modules/facility/facility.routes.ts';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const schema = {
@@ -44,6 +45,8 @@ export async function createServer() {
   const app = Fastify({
     logger: true,
   }).withTypeProvider<ZodTypeProvider>();
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
   app.setErrorHandler(function (error: any, request, reply) {
     request.log.error(error);
     if (error.validation) {
@@ -62,8 +65,6 @@ export async function createServer() {
     });
   });
 
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
   await app.register(cors, {
     origin: 'http://localhost:3000',
     credentials: true,
@@ -82,7 +83,8 @@ export async function createServer() {
   });
   await app.register(jwtVerification);
   await app.register(authRoutes, { prefix: '/auth' });
-  await app.register(bookingRoutes, { prefix: '/booking' });
+  await app.register(facilityRoutes, { prefix: '/facilities' });
+  // await app.register(bookingRoutes, { prefix: '/booking' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));
 

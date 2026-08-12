@@ -10,6 +10,6 @@ export const relations = defineRelations(schema, (r) => ({
     services: r.many.services({ from: r.facilities.id, to: r.services.facilityId }),
   },
   services: {
-    facilities: r.one.services({ from: r.services.facilityId, to: r.facilities.id }),
+    facilities: r.one.facilities({ from: r.services.facilityId, to: r.facilities.id }),
   },
 }));

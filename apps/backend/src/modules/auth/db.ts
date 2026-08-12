@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
-import { roleEnums, users, type UserSchemaType } from '../../db/schema.ts';
+import { users, type roleEnums, type UserSchemaType } from '../../db/schema/index.ts';
+
 type RegisterDbParams = {
   name: string;
   email: string;
