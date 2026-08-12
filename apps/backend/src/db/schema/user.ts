@@ -1,7 +1,7 @@
-import { uuid, pgTable, varchar, pgEnum, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const roleEnums = ['CLIENT', 'OWNER', 'ADMIN'] as const;
-const pgRoleEnums = pgEnum('role', roleEnums);
+export const pgRoleEnums = pgEnum('role', roleEnums);
 
 export const users = pgTable('users', {
   id: uuid().defaultRandom().primaryKey(),
@@ -13,5 +13,4 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   // telegram_chat_id
 });
-
 export type UserSchemaType = typeof users.$inferSelect;
