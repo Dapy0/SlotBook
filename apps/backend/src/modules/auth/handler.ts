@@ -100,8 +100,18 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
     return response.code(404).send({ message: 'User not found' });
   }
 
-  const { passwordHash: _, ...safeUser } = user;
-  return response.status(200).send(safeUser);
+  const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
+  const responseData: AuthResponse = {
+    user: {
+      name,
+      createdAt,
+      email,
+      id,
+      role,
+      updatedAt,
+    },
+  };
+  return response.code(200).send(responseData);
 };
 export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
   response.clearCookie('token', { path: '/' });

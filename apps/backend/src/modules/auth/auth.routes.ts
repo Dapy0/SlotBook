@@ -3,9 +3,7 @@ import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './h
 
 import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
 
-
 export async function authRoutes(fastify: FastifyInstance) {
-
   fastify.post(
     '/register',
     {
@@ -31,6 +29,17 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     postAuthSignIn,
   );
-  fastify.get('/me', { onRequest: [fastify.authenticate] }, getAuthMe);
+  fastify.get(
+    '/me',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        response: {
+          200: authResponseSchema,
+        },
+      },
+    },
+    getAuthMe,
+  );
   fastify.get('/logout', postAuthLogout);
 }
