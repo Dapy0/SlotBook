@@ -25,7 +25,9 @@ export default function Home() {
         {!isLoading && (
           <div>
             <b>{user.name}</b>
-
+            <br />
+            <p>{user.email}</p>
+            <br />
             <div>
               <button onClick={logout}>Log Out</button>
             </div>
