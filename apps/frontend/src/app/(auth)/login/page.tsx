@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
-import { authApi } from '@/services/auth';
+import { login } from '@/services/auth';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -26,8 +26,7 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
-      const res = await authApi.login(values);
-      console.log(res);
+      const res = await login(values);
       // if (!res.ok) {
       //   const data = await res.json();
       //   setServerError(data?.message ?? 'Unable to sign in. Check your details.');

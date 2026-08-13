@@ -10,8 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { registerSchema, type RegisterFormValues } from '@/lib/validations/auth';
-import { authApi } from '@/services/auth';
-
+import { register as userRegister } from '@/services/auth';
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -26,8 +25,7 @@ export default function RegisterPage() {
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError(null);
     try {
-      const res = await authApi.register(values);
-      console.log(res);
+      const res = await userRegister(values);
       // if (!res.ok) {
       //   const data = await res.json().catch(() => null);
       //   setServerError(data?.message ?? 'Unable to create account.');
