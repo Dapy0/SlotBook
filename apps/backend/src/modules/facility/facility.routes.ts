@@ -1,10 +1,18 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { createFacility, getFacilities, getOwnFacilities } from './fascility.controller.ts';
+import {
+  createFacility,
+  getFacilities,
+  getFacilityById,
+  getOwnFacilities,
+  patchFacilityById,
+} from './fascility.controller.ts';
 import { facilityListQuerySchema } from './facility.schema.ts';
 import {
   insertFacilitySchema,
   selectFacilitySchema,
+  updateFacilitySchema,
   type CreateFacilityBody,
+  type UpdateFacilityBody,
 } from '../../db/schema/facility.ts';
 import z from 'zod';
 
@@ -20,6 +28,20 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     getFacilities,
+  );
+  fastify.get(
+    '/:id',
+    {
+      schema: {
+        params: {
+          id: z.string(),
+        },
+        response: {
+          200: z.array(selectFacilitySchema),
+        },
+      },
+    },
+    getFacilityById,
   );
   fastify.get(
     '/getOwnFacilities',
@@ -48,5 +70,24 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     createFacility,
+  );
+  fastify.patch<{
+    Body: UpdateFacilityBody;
+    Params: {id:string}
+  }>(
+    '/:id',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: {
+          id: z.string(),
+        },
+        body: updateFacilitySchema,
+        response: {
+          200: selectFacilitySchema,
+        },
+      },
+    },
+    patchFacilityById,
   );
 }

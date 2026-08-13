@@ -12,7 +12,7 @@ import {
   pgTable,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.ts';
-import { createInsertSchema, createSelectSchema } from 'drizzle-orm/zod';
+import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-orm/zod';
 import z from 'zod';
 import type { Json } from 'drizzle-orm';
 
@@ -90,3 +90,6 @@ export type CreateFacilityBody = z.infer<typeof insertFacilitySchema>;
 export type FacilitySchemaType = typeof facilities.$inferSelect;
 export type FacilitySchema = z.infer<typeof selectFacilitySchema>;
 export const selectFacilitySchema = createSelectSchema(facilities);
+
+export const updateFacilitySchema = insertFacilitySchema.partial();
+export type UpdateFacilityBody = z.infer<typeof updateFacilitySchema>;
