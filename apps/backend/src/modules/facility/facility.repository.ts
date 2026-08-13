@@ -39,3 +39,10 @@ export async function updateFacilityById(db: DB, id: string, data: UpdateFacilit
 
   return facility ?? null;
 }
+export async function deleteFacilityById(db: DB, id: string) {
+  const [deletedFacility] = await db.delete(facilities).where(eq(facilities.id, id)).returning();
+  if (!deletedFacility) {
+    throw new Error('Failed to delete facility');
+  }
+  return deletedFacility ?? null;
+}

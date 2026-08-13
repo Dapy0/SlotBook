@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import {
+  deleteFacilityById,
   findAllFacilities,
   findFacilitiesByOwnerId,
   findFacilityById,
@@ -103,6 +104,23 @@ export async function patchFacilityById(
 
   return response.status(200).send(updatedFacility);
 }
-export async function deleteFacilityById(request: FastifyRequest, response: FastifyReply) {
+export async function removeFacilityById(
+  request: FastifyRequest<{
+    Params: { id: string };
+  }>,
+  response: FastifyReply,
+) {
+  const facility = await findFacilityById(request.server.drizzle, request.params.id);
 
+  if (!facility) {
+    return response.code(404).send({ message: 'Facility not found' });
   }
+  const isOwner = request.user.id === facility.ownerId;
+
+  if (!isOwner) {
+    return response.code(403).send({ message: 'Not owned facility' });
+  }
+  await deleteFacilityById(request.server.drizzle, request.params.id);
+
+  return response.status(204).send();
+}

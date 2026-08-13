@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
   createFacility,
+  deleteFacilityById,
   getFacilities,
   getFacilityById,
   getOwnFacilities,
@@ -89,5 +90,22 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     patchFacilityById,
+  );
+  fastify.delete<{
+    Params: { id: string };
+  }>(
+    '/:id',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: {
+          id: z.string(),
+        },
+        response: {
+          200: selectFacilitySchema,
+        },
+      },
+    },
+    deleteFacilityById,
   );
 }
