@@ -34,9 +34,9 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     '/:id',
     {
       schema: {
-        params: {
-          id: z.string(),
-        },
+        params: z.object({
+          id: z.uuid(),
+        }),
         response: {
           200: z.array(selectFacilitySchema),
         },
@@ -80,9 +80,9 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: {
-          id: z.string(),
-        },
+        params: z.object({
+          id: z.uuid(),
+        }),
         body: updateFacilitySchema,
         response: {
           200: selectFacilitySchema,
@@ -98,9 +98,9 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: {
-          id: z.string(),
-        },
+        params: z.object({
+          id: z.uuid(),
+        }),
       },
     },
     removeFacilityById,
