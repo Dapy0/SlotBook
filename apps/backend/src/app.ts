@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url';
 import jwtVerification from './plugins/jwtVerification.ts';
 import { bookingRoutes } from './modules/booking/booking.routes.ts';
 import { facilityRoutes } from './modules/facility/facility.routes.ts';
+import { serviceRoutes } from './modules/service/service.routes.ts';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const schema = {
@@ -84,6 +85,7 @@ export async function createServer() {
   await app.register(jwtVerification);
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(facilityRoutes, { prefix: '/facilities' });
+  await app.register(serviceRoutes, { prefix: '/facilities' });
   // await app.register(bookingRoutes, { prefix: '/booking' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));

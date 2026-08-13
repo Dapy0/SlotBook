@@ -9,6 +9,8 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 import { facilities } from './facility.ts';
+import { createInsertSchema, createSelectSchema } from 'drizzle-orm/zod';
+import z from 'zod';
 
 export const services = pgTable(
   'services',
@@ -33,4 +35,22 @@ export const services = pgTable(
   },
   (table) => [index('services_facility_idx').on(table.facilityId)],
 );
-export type ServiceSchemaType = typeof facilities.$inferSelect;
+
+export const insertServiceSchema = createInsertSchema(services, {
+  name: z.string().min(2).max(255),
+  durationMinutes: z
+    .number()
+    .int()
+    .positive()
+    .max(24 * 60),
+  priceCents: z.number().int().nonnegative(),
+  currency: z.string().length(3).default('PLN'),
+}).omit({
+  id: true,
+  facilityId: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export const selectServiceSchema = createSelectSchema(services);
+export type CreateServiceBody = z.infer<typeof insertServiceSchema>;
+export type ServiceSchemaType = z.infer<typeof selectServiceSchema>;
