@@ -1,11 +1,11 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
   createFacility,
-  deleteFacilityById,
   getFacilities,
   getFacilityById,
   getOwnFacilities,
   patchFacilityById,
+  removeFacilityById,
 } from './fascility.controller.ts';
 import { facilityListQuerySchema } from './facility.schema.ts';
 import {
@@ -74,7 +74,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   );
   fastify.patch<{
     Body: UpdateFacilityBody;
-    Params: {id:string}
+    Params: { id: string };
   }>(
     '/:id',
     {
@@ -101,11 +101,8 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         params: {
           id: z.string(),
         },
-        response: {
-          200: selectFacilitySchema,
-        },
       },
     },
-    deleteFacilityById,
+    removeFacilityById,
   );
 }
