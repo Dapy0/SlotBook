@@ -38,14 +38,14 @@ export async function facilityRoutes(fastify: FastifyInstance) {
           id: z.uuid(),
         }),
         response: {
-          200: z.array(selectFacilitySchema),
+          200: selectFacilitySchema,
         },
       },
     },
     getFacilityById,
   );
   fastify.get(
-    '/getOwnFacilities',
+    '/mine',
     {
       onRequest: [fastify.authenticate],
       schema: {

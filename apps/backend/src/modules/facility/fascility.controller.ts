@@ -96,6 +96,7 @@ export async function patchFacilityById(
   if (!isOwner) {
     return response.code(403).send({ message: 'Not owned facility' });
   }
+
   const updatedFacility = await updateFacilityById(request.server.drizzle, request.params.id, body);
 
   if (!updatedFacility) {

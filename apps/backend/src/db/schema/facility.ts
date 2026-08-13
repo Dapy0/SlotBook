@@ -16,7 +16,10 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'driz
 import z from 'zod';
 import type { Json } from 'drizzle-orm';
 
-export const facilityCategoryEnum = pgEnum('facility_category', facilityCategories);
+export const facilityCategoryEnum = pgEnum(
+  'facility_category',
+  facilityCategories,
+);
 export type WorkingHours = Record<
   'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun',
   { open: string; close: string } | null
@@ -82,7 +85,6 @@ export const insertFacilitySchema = createInsertSchema(facilities, {
 }).omit({
   id: true,
   ownerId: true,
-  isPublished: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -91,5 +93,5 @@ export type FacilitySchemaType = typeof facilities.$inferSelect;
 export type FacilitySchema = z.infer<typeof selectFacilitySchema>;
 export const selectFacilitySchema = createSelectSchema(facilities);
 
-export const updateFacilitySchema = insertFacilitySchema.partial();
+export const updateFacilitySchema = insertFacilitySchema.partial().strict();
 export type UpdateFacilityBody = z.infer<typeof updateFacilitySchema>;
