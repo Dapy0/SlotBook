@@ -80,6 +80,7 @@ export async function createServer() {
     cookie: {
       cookieName: 'token',
       signed: false,
+      
     },
   });
   await app.register(jwtVerification);

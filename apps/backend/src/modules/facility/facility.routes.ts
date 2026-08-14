@@ -6,7 +6,7 @@ import {
   getOwnFacilities,
   patchFacilityById,
   removeFacilityById,
-} from './fascility.controller.ts';
+} from './facility.controller.ts';
 import { facilityListQuerySchema } from './facility.schema.ts';
 import {
   insertFacilitySchema,
