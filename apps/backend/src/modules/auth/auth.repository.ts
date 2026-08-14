@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
-import { users, type roleEnums, type UserSchemaType } from '../../db/schema/index.ts';
+import { users, type roleEnums, type UserEntity } from '../../db/schema/index.ts';
 
 type RegisterDbParams = {
   name: string;
@@ -8,7 +8,10 @@ type RegisterDbParams = {
   passwordHash: string;
   role: (typeof roleEnums)[number];
 };
-export const registerUser = async (db: DB, userData: RegisterDbParams) => {
+export const registerUser = async (
+  db: DB,
+  userData: RegisterDbParams,
+): Promise<UserEntity > => {
   const { email, name, passwordHash, role } = userData;
   const [newUser] = await db
     .insert(users)
@@ -19,14 +22,17 @@ export const registerUser = async (db: DB, userData: RegisterDbParams) => {
       role,
     })
     .returning();
+  if (!newUser) {
+    throw new Error('Failed to insert user: no record returned');
+  }
   return newUser;
 };
 
-export const findUserByEmail = async (db: DB, email: string): Promise<UserSchemaType | undefined> => {
+export const findUserByEmail = async (db: DB, email: string): Promise<UserEntity | undefined> => {
   const [newUser] = await db.select().from(users).where(eq(users.email, email));
   return newUser;
 };
-export const findUserById = async (db: DB, id: string): Promise<UserSchemaType | undefined> => {
+export const findUserById = async (db: DB, id: string): Promise<UserEntity | undefined> => {
   const [newUser] = await db.select().from(users).where(eq(users.id, id));
   return newUser;
 };

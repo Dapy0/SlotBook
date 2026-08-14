@@ -1,7 +1,11 @@
 import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
 import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
-import { type AuthResponse, type LoginRequest, type RegisterRequest } from '@slotbook/shared/auth';
+import {
+  type AuthResponseDTO,
+  type LoginRequest,
+  type RegisterRequest,
+} from '@slotbook/shared/auth';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -27,14 +31,26 @@ export const postAuthRegister = async (
     name: request.body.name,
     passwordHash,
     role: 'CLIENT',
-  })
+  }).catch((err) => {
+    if (err.code === '23505') {
+      return { error: 'EMAIL_TAKEN' as const };
+    }
+    request.log.error(err, 'Failed to create user');
+    return { error: 'UNKNOWN' as const };
+  });
+
+  if ('error' in user) {
+    const message =
+      user.error === 'EMAIL_TAKEN' ? 'This email is already registered' : 'Failed to create user';
+    return response.code(400).send({ message });
+  }
   if (!user) {
     return response.code(400).send({ message: 'Failed to create user' });
   }
   const token = request.server.jwt.sign({ id: user.id, role: user.role });
   const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
   setAuthCookie(response, token);
-  const responseData: AuthResponse = {
+  const responseData: AuthResponseDTO = {
     user: {
       name,
       createdAt,
@@ -54,10 +70,9 @@ export const postAuthSignIn = async (
   const { email: typedEmail, password } = request.body;
 
   try {
-    const user = await findUserByEmail(request.server.drizzle, typedEmail)
+    const user = await findUserByEmail(request.server.drizzle, typedEmail);
 
     if (!user) {
-      console.log('No user found');
       return response.code(400).send({ message: 'No user found' });
     }
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
@@ -70,7 +85,7 @@ export const postAuthSignIn = async (
 
     setAuthCookie(response, token);
 
-    const responseData: AuthResponse = {
+    const responseData: AuthResponseDTO = {
       user: {
         name,
         createdAt,
@@ -93,7 +108,7 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
   }
 
   const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
-  const responseData: AuthResponse = {
+  const responseData: AuthResponseDTO = {
     user: {
       name,
       createdAt,
