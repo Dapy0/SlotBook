@@ -66,25 +66,3 @@ export type FacilityResponseDTO = z.infer<typeof facilityResponseSchema>;
 
 
 
-
-export type Service = {
-  id: string;
-  facilityId: string;
-  name: string;
-  description: string | null;
-  category: string | null;
-  durationMinutes: number;
-  priceCents: number;
-  currency: string;
-  isActive: boolean;
-};
-
-
-export type CreateServicePayload = {
-  name: string;
-  description: string;
-  category: string;
-  durationMinutes: number;
-  priceCents: number;
-  currency: string;
-};
