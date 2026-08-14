@@ -7,20 +7,18 @@ import {
   insertFacility,
   updateFacilityById,
 } from './facility.repository.ts';
-import type {
-  CreateFacilityRequest,
-  UpdateFacilityRequest,
-} from '@slotbook/shared/facilities';
+import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facilities';
 import type { FacilityParams } from './facility.schema.ts';
 
 export async function getFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await findAllFacilities(request.server.drizzle);
 
+  response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');
   return response.status(200).send(facilities);
 }
 export async function getOwnFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await findFacilitiesByOwnerId(request.server.drizzle, request.user.id);
-
+  response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   return response.status(200).send(facilities);
 }
 export async function getFacilityById(
@@ -33,6 +31,7 @@ export async function getFacilityById(
   if (!facility) {
     return response.status(404).send({ message: 'Facility not found' });
   }
+  response.header('Cache-Control', 'public, no-cache');
   return response.code(200).send(facility);
 }
 export async function createFacility(

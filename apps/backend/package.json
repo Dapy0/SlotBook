@@ -10,10 +10,13 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@fastify/caching": "^9.0.4",
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.3.0",
     "@fastify/env": "^7.0.0",
+    "@fastify/etag": "^6.2.0",
     "@fastify/jwt": "^10.2.1",
+    "@slotbook/shared": "*",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
@@ -21,8 +24,7 @@
     "fastify": "^5.11.2",
     "fastify-type-provider-zod": "^7.0.0",
     "pg": "^8.22.0",
-    "zod": "^4.4.3",
-    "@slotbook/shared": "*"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",

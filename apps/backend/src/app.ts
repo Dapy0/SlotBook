@@ -20,6 +20,8 @@ import {
   fastifyEnvOptions,
   fastifyJwtOptions,
 } from './app.config.ts';
+import fastifyEtag from '@fastify/etag';
+import fastifyCaching from '@fastify/caching';
 
 export async function createServer() {
   const app = Fastify({
@@ -50,6 +52,10 @@ export async function createServer() {
   });
 
   // Plugins
+  await app.register(fastifyEtag);
+  await app.register(fastifyCaching, {
+    privacy: fastifyCaching.privacy.NOCACHE,
+  });
   await app.register(cors, fastifyCorsOptions);
   await app.register(fastifyEnv, fastifyEnvOptions);
   await app.register(cookie, fastifyCookieOptions);

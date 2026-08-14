@@ -1,3 +1,4 @@
+import fastifyCaching from '@fastify/caching';
 import type { CookieSerializeOptions, FastifyCookieOptions } from '@fastify/cookie';
 import type { FastifyCorsOptions } from '@fastify/cors';
 import { type FastifyEnvOptions } from '@fastify/env';
@@ -59,3 +60,7 @@ export const fastifyJwtOptions = {
     signed: false,
   },
 };
+// Caching
+export const fastifyCachingOptions = {
+    privacy: fastifyCaching.privacy.NOCACHE,
+  }

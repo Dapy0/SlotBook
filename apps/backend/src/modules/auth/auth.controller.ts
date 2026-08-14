@@ -118,6 +118,7 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
       updatedAt,
     },
   };
+  response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   return response.code(200).send(responseData);
 };
 export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
