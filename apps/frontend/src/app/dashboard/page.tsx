@@ -9,12 +9,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  formatPrice,
-  type Service,
-  type Facility,
-  facilityCategories,
-} from '@slotbook/shared/facilities';
+
 import {
   createServiceSchema,
   type CreateServiceFormInput,
@@ -30,19 +25,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { FACILITY_CATEGORIES, type FacilityResponseDTO, type Service } from '@slotbook/shared/facilities';
+import { formatPrice } from '@/lib/utils';
 
 function generateCategoryObj() {
   const obj: Array<{ label: string; value: string | null }> = [
     { label: 'Select category', value: null },
   ];
 
-  for (const key of facilityCategories) {
+  for (const key of FACILITY_CATEGORIES) {
     obj.push({ label: key, value: key });
   }
   return obj;
 }
 export default function FacilityDashboardPage() {
-  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [facilities, setFacilities] = useState<FacilityResponseDTO[]>([]);
   const [isLoadingFacilities, setIsLoadingFacilities] = useState(true);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
 
@@ -64,7 +61,7 @@ export default function FacilityDashboardPage() {
 
   useEffect(() => {
     getMyFacilities()
-      .then((data: Facility[] | null) => {
+      .then((data: FacilityResponseDTO[] | null) => {
         if (data === null) {
           setFacilities([]);
           setSelectedFacilityId(null);

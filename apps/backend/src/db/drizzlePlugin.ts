@@ -6,9 +6,7 @@ import { relations } from './relations.ts';
 
 export type DB = NodePgDatabase<typeof relations>;
 
-
 function drizzlePlugin(fastify: FastifyInstance, options = {}, done: any) {
-  console.log('CHECK DATABASE_URL:', process.env.DATABASE_URL!);
   if (!fastify.drizzle) {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL!,

@@ -8,10 +8,10 @@ import {
   updateFacilityById,
 } from './facility.repository.ts';
 import type {
-  CreateFacilityBody,
-  FacilitySchema,
-  UpdateFacilityBody,
-} from '../../db/schema/facility.ts';
+  CreateFacilityRequest,
+  UpdateFacilityRequest,
+} from '@slotbook/shared/facilities';
+import type { FacilityParams } from './facility.schema.ts';
 
 export async function getFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await findAllFacilities(request.server.drizzle);
@@ -24,7 +24,7 @@ export async function getOwnFacilities(request: FastifyRequest, response: Fastif
   return response.status(200).send(facilities);
 }
 export async function getFacilityById(
-  request: FastifyRequest<{ Params: { id: string } }>,
+  request: FastifyRequest<{ Params: FacilityParams }>,
   response: FastifyReply,
 ) {
   const { id } = request.params;
@@ -36,7 +36,7 @@ export async function getFacilityById(
   return response.code(200).send(facility);
 }
 export async function createFacility(
-  request: FastifyRequest<{ Body: CreateFacilityBody }>,
+  request: FastifyRequest<{ Body: CreateFacilityRequest }>,
   response: FastifyReply,
 ) {
   const {
@@ -52,23 +52,28 @@ export async function createFacility(
     email,
     images,
     workingHours,
+    isPublished,
   } = request.body;
 
-  const facility = await insertFacility(request.server.drizzle, {
-    name,
-    slug,
-    description,
-    category,
-    city,
-    address,
-    latitude,
-    longitude,
-    phone,
-    email,
-    images,
-    workingHours,
-    ownerId: request.user.id,
-  }).catch((err) => {
+  const facility = await insertFacility(
+    request.server.drizzle,
+    {
+      name,
+      slug,
+      description,
+      category,
+      city,
+      address,
+      latitude,
+      longitude,
+      phone,
+      email,
+      images,
+      workingHours,
+      isPublished,
+    },
+    request.user.id,
+  ).catch((err) => {
     request.log.error(err, 'Failed to create facility');
     return null;
   });
@@ -82,10 +87,10 @@ export async function createFacility(
   return response.status(201).send(facility);
 }
 export async function patchFacilityById(
-  request: FastifyRequest<{ Body: UpdateFacilityBody; Params: { id: string } }>,
+  request: FastifyRequest<{ Body: UpdateFacilityRequest; Params: FacilityParams }>,
   response: FastifyReply,
 ) {
-  const body = request.body as UpdateFacilityBody;
+  const body = request.body;
   const facility = await findFacilityById(request.server.drizzle, request.params.id);
 
   if (!facility) {
@@ -107,7 +112,7 @@ export async function patchFacilityById(
 }
 export async function removeFacilityById(
   request: FastifyRequest<{
-    Params: { id: string };
+    Params: FacilityParams;
   }>,
   response: FastifyReply,
 ) {

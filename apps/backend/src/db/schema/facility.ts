@@ -1,4 +1,7 @@
-import { facilityCategories } from '@slotbook/shared/facilities';
+import {
+  FACILITY_CATEGORIES,
+  type WeekSchedule,
+} from '@slotbook/shared/facilities';
 import {
   varchar,
   numeric,
@@ -16,14 +19,7 @@ import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'driz
 import z from 'zod';
 import type { Json } from 'drizzle-orm';
 
-export const facilityCategoryEnum = pgEnum(
-  'facility_category',
-  facilityCategories,
-);
-export type WorkingHours = Record<
-  'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun',
-  { open: string; close: string } | null
->;
+export const facilityCategoryEnum = pgEnum('facility_category', FACILITY_CATEGORIES);
 
 export const facilities = pgTable(
   'facilities',
@@ -38,14 +34,13 @@ export const facilities = pgTable(
     category: facilityCategoryEnum('category').notNull(),
     city: varchar({ length: 120 }).notNull(),
     address: varchar({ length: 255 }).notNull(),
-    latitude: numeric({ precision: 9, scale: 6 }),
-    longitude: numeric({ precision: 9, scale: 6 }),
+    latitude: numeric({ precision: 9, scale: 6, mode: 'number' }),
+    longitude: numeric({ precision: 9, scale: 6, mode: 'number' }),
     phone: varchar({ length: 32 }).notNull(),
     email: varchar({ length: 255 }).notNull(),
-    images: jsonb().$type<Json>().notNull(),
-    workingHours: jsonb('working_hours').$type<WorkingHours>().notNull(),
+    images: jsonb().$type<string[]>().notNull(),
+    workingHours: jsonb('working_hours').$type<WeekSchedule>().notNull(),
     isPublished: boolean('is_published').notNull().default(false),
-
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     // telegram_chat_id
@@ -55,43 +50,31 @@ export const facilities = pgTable(
     index('facilities_owner_idx').on(table.ownerId),
   ],
 );
-const dayScheduleSchema = z
-  .object({
-    open: z.string(),
-    close: z.string(),
-  })
-  .nullable();
-const weekScheduleSchema = z.object({
-  mon: dayScheduleSchema,
-  tue: dayScheduleSchema,
-  wed: dayScheduleSchema,
-  thu: dayScheduleSchema,
-  fri: dayScheduleSchema,
-  sat: dayScheduleSchema,
-  sun: dayScheduleSchema,
-});
-export const insertFacilitySchema = createInsertSchema(facilities, {
-  name: z.string().min(2).max(255),
-  slug: z
-    .string()
-    .min(2)
-    .max(255)
-    .regex(/^[a-z0-9-]+$/),
-  city: z.string().min(1),
-  address: z.string().min(1),
-  phone: z.string(),
-  email: z.email(),
-  workingHours: weekScheduleSchema,
-}).omit({
-  id: true,
-  ownerId: true,
-  createdAt: true,
-  updatedAt: true,
-});
-export type CreateFacilityBody = z.infer<typeof insertFacilitySchema>;
-export type FacilitySchemaType = typeof facilities.$inferSelect;
-export type FacilitySchema = z.infer<typeof selectFacilitySchema>;
-export const selectFacilitySchema = createSelectSchema(facilities);
 
-export const updateFacilitySchema = insertFacilitySchema.partial().strict();
-export type UpdateFacilityBody = z.infer<typeof updateFacilitySchema>;
+// export const insertFacilitySchema = createInsertSchema(facilities, {
+//   name: z.string().min(2).max(255),
+//   slug: z
+//     .string()
+//     .min(2)
+//     .max(255)
+//     .regex(/^[a-z0-9-]+$/),
+//   city: z.string().min(1),
+//   address: z.string().min(1),
+//   phone: z.string(),
+//   email: z.email(),
+//   workingHours: weekScheduleSchema,
+// }).omit({
+//   id: true,
+//   ownerId: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
+// export type CreateFacilityBody = z.infer<typeof insertFacilitySchema>;
+// export type FacilitySchemaType = typeof facilities.$inferSelect;
+// export type FacilitySchema = z.infer<typeof selectFacilitySchema>;
+// export const selectFacilitySchema = createSelectSchema(facilities);
+
+// export const updateFacilitySchema = insertFacilitySchema.partial().strict();
+// export type UpdateFacilityBody = z.infer<typeof updateFacilitySchema>;
+export type FacilityEntity = typeof facilities.$inferSelect;
+export type NewFacilityEntity = typeof facilities.$inferInsert;

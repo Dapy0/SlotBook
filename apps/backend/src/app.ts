@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import cors from '@fastify/cors';
-import Fastify, { fastify, type FastifyReply } from 'fastify';
+import Fastify from 'fastify';
 import { authRoutes } from './modules/auth/auth.routes.ts';
-import fastifyEnv, { type FastifyEnvOptions } from '@fastify/env';
+import fastifyEnv from '@fastify/env';
 import cookie from '@fastify/cookie';
 import {
   serializerCompiler,
@@ -11,50 +11,33 @@ import {
 } from 'fastify-type-provider-zod';
 import drizzlePlugin from './db/drizzlePlugin.ts';
 import fastifyJwt from '@fastify/jwt';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import jwtVerification from './plugins/jwtVerification.ts';
-import { bookingRoutes } from './modules/booking/booking.routes.ts';
 import { facilityRoutes } from './modules/facility/facility.routes.ts';
 import { serviceRoutes } from './modules/service/service.routes.ts';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const schema = {
-  type: 'object',
-  required: ['PORT', 'DATABASE_URL', 'JWT_SECRET_KEY'],
-  properties: {
-    PORT: {
-      type: 'number',
-    },
-    DATABASE_URL: {
-      type: 'string',
-    },
-    JWT_SECRET_KEY: {
-      type: 'string',
-    },
-  },
-};
-const options: FastifyEnvOptions = {
-  confKey: 'config',
-  schema: schema,
-  dotenv: {
-    path: path.join(__dirname, '../.env'),
-  },
-};
+import {
+  fastifyCookieOptions,
+  fastifyCorsOptions,
+  fastifyEnvOptions,
+  fastifyJwtOptions,
+} from './app.config.ts';
 
 export async function createServer() {
   const app = Fastify({
     logger: true,
   }).withTypeProvider<ZodTypeProvider>();
+
+  // validator and serializer
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
+
+  //Error handler
   app.setErrorHandler(function (error: any, request, reply) {
     request.log.error(error);
     if (error.validation) {
       return reply.status(400).send({
         statusCode: 400,
         error: 'Bad Request',
-        message: 'Ошибка валидации данных. Проверьте правильность полей.',
+        message: 'Data validation Error.',
         details: error.validation,
       });
     }
@@ -62,32 +45,22 @@ export async function createServer() {
     return reply.status(500).send({
       statusCode: 500,
       error: 'Internal Server Error',
-      message: 'На сервере произошла непредвиденная ошибка. Мы уже чиним!',
+      message: 'Some error happened on the server. We are fixing it.',
     });
   });
 
-  await app.register(cors, {
-    origin: 'http://localhost:3000',
-    credentials: true,
-  });
-  await app.register(fastifyEnv, options);
+  // Plugins
+  await app.register(cors, fastifyCorsOptions);
+  await app.register(fastifyEnv, fastifyEnvOptions);
+  await app.register(cookie, fastifyCookieOptions);
+  await app.register(fastifyJwt, fastifyJwtOptions);
   await app.register(drizzlePlugin);
-  await app.register(cookie, {
-    secret: app.config.JWT_SECRET_KEY,
-  });
-  await app.register(fastifyJwt, {
-    secret: app.config.JWT_SECRET_KEY ?? process.env.JWT_SECRET_KEY,
-    cookie: {
-      cookieName: 'token',
-      signed: false,
-      
-    },
-  });
   await app.register(jwtVerification);
+
+  // routes
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(facilityRoutes, { prefix: '/facilities' });
   await app.register(serviceRoutes, { prefix: '/facilities' });
-  // await app.register(bookingRoutes, { prefix: '/booking' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));
 

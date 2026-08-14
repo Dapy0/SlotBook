@@ -1,13 +1,7 @@
 import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
 import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
-import {
-  authResponseSchema,
-  type AuthResponse,
-  type LoginRequest,
-  type RegisterRequest,
-} from '@slotbook/shared/auth';
-import type { UserResponse } from '@slotbook/shared/user';
+import { type AuthResponse, type LoginRequest, type RegisterRequest } from '@slotbook/shared/auth';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -33,7 +27,7 @@ export const postAuthRegister = async (
     name: request.body.name,
     passwordHash,
     role: 'CLIENT',
-  }).catch((err) => console.log('Failed to Create User'));
+  })
   if (!user) {
     return response.code(400).send({ message: 'Failed to create user' });
   }
@@ -60,9 +54,7 @@ export const postAuthSignIn = async (
   const { email: typedEmail, password } = request.body;
 
   try {
-    const user = await findUserByEmail(request.server.drizzle, typedEmail).catch((err) =>
-      console.log('Failed to Find User'),
-    );
+    const user = await findUserByEmail(request.server.drizzle, typedEmail)
 
     if (!user) {
       console.log('No user found');

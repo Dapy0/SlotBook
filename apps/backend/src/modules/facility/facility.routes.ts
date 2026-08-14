@@ -7,15 +7,20 @@ import {
   patchFacilityById,
   removeFacilityById,
 } from './facility.controller.ts';
-import { facilityListQuerySchema } from './facility.schema.ts';
 import {
-  insertFacilitySchema,
-  selectFacilitySchema,
-  updateFacilitySchema,
-  type CreateFacilityBody,
-  type UpdateFacilityBody,
-} from '../../db/schema/facility.ts';
+  facilityListQuerySchema,
+  facilityParamsSchema,
+  type FacilityParams,
+} from './facility.schema.ts';
+
 import z from 'zod';
+import {
+  createFacilityRequestSchema,
+  facilityResponseSchema,
+  updateFacilityRequestSchema,
+  type CreateFacilityRequest,
+  type UpdateFacilityRequest,
+} from '@slotbook/shared/facilities';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -24,25 +29,11 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       schema: {
         querystring: facilityListQuerySchema,
         response: {
-          200: z.array(selectFacilitySchema),
+          200: z.array(facilityResponseSchema),
         },
       },
     },
     getFacilities,
-  );
-  fastify.get(
-    '/:id',
-    {
-      schema: {
-        params: z.object({
-          id: z.uuid(),
-        }),
-        response: {
-          200: selectFacilitySchema,
-        },
-      },
-    },
-    getFacilityById,
   );
   fastify.get(
     '/mine',
@@ -51,56 +42,67 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       schema: {
         querystring: facilityListQuerySchema,
         response: {
-          200: z.array(selectFacilitySchema),
+          200: z.array(facilityResponseSchema),
         },
       },
     },
     getOwnFacilities,
   );
+  fastify.get(
+    '/:id',
+    {
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    getFacilityById,
+  );
   fastify.post<{
-    Body: CreateFacilityBody;
+    Body: CreateFacilityRequest;
   }>(
     '/',
     {
       onRequest: [fastify.authenticate],
       schema: {
-        body: insertFacilitySchema,
+        body: createFacilityRequestSchema,
         response: {
-          201: selectFacilitySchema,
+          201: facilityResponseSchema,
         },
       },
     },
     createFacility,
   );
   fastify.patch<{
-    Body: UpdateFacilityBody;
-    Params: { id: string };
+    Body: UpdateFacilityRequest;
+    Params: FacilityParams;
   }>(
     '/:id',
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: z.object({
-          id: z.uuid(),
-        }),
-        body: updateFacilitySchema,
+        params: facilityParamsSchema,
+        body: updateFacilityRequestSchema,
         response: {
-          200: selectFacilitySchema,
+          200: facilityResponseSchema,
         },
       },
     },
     patchFacilityById,
   );
   fastify.delete<{
-    Params: { id: string };
+    Params: FacilityParams;
   }>(
     '/:id',
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: z.object({
-          id: z.uuid(),
-        }),
+        params: facilityParamsSchema,
+        response: {
+          204: z.null().describe('No Content'),
+        },
       },
     },
     removeFacilityById,

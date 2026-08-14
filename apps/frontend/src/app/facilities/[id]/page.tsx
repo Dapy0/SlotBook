@@ -1,5 +1,5 @@
+import { formatPrice } from '@/lib/utils';
 import { getFacilityById, getFacilityServicesById } from '@/services/facilities';
-import { formatPrice } from '@slotbook/shared/facilities';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

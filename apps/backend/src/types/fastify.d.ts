@@ -1,17 +1,11 @@
 import { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import '@fastify/jwt';
 import type { DB } from '../db/drizzlePlugin.ts';
+import type {EnvType} from '../app.config.ts'
 declare module 'fastify' {
-  interface FastifyInstance extends FastifyJwtNamespace<{
-    jwtDecode: 'securityJwtDecode';
-    jwtSign: 'securityJwtSign';
-    jwtVerify: 'securityJwtVerify';
-  }> {
-    config: {
-      PORT: number;
-      DATABASE_URL: string;
-      JWT_SECRET_KEY: string;
-    };
+  interface FastifyInstance{
+    config: EnvType;
     drizzle: DB;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
@@ -20,6 +14,6 @@ declare module 'fastify' {
 declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: { id: string; role: string };
-    user: { id: string; role: string }; 
+    user: { id: string; role: string };
   }
 }

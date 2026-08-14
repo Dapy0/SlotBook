@@ -1,16 +1,15 @@
 import { api } from '@/lib/api';
-import { ConsoleIcon } from '@hugeicons/core-free-icons';
-import type { CreateServicePayload, Facility, Service } from '@slotbook/shared/facilities';
+import type { CreateServicePayload, FacilityResponseDTO, Service } from '@slotbook/shared/facilities';
 
-export async function getFacilities(): Promise<Facility[]> {
-  const result = await api<Facility[]>('/facilities/', {
+export async function getFacilities(): Promise<FacilityResponseDTO[]> {
+  const result = await api<FacilityResponseDTO[]>('/facilities/', {
     method: 'GET',
   });
 
   return result;
 }
-export async function getFacilityById(id: string): Promise<Facility | null> {
-  return await api<Facility>(`/facilities/${id}`, {
+export async function getFacilityById(id: string): Promise<FacilityResponseDTO | null> {
+  return await api<FacilityResponseDTO>(`/facilities/${id}`, {
     method: 'GET',
   });
 }
@@ -32,9 +31,8 @@ export async function createService(
   });
 }
 
-export async function getMyFacilities(): Promise<Facility[]> {
-
-  const res = await api<Facility[] | null>(`/facilities/mine`, {
+export async function getMyFacilities(): Promise<FacilityResponseDTO[]> {
+  const res = await api<FacilityResponseDTO[] | null>(`/facilities/mine`, {
     method: 'GET',
   });
   return res ?? [];
