@@ -2,6 +2,7 @@
   "name": "@slotbook/shared",
   "private": true,
   "type": "module",
+  "main": "./src/index.ts",
   "exports": {
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
