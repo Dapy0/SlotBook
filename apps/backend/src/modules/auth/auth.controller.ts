@@ -1,6 +1,6 @@
 import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
 import bcrypt from 'bcrypt';
-import { findUserByEmail, findUserById, registerUser } from './db.ts';
+import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
 import {
   authResponseSchema,
   type AuthResponse,

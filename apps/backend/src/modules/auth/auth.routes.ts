@@ -1,5 +1,5 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './handler.ts';
+import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './auth.controller.ts';
 
 import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
 
