@@ -1,5 +1,6 @@
 import { formatPrice } from '@/lib/utils';
-import { getFacilityById, getFacilityServicesById } from '@/services/facilities';
+import { getFacilityById } from '@/services/facilities';
+import { getServicesByFacilityId } from '@/services/service';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -29,8 +30,8 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
     notFound();
   }
 
-  const services = await getFacilityServicesById(facility.id);
-
+  const services = await getServicesByFacilityId(facility.id);
+  console.log(facility.id, services);
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
       <span className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">

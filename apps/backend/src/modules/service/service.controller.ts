@@ -1,22 +1,24 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { getServicesById, insertService } from './service.repository.ts';
-import type { CreateServiceBody } from '../../db/schema/service.ts';
+import { getServicesByFacilityId, insertService } from './service.repository.ts';
 import { findFacilityById } from '../facility/facility.repository.ts';
+import type { ServiceParams } from './service.schema.ts';
+import type { CreateServiceRequest } from '@slotbook/shared/service';
+import type { NewServiceEntity } from '../../db/schema/service.ts';
 
 export async function getFacilityServices(
   request: FastifyRequest<{
-    Params: { id: string };
+    Params: ServiceParams;
   }>,
   response: FastifyReply,
 ) {
-  const id = request.params.id as string;
-  const services = await getServicesById(request.server.drizzle, id);
+  const id = request.params.id;
+  const services = await getServicesByFacilityId(request.server.drizzle, id);
   return response.status(200).send(services);
 }
 export async function createService(
   request: FastifyRequest<{
-    Params: { id: string };
-    Body: CreateServiceBody;
+    Params: ServiceParams;
+    Body: CreateServiceRequest;
   }>,
   response: FastifyReply,
 ) {
@@ -32,8 +34,11 @@ export async function createService(
   if (!isOwner) {
     return response.code(403).send({ message: 'Not owned facility' });
   }
-
-  const service = await insertService(request.server.drizzle, request.params.id, body);
+  const newServiceData: NewServiceEntity = {
+    ...body,
+    facilityId:request.params.id
+  };
+  const service = await insertService(request.server.drizzle, newServiceData);
 
   return response.status(201).send(service);
 }

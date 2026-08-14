@@ -55,25 +55,22 @@ export async function createFacility(
     isPublished,
   } = request.body;
 
-  const facility = await insertFacility(
-    request.server.drizzle,
-    {
-      name,
-      slug,
-      description,
-      category,
-      city,
-      address,
-      latitude,
-      longitude,
-      phone,
-      email,
-      images,
-      workingHours,
-      isPublished,
-    },
-    request.user.id,
-  ).catch((err) => {
+  const facility = await insertFacility(request.server.drizzle, {
+    name,
+    slug,
+    description,
+    category,
+    city,
+    address,
+    latitude,
+    longitude,
+    phone,
+    email,
+    images,
+    workingHours,
+    isPublished,
+    ownerId: request.user.id,
+  }).catch((err) => {
     request.log.error(err, 'Failed to create facility');
     return null;
   });

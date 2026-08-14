@@ -11,11 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import {
-  createServiceSchema,
   type CreateServiceFormInput,
   type CreateServiceFormValues,
 } from '@/lib/validations/service';
-import { createService, getFacilityServicesById, getMyFacilities } from '@/services/facilities';
+import { getMyFacilities } from '@/services/facilities';
 import {
   Select,
   SelectContent,
@@ -25,8 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FACILITY_CATEGORIES, type FacilityResponseDTO, type Service } from '@slotbook/shared/facilities';
+import { FACILITY_CATEGORIES, type FacilityResponseDTO } from '@slotbook/shared/facilities';
 import { formatPrice } from '@/lib/utils';
+import { createService, getServicesByFacilityId } from '@/services/service';
+import { createServiceSchema, type ServiceResponseDTO } from '@slotbook/shared/service';
 
 function generateCategoryObj() {
   const obj: Array<{ label: string; value: string | null }> = [
@@ -43,7 +44,7 @@ export default function FacilityDashboardPage() {
   const [isLoadingFacilities, setIsLoadingFacilities] = useState(true);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
 
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<ServiceResponseDTO[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -77,7 +78,7 @@ export default function FacilityDashboardPage() {
     if (!selectedFacilityId) return;
 
     setIsLoadingServices(true);
-    getFacilityServicesById(selectedFacilityId)
+    getServicesByFacilityId(selectedFacilityId)
       .then(setServices)
       .finally(() => setIsLoadingServices(false));
   }, [selectedFacilityId]);

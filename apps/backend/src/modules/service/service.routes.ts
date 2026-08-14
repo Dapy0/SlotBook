@@ -1,41 +1,38 @@
 import type { FastifyInstance } from 'fastify';
 import z from 'zod';
 import { createService, getFacilityServices } from './service.controller.ts';
+import { serviceParamsSchema, type ServiceParams } from './service.schema.ts';
 import {
-  insertServiceSchema,
-  selectServiceSchema,
-  type CreateServiceBody,
-} from '../../db/schema/service.ts';
+  createServiceSchema,
+  serviceResponseSchema,
+  type ServiceResponseDTO,
+} from '@slotbook/shared/service';
 
 export async function serviceRoutes(fastify: FastifyInstance) {
   fastify.get(
     '/:id/services',
     {
       schema: {
-        params: z.object({
-          id: z.uuid(),
-        }),
+        params: serviceParamsSchema,
         response: {
-          200: z.array(selectServiceSchema),
+          200: z.array(serviceResponseSchema),
         },
       },
     },
     getFacilityServices,
   );
   fastify.post<{
-    Params: { id: string };
-    Body: CreateServiceBody;
+    Params: ServiceParams;
+    Body: ServiceResponseDTO;
   }>(
     '/:id/services',
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: z.object({
-          id: z.uuid(),
-        }),
-        body: insertServiceSchema,
+        params: serviceParamsSchema,
+        body: createServiceSchema,
         response: {
-          201: selectServiceSchema,
+          201: serviceResponseSchema,
         },
       },
     },

@@ -20,7 +20,7 @@ export const services = pgTable(
       .notNull()
       .references(() => facilities.id, { onDelete: 'cascade' }),
     name: varchar({ length: 255 }).notNull(),
-    description: text(),
+    description: text().notNull(),
     category: varchar({ length: 255 }).notNull(),
 
     durationMinutes: integer('duration_minutes').notNull(),
@@ -36,21 +36,5 @@ export const services = pgTable(
   (table) => [index('services_facility_idx').on(table.facilityId)],
 );
 
-export const insertServiceSchema = createInsertSchema(services, {
-  name: z.string().min(2).max(255),
-  durationMinutes: z
-    .number()
-    .int()
-    .positive()
-    .max(24 * 60),
-  priceCents: z.number().int().nonnegative(),
-  currency: z.string().length(3).default('PLN'),
-}).omit({
-  id: true,
-  facilityId: true,
-  createdAt: true,
-  updatedAt: true,
-});
-export const selectServiceSchema = createSelectSchema(services);
-export type CreateServiceBody = z.infer<typeof insertServiceSchema>;
-export type ServiceSchemaType = z.infer<typeof selectServiceSchema>;
+export type ServiceEntity = typeof services.$inferSelect;
+export type NewServiceEntity = typeof services.$inferInsert;

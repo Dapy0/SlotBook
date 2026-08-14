@@ -1,7 +1,4 @@
-import {
-  FACILITY_CATEGORIES,
-  type WeekSchedule,
-} from '@slotbook/shared/facilities';
+import { FACILITY_CATEGORIES, type WeekSchedule } from '@slotbook/shared/facilities';
 import {
   varchar,
   numeric,
@@ -15,9 +12,6 @@ import {
   pgTable,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.ts';
-import { createInsertSchema, createSelectSchema, createUpdateSchema } from 'drizzle-orm/zod';
-import z from 'zod';
-import type { Json } from 'drizzle-orm';
 
 export const facilityCategoryEnum = pgEnum('facility_category', FACILITY_CATEGORIES);
 
@@ -50,31 +44,5 @@ export const facilities = pgTable(
     index('facilities_owner_idx').on(table.ownerId),
   ],
 );
-
-// export const insertFacilitySchema = createInsertSchema(facilities, {
-//   name: z.string().min(2).max(255),
-//   slug: z
-//     .string()
-//     .min(2)
-//     .max(255)
-//     .regex(/^[a-z0-9-]+$/),
-//   city: z.string().min(1),
-//   address: z.string().min(1),
-//   phone: z.string(),
-//   email: z.email(),
-//   workingHours: weekScheduleSchema,
-// }).omit({
-//   id: true,
-//   ownerId: true,
-//   createdAt: true,
-//   updatedAt: true,
-// });
-// export type CreateFacilityBody = z.infer<typeof insertFacilitySchema>;
-// export type FacilitySchemaType = typeof facilities.$inferSelect;
-// export type FacilitySchema = z.infer<typeof selectFacilitySchema>;
-// export const selectFacilitySchema = createSelectSchema(facilities);
-
-// export const updateFacilitySchema = insertFacilitySchema.partial().strict();
-// export type UpdateFacilityBody = z.infer<typeof updateFacilitySchema>;
 export type FacilityEntity = typeof facilities.$inferSelect;
 export type NewFacilityEntity = typeof facilities.$inferInsert;

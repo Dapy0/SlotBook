@@ -1,6 +1,10 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
-import { facilities, type FacilityEntity } from '../../db/schema/facility.ts';
+import {
+  facilities,
+  type FacilityEntity,
+  type NewFacilityEntity,
+} from '../../db/schema/facility.ts';
 import type {
   CreateFacilityRequest,
   FacilityResponseDTO,
@@ -22,14 +26,10 @@ export async function findFacilitiesByOwnerId(
   return db.select().from(facilities).where(eq(facilities.ownerId, ownerId));
 }
 
-export async function insertFacility(
-  db: DB,
-  data: CreateFacilityRequest,
-  ownerId: string,
-): Promise<FacilityEntity> {
+export async function insertFacility(db: DB, data: NewFacilityEntity): Promise<FacilityEntity> {
   const [facility] = await db
     .insert(facilities)
-    .values({ ...data, ownerId })
+    .values({ ...data })
     .returning();
   if (!facility) {
     throw new Error('Failed to insert facility');
