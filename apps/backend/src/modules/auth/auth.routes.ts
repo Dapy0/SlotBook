@@ -2,6 +2,7 @@ import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fa
 import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './auth.controller.ts';
 
 import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
+import z from 'zod';
 
 export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -11,6 +12,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         body: registerSchema,
         response: {
           201: authResponseSchema,
+          // 400: {message:z.string()}
         },
       },
     },

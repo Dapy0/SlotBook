@@ -73,7 +73,7 @@ export const postAuthSignIn = async (
     const user = await findUserByEmail(request.server.drizzle, typedEmail);
 
     if (!user) {
-      return response.code(400).send({ message: 'No user found' });
+      return response.code(404).send({ message: 'No user found' });
     }
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
