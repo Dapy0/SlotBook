@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "tsx watch --watch src src/index.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "test": "vitest"
   },
   "dependencies": {
     "@fastify/caching": "^9.0.4",
@@ -31,6 +32,7 @@
     "@types/pg": "^8.20.4",
     "drizzle-kit": "^1.0.0-rc.4",
     "tsx": "^4.23.11",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   }
 }
