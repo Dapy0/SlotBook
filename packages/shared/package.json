@@ -3,10 +3,16 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
+  "scripts": {
+    "test": "vitest"
+  },
   "exports": {
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
     "./facilities": "./src/facilities.ts",
     "./service": "./src/service.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.10"
   }
 }

@@ -8,7 +8,8 @@
     "build": "npm run build --workspaces",
     "backend:generate": "npm run db:generate --workspace=apps/backend",
     "backend:migrate": "npm run db:migrate --workspace=apps/backend",
-    "backend:test": "npm run test --workspace=apps/backend"
+    "backend:test": "npm run test --workspace=apps/backend",
+    "shared:test": "npm run test --workspace=packages/shared"
   },
   "workspaces": [
     "apps/*",
