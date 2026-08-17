@@ -1,10 +1,9 @@
-import { boolean, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, timestamp, uuid, primaryKey } from 'drizzle-orm/pg-core';
 import { staffMembers } from './staffMember.ts';
 import { services } from './service.ts';
-import { primaryKey } from 'drizzle-orm/cockroach-core';
 
 export const staffServices = pgTable(
-  'staff_members',
+  'staff_services',
   {
     staffMemberId: uuid('staff_member_id')
       .notNull()

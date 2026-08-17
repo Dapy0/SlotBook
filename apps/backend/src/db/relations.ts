@@ -31,7 +31,7 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.staffServices.staffMemberId,
       to: r.staffMembers.id,
     }),
-    serviceId: r.one.services({
+    service: r.one.services({
       from: r.staffServices.serviceId,
       to: r.services.id,
     }),
