@@ -29,8 +29,8 @@ export const services = pgTable(
 
     isActive: boolean('is_active').notNull().default(true),
 
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     // telegram_chat_id
   },
   (table) => [index('services_facility_idx').on(table.facilityId)],

@@ -35,8 +35,8 @@ export const facilities = pgTable(
     images: jsonb().$type<string[]>().notNull(),
     workingHours: jsonb('working_hours').$type<WeekSchedule>().notNull(),
     isPublished: boolean('is_published').notNull().default(false),
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     // telegram_chat_id
   },
   (table) => [
