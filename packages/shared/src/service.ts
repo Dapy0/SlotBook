@@ -1,5 +1,4 @@
 import z from 'zod';
-import { createFacilityRequestSchema } from './facilities';
 
 // Request DTOs
 export const createServiceSchema = z.object({
