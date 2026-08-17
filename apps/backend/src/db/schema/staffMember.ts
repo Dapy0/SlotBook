@@ -1,6 +1,6 @@
 import { boolean, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { facilities } from './facility.ts';
 import { users } from './user.ts';
+import { facilities } from './facility.ts';
 
 export const staffMembers = pgTable('staff_members', {
   id: uuid().defaultRandom().primaryKey(),
@@ -18,3 +18,5 @@ export const staffMembers = pgTable('staff_members', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+export type StaffMemberEntity = typeof staffMembers.$inferSelect;
+export type NewStaffMemberEntity = typeof staffMembers.$inferInsert;
