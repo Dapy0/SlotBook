@@ -30,7 +30,6 @@ export const postAuthRegister = async (
     email: request.body.email,
     name: request.body.name,
     passwordHash,
-    role: 'CLIENT',
   }).catch((err) => {
     if (err.code === '23505') {
       return { error: 'EMAIL_TAKEN' as const };
@@ -47,8 +46,8 @@ export const postAuthRegister = async (
   if (!user) {
     return response.code(400).send({ message: 'Failed to create user' });
   }
-  const token = request.server.jwt.sign({ id: user.id, role: user.role });
-  const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
+  const token = request.server.jwt.sign({ id: user.id });
+  const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
   setAuthCookie(response, token);
   const responseData: AuthResponseDTO = {
     user: {
@@ -56,7 +55,7 @@ export const postAuthRegister = async (
       createdAt,
       email,
       id,
-      role,
+
       updatedAt,
     },
   };
@@ -80,8 +79,8 @@ export const postAuthSignIn = async (
       return response.status(401).send({ message: 'Incorrect Password' });
     }
 
-    const token = request.server.jwt.sign({ id: user.id, role: user.role });
-    const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
+    const token = request.server.jwt.sign({ id: user.id });
+    const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
 
     setAuthCookie(response, token);
 
@@ -91,7 +90,7 @@ export const postAuthSignIn = async (
         createdAt,
         email,
         id,
-        role,
+
         updatedAt,
       },
     };
@@ -107,14 +106,13 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
     return response.code(404).send({ message: 'User not found' });
   }
 
-  const { passwordHash: _, name, createdAt, email, id, role, updatedAt } = user;
+  const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
   const responseData: AuthResponseDTO = {
     user: {
       name,
       createdAt,
       email,
       id,
-      role,
       updatedAt,
     },
   };

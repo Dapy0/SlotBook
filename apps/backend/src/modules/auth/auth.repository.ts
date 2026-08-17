@@ -1,25 +1,23 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
-import { users, type roleEnums, type UserEntity } from '../../db/schema/index.ts';
+import { users, type UserEntity } from '../../db/schema/index.ts';
 
 type RegisterDbParams = {
   name: string;
   email: string;
   passwordHash: string;
-  role: (typeof roleEnums)[number];
 };
 export const registerUser = async (
   db: DB,
   userData: RegisterDbParams,
 ): Promise<UserEntity > => {
-  const { email, name, passwordHash, role } = userData;
+  const { email, name, passwordHash } = userData;
   const [newUser] = await db
     .insert(users)
     .values({
       email,
       name,
       passwordHash,
-      role,
     })
     .returning();
   if (!newUser) {
