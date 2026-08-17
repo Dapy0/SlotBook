@@ -10,7 +10,9 @@
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
     "./facilities": "./src/facilities.ts",
-    "./service": "./src/service.ts"
+    "./service": "./src/service.ts",
+    "./staffMembers": "./src/staffMembers.ts",
+    "./staffServices": "./src/staffServices.ts"
   },
   "devDependencies": {
     "vitest": "^4.1.10"

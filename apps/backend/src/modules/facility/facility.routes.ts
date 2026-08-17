@@ -21,6 +21,7 @@ import {
   type CreateFacilityRequest,
   type UpdateFacilityRequest,
 } from '@slotbook/shared/facilities';
+import { staffRoutes } from '../staff/staff.routes.ts';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -107,4 +108,5 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     },
     removeFacilityById,
   );
+  fastify.register(staffRoutes, { prefix: '/' });
 }
