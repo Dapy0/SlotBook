@@ -1,11 +1,9 @@
-import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
-import bcrypt from 'bcrypt';
-import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
+import {  type FastifyReply, type FastifyRequest } from 'fastify';
 import {
-  type AuthResponseDTO,
   type LoginRequest,
   type RegisterRequest,
 } from '@slotbook/shared/auth';
+import { authorizeUser, signInUser, signUpUser } from './auth.service.ts';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -24,102 +22,32 @@ export const postAuthRegister = async (
   request: FastifyRequest<{ Body: RegisterRequest }>,
   response: FastifyReply,
 ) => {
-  const passwordHash = await bcrypt.hash(request.body.password, 10);
-
-  const user = await registerUser(request.server.drizzle, {
-    email: request.body.email,
-    name: request.body.name,
-    passwordHash,
-  }).catch((err) => {
-    if (err.code === '23505') {
-      return { error: 'EMAIL_TAKEN' as const };
-    }
-    request.log.error(err, 'Failed to create user');
-    return { error: 'UNKNOWN' as const };
-  });
-
-  if ('error' in user) {
-    const message =
-      user.error === 'EMAIL_TAKEN' ? 'This email is already registered' : 'Failed to create user';
-    return response.code(400).send({ message });
-  }
-  if (!user) {
-    return response.code(400).send({ message: 'Failed to create user' });
-  }
-  const token = request.server.jwt.sign({ id: user.id });
-  const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
+  const { token, userObject } = await signUpUser(
+    request.server.drizzle,
+    request.server.jwt,
+    request.body,
+  );
   setAuthCookie(response, token);
-  const responseData: AuthResponseDTO = {
-    user: {
-      name,
-      createdAt,
-      email,
-      id,
-
-      updatedAt,
-    },
-  };
-
-  return response.code(201).send(responseData);
+  return response.code(201).send(userObject);
 };
-export const postAuthSignIn = async (
+export const postAuthLogin = async (
   request: FastifyRequest<{ Body: LoginRequest }>,
   response: FastifyReply,
 ) => {
-  const { email: typedEmail, password } = request.body;
-
-  try {
-    const user = await findUserByEmail(request.server.drizzle, typedEmail);
-
-    if (!user) {
-      return response.code(404).send({ message: 'No user found' });
-    }
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isPasswordValid) {
-      return response.status(401).send({ message: 'Incorrect Password' });
-    }
-
-    const token = request.server.jwt.sign({ id: user.id });
-    const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
-
-    setAuthCookie(response, token);
-
-    const responseData: AuthResponseDTO = {
-      user: {
-        name,
-        createdAt,
-        email,
-        id,
-
-        updatedAt,
-      },
-    };
-    return response.code(200).send(responseData);
-  } catch (e) {
-    throw e;
-  }
+  const { token, userObject } = await signInUser(
+    request.server.drizzle,
+    request.server.jwt,
+    request.body,
+  );
+  setAuthCookie(response, token);
+  return response.send(userObject);
 };
 export const getAuthMe = async (request: FastifyRequest, response: FastifyReply) => {
-  const user = await findUserById(request.server.drizzle, request.user.id);
-
-  if (!user) {
-    return response.code(404).send({ message: 'User not found' });
-  }
-
-  const { passwordHash: _, name, createdAt, email, id, updatedAt } = user;
-  const responseData: AuthResponseDTO = {
-    user: {
-      name,
-      createdAt,
-      email,
-      id,
-      updatedAt,
-    },
-  };
+  const {userObject} = await authorizeUser(request.server.drizzle, request.user.id);
   response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-  return response.code(200).send(responseData);
+  return response.send(userObject);
 };
 export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
   response.clearCookie('token', { path: '/' });
-  return response.status(200).send({ message: 'Logged out' });
+  return response.send({ message: 'Logged out' });
 };

@@ -21,7 +21,7 @@ export const registerUser = async (
     })
     .returning();
   if (!newUser) {
-    throw new Error('Failed to insert user: no record returned');
+    throw new Error('Failed to insert user');
   }
   return newUser;
 };

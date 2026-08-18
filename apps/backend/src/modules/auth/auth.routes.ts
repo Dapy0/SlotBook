@@ -1,5 +1,5 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { getAuthMe, postAuthLogout, postAuthRegister, postAuthSignIn } from './auth.controller.ts';
+import { getAuthMe, postAuthLogout, postAuthRegister, postAuthLogin } from './auth.controller.ts';
 
 import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
 import z from 'zod';
@@ -12,7 +12,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         body: registerSchema,
         response: {
           201: authResponseSchema,
-          // 400: {message:z.string()}
         },
       },
     },
@@ -29,7 +28,7 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    postAuthSignIn,
+    postAuthLogin,
   );
   fastify.get(
     '/me',
@@ -43,5 +42,5 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     getAuthMe,
   );
-  fastify.get('/logout', postAuthLogout);
+  fastify.post('/logout', postAuthLogout);
 }
