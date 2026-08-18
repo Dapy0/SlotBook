@@ -10,11 +10,7 @@ export class AppError extends Error {
     this.name = this.constructor.name;
   }
 }
-export class CRUDOperationFailed extends AppError {
-  constructor(message = 'FAILED to do CRUD operation') {
-    super(404, 'CRUD_FAILED', message);
-  }
-}
+
 export class NotFoundError extends AppError {
   constructor(message = 'Resource not found') {
     super(404, 'NOT_FOUND', message);

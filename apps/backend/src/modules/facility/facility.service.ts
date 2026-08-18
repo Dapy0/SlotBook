@@ -60,11 +60,6 @@ export async function updateOwnedFacility(
   data: UpdateFacilityRequest,
 ) {
   await checkFacilityOwnership(db, facilityId, userId);
-  // try{
-
-  // }catch(e){
-
-  // }
 
   const updatedFacility = await updateFacilityById(db, facilityId, data);
 
