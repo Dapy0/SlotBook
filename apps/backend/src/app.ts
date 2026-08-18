@@ -22,6 +22,7 @@ import {
 } from './app.config.ts';
 import fastifyEtag from '@fastify/etag';
 import fastifyCaching from '@fastify/caching';
+import { AppError } from './lib/errors.ts';
 
 export async function createServer() {
   const app = Fastify({
@@ -43,12 +44,10 @@ export async function createServer() {
         details: error.validation,
       });
     }
-
-    return reply.status(500).send({
-      statusCode: 500,
-      error: 'Internal Server Error',
-      message: 'Some error happened on the server. We are fixing it.',
-    });
+    if (error instanceof AppError) {
+      return reply.status(error.statusCode).send({ code: error.code, message: error.message });
+    }
+    return reply.status(500).send({ message: 'Internal server error' });
   });
 
   // Plugins

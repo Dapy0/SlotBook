@@ -1,0 +1,38 @@
+
+
+export class AppError extends Error {
+  constructor(
+    public statusCode: number,
+    public code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+export class CRUDOperationFailed extends AppError {
+  constructor(message = 'FAILED to do CRUD operation') {
+    super(404, 'CRUD_FAILED', message);
+  }
+}
+export class NotFoundError extends AppError {
+  constructor(message = 'Resource not found') {
+    super(404, 'NOT_FOUND', message);
+  }
+}
+export class ForbiddenError extends AppError {
+  constructor(message = 'Access denied') {
+    super(403, 'FORBIDDEN', message);
+  }
+}
+
+export class ConflictError extends AppError {
+  constructor(message = 'Conflict') {
+    super(409, 'CONFLICT', message);
+  }
+}
+export class BadRequestError extends AppError {
+  constructor(message = 'Bad request') {
+    super(400, 'BAD_REQUEST', message);
+  }
+}

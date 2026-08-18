@@ -9,120 +9,64 @@ import {
 } from './facility.repository.ts';
 import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facilities';
 import type { FacilityParams } from './facility.schema.ts';
+import {
+  createFacilityByUserId,
+  getAllPublicFacilities,
+  getFacilityDetails,
+  getOwnFacilitiesByUserId,
+  removeOwnedFacilityById,
+  updateOwnedFacility,
+} from './facility.service.ts';
 
-export async function getFacilities(request: FastifyRequest, response: FastifyReply) {
-  const facilities = await findAllFacilities(request.server.drizzle);
-
+export async function getAllFacilities(request: FastifyRequest, response: FastifyReply) {
+  const facilities = await getAllPublicFacilities(request.server.drizzle);
   response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');
-  return response.status(200).send(facilities);
-}
-export async function getOwnFacilities(request: FastifyRequest, response: FastifyReply) {
-  const facilities = await findFacilitiesByOwnerId(request.server.drizzle, request.user.id);
-  response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-  return response.status(200).send(facilities);
+  return response.send(facilities);
 }
 export async function getFacilityById(
   request: FastifyRequest<{ Params: FacilityParams }>,
   response: FastifyReply,
 ) {
-  const { id } = request.params;
-  const facility = await findFacilityById(request.server.drizzle, id);
-
-  if (!facility) {
-    return response.status(404).send({ message: 'Facility not found' });
-  }
+  const facility = await getFacilityDetails(request.server.drizzle, request.params.id);
   response.header('Cache-Control', 'public, no-cache');
-  return response.code(200).send(facility);
+  return response.send(facility);
+}
+export async function getOwnFacilities(request: FastifyRequest, response: FastifyReply) {
+  const facilities = await getOwnFacilitiesByUserId(request.server.drizzle, request.user.id);
+  response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  return response.send(facilities);
 }
 export async function createFacility(
   request: FastifyRequest<{ Body: CreateFacilityRequest }>,
   response: FastifyReply,
 ) {
-  const {
-    name,
-    slug,
-    description,
-    category,
-    city,
-    address,
-    latitude,
-    longitude,
-    phone,
-    email,
-    images,
-    workingHours,
-    isPublished,
-  } = request.body;
-
-  const facility = await insertFacility(request.server.drizzle, {
-    name,
-    slug,
-    description,
-    category,
-    city,
-    address,
-    latitude,
-    longitude,
-    phone,
-    email,
-    images,
-    workingHours,
-    isPublished,
-    ownerId: request.user.id,
-  }).catch((err) => {
-    request.log.error(err, 'Failed to create facility');
-    return null;
-  });
-
-  if (!facility) {
-    return response
-      .status(400)
-      .send({ message: 'Failed to create facility. Slug may already be taken.' });
-  }
-
+  const facility = await createFacilityByUserId(
+    request.server.drizzle,
+    request.body,
+    request.user.id,
+  );
   return response.status(201).send(facility);
 }
 export async function patchFacilityById(
   request: FastifyRequest<{ Body: UpdateFacilityRequest; Params: FacilityParams }>,
   response: FastifyReply,
 ) {
-  const body = request.body;
-  const facility = await findFacilityById(request.server.drizzle, request.params.id);
-
-  if (!facility) {
-    return response.code(404).send({ message: 'Facility not found' });
-  }
-  const isOwner = request.user.id === facility.ownerId;
-
-  if (!isOwner) {
-    return response.code(403).send({ message: 'Not owned facility' });
-  }
-
-  const updatedFacility = await updateFacilityById(request.server.drizzle, request.params.id, body);
-
-  if (!updatedFacility) {
-    return response.status(404).send({ message: 'Facility not found' });
-  }
-
-  return response.status(200).send(updatedFacility);
+  const updated = await updateOwnedFacility(
+    request.server.drizzle,
+    request.params.id,
+    request.user.id,
+    request.body,
+  );
+  return response.status(200).send(updated);
 }
+
 export async function removeFacilityById(
   request: FastifyRequest<{
     Params: FacilityParams;
   }>,
   response: FastifyReply,
 ) {
-  const facility = await findFacilityById(request.server.drizzle, request.params.id);
-
-  if (!facility) {
-    return response.code(404).send({ message: 'Facility not found' });
-  }
-  const isOwner = request.user.id === facility.ownerId;
-
-  if (!isOwner) {
-    return response.code(403).send({ message: 'Not owned facility' });
-  }
-  await deleteFacilityById(request.server.drizzle, request.params.id);
+  await removeOwnedFacilityById(request.server.drizzle, request.params.id, request.user.id);
 
   return response.status(204).send();
 }

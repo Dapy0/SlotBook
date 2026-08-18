@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import {
   createFacility,
-  getFacilities,
+  getAllFacilities,
   getFacilityById,
   getOwnFacilities,
   patchFacilityById,
@@ -24,6 +24,7 @@ import {
 import { staffRoutes } from '../staff/staff.routes.ts';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
+
   fastify.get(
     '/',
     {
@@ -34,7 +35,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getFacilities,
+    getAllFacilities,
   );
   fastify.get(
     '/mine',
