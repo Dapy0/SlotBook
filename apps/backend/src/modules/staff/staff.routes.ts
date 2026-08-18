@@ -25,12 +25,12 @@ export async function staffRoutes(fastify: FastifyInstance) {
 
   fastify.post<{ Params: StaffParams; Body: StaffBody }>(
     '/:id/staff',
-    // [fastify.authenticate, requireFacilityOwnership],
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: staffParamsSchema,
         body: staffBodySchema,
+        response: { 201: staffMemberResponseSchema },
       },
     },
     addStaffToFacility,

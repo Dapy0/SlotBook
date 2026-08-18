@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import { staffMembers } from '../../db/schema/staffMember.ts';
-import { facilities } from '../../db/schema/facility.ts';
 import { staffServices } from '../../db/schema/staffService.ts';
 import { services } from '../../db/schema/service.ts';
 
