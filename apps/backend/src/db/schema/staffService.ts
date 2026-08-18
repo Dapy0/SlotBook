@@ -1,4 +1,4 @@
-import { boolean, pgTable, timestamp, uuid, primaryKey } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, timestamp, uuid, primaryKey, index } from 'drizzle-orm/pg-core';
 import { staffMembers } from './staffMember.ts';
 import { services } from './service.ts';
 
@@ -12,7 +12,10 @@ export const staffServices = pgTable(
       .notNull()
       .references(() => services.id, { onDelete: 'cascade' }),
   },
-  (table) => [primaryKey({ columns: [table.staffMemberId, table.serviceId] })],
+  (table) => [
+    primaryKey({ columns: [table.staffMemberId, table.serviceId] }),
+    index('staff_services_service_idx').on(table.serviceId),
+  ],
 );
 
 export type StaffServiceEntity = typeof staffServices.$inferSelect;
