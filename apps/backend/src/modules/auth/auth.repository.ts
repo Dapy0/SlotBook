@@ -26,11 +26,11 @@ export const registerUser = async (
   return newUser;
 };
 
-export const findUserByEmail = async (db: DB, email: string): Promise<UserEntity | undefined> => {
+export const findUserByEmail = async (db: DB, email: string): Promise<UserEntity | null> => {
   const [newUser] = await db.select().from(users).where(eq(users.email, email));
-  return newUser;
+  return newUser ?? null;
 };
-export const findUserById = async (db: DB, id: string): Promise<UserEntity | undefined> => {
+export const findUserById = async (db: DB, id: string): Promise<UserEntity | null> => {
   const [newUser] = await db.select().from(users).where(eq(users.id, id));
-  return newUser;
+  return newUser ?? null;
 };
