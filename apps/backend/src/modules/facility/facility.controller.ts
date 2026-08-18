@@ -1,12 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import {
-  deleteFacilityById,
-  findAllFacilities,
-  findFacilitiesByOwnerId,
-  findFacilityById,
-  insertFacility,
-  updateFacilityById,
-} from './facility.repository.ts';
+
 import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facilities';
 import type { FacilityParams } from './facility.schema.ts';
 import {

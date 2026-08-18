@@ -10,7 +10,6 @@ import {
 } from './facility.repository.ts';
 import {
   ConflictError,
-  CRUDOperationFailed,
   ForbiddenError,
   NotFoundError,
 } from '../../lib/errors.ts';
@@ -31,7 +30,7 @@ export async function getAllPublicFacilities(db: DB) {
   return findAllFacilities(db);
 }
 export async function getFacilityDetails(db: DB, facilityId: string) {
-  const facility = findFacilityById(db, facilityId);
+  const facility = await findFacilityById(db, facilityId);
   if (!facility) {
     throw new NotFoundError('Facility not found');
   }

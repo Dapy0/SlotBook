@@ -6,8 +6,6 @@ import {
   type NewFacilityEntity,
 } from '../../db/schema/facility.ts';
 import type {
-  CreateFacilityRequest,
-  FacilityResponseDTO,
   UpdateFacilityRequest,
 } from '@slotbook/shared/facilities';
 
