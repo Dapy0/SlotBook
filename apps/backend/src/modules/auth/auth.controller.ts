@@ -22,30 +22,30 @@ export const postAuthRegister = async (
   request: FastifyRequest<{ Body: RegisterRequest }>,
   response: FastifyReply,
 ) => {
-  const { token, userObject } = await signUpUser(
+  const { token, user } = await signUpUser(
     request.server.drizzle,
     request.server.jwt,
     request.body,
   );
   setAuthCookie(response, token);
-  return response.code(201).send(userObject);
+  return response.code(201).send({user: user});
 };
 export const postAuthLogin = async (
   request: FastifyRequest<{ Body: LoginRequest }>,
   response: FastifyReply,
 ) => {
-  const { token, userObject } = await signInUser(
+  const { token, user } = await signInUser(
     request.server.drizzle,
     request.server.jwt,
     request.body,
   );
   setAuthCookie(response, token);
-  return response.send(userObject);
+  return response.send({ user: user });
 };
 export const getAuthMe = async (request: FastifyRequest, response: FastifyReply) => {
-  const {userObject} = await authorizeUser(request.server.drizzle, request.user.id);
+  const { user } = await authorizeUser(request.server.drizzle, request.user.id);
   response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-  return response.send(userObject);
+  return response.send({ user: user });
 };
 export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
   response.clearCookie('token', { path: '/' });

@@ -2,8 +2,15 @@ import type { AuthResponseDTO, LoginRequest, RegisterRequest } from '@slotbook/s
 import type { DB } from '../../db/drizzlePlugin.ts';
 import bcrypt from 'bcrypt';
 import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
-import { BadRequestError, ConflictError, NotFoundError } from '../../lib/errors.ts';
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../../lib/errors.ts';
 import type { FastifyInstance, FastifyReply } from 'fastify';
+import { DrizzleQueryError } from 'drizzle-orm';
+import { DatabaseError } from 'pg';
 
 type JWT = FastifyInstance['jwt'];
 export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
@@ -13,9 +20,12 @@ export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
     ...data,
     passwordHash,
   }).catch((e) => {
-    if ((e as Error).message?.includes('unique')) {
-      throw new ConflictError('Email already taken');
+    if (e?.cause instanceof DatabaseError) {
+      if (e.cause.code === '23505') {
+        throw new ConflictError('Email already taken!');
+      }
     }
+
     throw e;
   });
 
@@ -23,7 +33,7 @@ export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
   const { passwordHash: _, ...newUser } = user;
 
   return {
-    userObject: { user: { ...newUser } },
+    user: newUser,
     token,
   };
 }
@@ -36,14 +46,14 @@ export async function signInUser(db: DB, jwt: JWT, data: LoginRequest) {
   }
   const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
   if (!isPasswordValid) {
-    throw new BadRequestError('Password is incorrect');
+    throw new UnauthorizedError('Password is incorrect');
   }
 
   const token = jwt.sign({ id: user.id });
   const { passwordHash: _, ...newUser } = user;
 
   return {
-    userObject: { user: { ...newUser } },
+    user: newUser,
     token,
   };
 }
@@ -56,6 +66,6 @@ export async function authorizeUser(db: DB, userId: string) {
 
   const { passwordHash: _, ...newUser } = user;
   return {
-    userObject: { user: { ...newUser } } as AuthResponseDTO,
+    user: newUser,
   };
 }

@@ -38,10 +38,8 @@ export async function createServer() {
     request.log.error(error);
     if (error.validation) {
       return reply.status(400).send({
-        statusCode: 400,
-        error: 'Bad Request',
+        code: 'BAD_REQUEST',
         message: 'Data validation Error.',
-        details: error.validation,
       });
     }
     if (error instanceof AppError) {

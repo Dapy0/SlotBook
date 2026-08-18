@@ -48,7 +48,7 @@ describe('POST auth/register', () => {
     expect(setCookie).toContain('token=');
     expect(setCookie).toContain('HttpOnly');
   });
-  test('rejects second registration with same email and returns 400', async () => {
+  test('rejects second registration with same email and returns 409', async () => {
     await app.inject({
       method: 'POST',
       url: '/auth/register',
@@ -59,7 +59,7 @@ describe('POST auth/register', () => {
       url: '/auth/register',
       payload: { name: 'Test', email: 'test@test.com', password: 'password123' },
     });
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(409);
   });
   test('rejects invalid email', async () => {
     const response = await app.inject({
