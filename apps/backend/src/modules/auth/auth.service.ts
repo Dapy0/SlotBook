@@ -20,10 +20,9 @@ export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
     ...data,
     passwordHash,
   }).catch((e) => {
-    if (e?.cause instanceof DatabaseError) {
-      if (e.cause.code === '23505') {
-        throw new ConflictError('Email already taken!');
-      }
+    const pgError = (e as any)?.cause ?? e;
+    if (pgError?.code === '23505') {
+      throw new ConflictError('Email already exists');
     }
 
     throw e;

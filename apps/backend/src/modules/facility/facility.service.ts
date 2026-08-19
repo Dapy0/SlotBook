@@ -6,13 +6,10 @@ import {
   findFacilityById,
   insertFacility,
   updateFacilityById,
-   deleteFacilityById,
+  deleteFacilityById,
 } from './facility.repository.ts';
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from '../../lib/errors.ts';
+import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
+import { DrizzleError } from 'drizzle-orm';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -46,9 +43,11 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
       ownerId: userId,
     });
   } catch (e) {
-    if ((e as Error).message?.includes('unique')) {
-      throw new ConflictError('Slug already taken');
+    const pgError = (e as any)?.cause ?? e; 
+    if (pgError?.code === '23505') {
+      throw new ConflictError('Slug already exists');
     }
+
     throw e;
   }
 }
@@ -69,12 +68,12 @@ export async function updateOwnedFacility(
   return updatedFacility;
 }
 
-export async function removeOwnedFacilityById(db: DB, facilityId: string, userId: string){
-  await checkFacilityOwnership(db, facilityId, userId)
+export async function removeOwnedFacilityById(db: DB, facilityId: string, userId: string) {
+  await checkFacilityOwnership(db, facilityId, userId);
 
-  const deletedFacility = await deleteFacilityById(db, facilityId)
+  const deletedFacility = await deleteFacilityById(db, facilityId);
   if (!deletedFacility) {
     throw new NotFoundError('Facility not found');
   }
   return deletedFacility;
-};
+}

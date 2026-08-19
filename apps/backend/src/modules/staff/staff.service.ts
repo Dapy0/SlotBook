@@ -22,9 +22,11 @@ export async function addNewStaffMembersToFacilityById(
     const newStaff = await insertStaffMemberById(db, user.id, facilityId);
     return newStaff;
   } catch (e) {
-    if ((e as Error).message?.includes('unique')) {
-      throw new ConflictError('This user is already working here');
+    const pgError = (e as any)?.cause ?? e;
+    if (pgError?.code === '23505') {
+      throw new ConflictError('User already working here');
     }
+
     throw e;
   }
 }
