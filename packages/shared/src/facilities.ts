@@ -18,13 +18,13 @@ const dayScheduleSchema = z
   })
   .nullable();
 const weekScheduleSchema = z.object({
-  mon: dayScheduleSchema,
-  tue: dayScheduleSchema,
-  wed: dayScheduleSchema,
-  thu: dayScheduleSchema,
-  fri: dayScheduleSchema,
-  sat: dayScheduleSchema,
-  sun: dayScheduleSchema,
+  1: dayScheduleSchema,
+  2: dayScheduleSchema,
+  3: dayScheduleSchema,
+  4: dayScheduleSchema,
+  5: dayScheduleSchema,
+  6: dayScheduleSchema,
+  7: dayScheduleSchema,
 });
 export type WeekSchedule = z.infer<typeof weekScheduleSchema>;
 
