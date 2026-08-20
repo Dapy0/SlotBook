@@ -1,10 +1,10 @@
 import z from 'zod';
 
 // Request DTOs
-
-const staffScheduleSchema = z.object({
+const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
+export const staffScheduleSchema = z.object({
   staffMemberId: z.uuid(),
-  dayOfTheWeek: z.int().min(1).max(7),
+  dayOfTheWeek: dayOfTheWeekSchema,
   startTime: z.iso.time({ precision: -1 }),
   endTime: z.iso.time({ precision: -1 }),
 });
