@@ -13,7 +13,8 @@
     "./service": "./src/service.ts",
     "./staffMembers": "./src/staffMembers.ts",
     "./staffServices": "./src/staffServices.ts",
-    "./staffSchedule": "./src/staffSchedule.ts"
+    "./staffSchedule": "./src/staffSchedule.ts",
+    "./bookings": "./src/bookings.ts"
   },
   "devDependencies": {
     "vitest": "^4.1.10"

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import { staffMembers } from '../../db/schema/staffMember.ts';
 import { staffServices } from '../../db/schema/staffService.ts';
@@ -47,5 +47,20 @@ export async function findServicesByStaffMemberId(db: DB, staffMemberId: string)
     .where(eq(staffServices.staffMemberId, staffMemberId));
   if (!result) return [];
 
+  return result;
+}
+export async function findServiceByServiceIdAndMemberId(
+  db: DB,
+  staffMemberId: string,
+  serviceId: string,
+) {
+  const [result] = await db
+    .select({
+      name: services.name,
+    })
+    .from(staffServices)
+    .where(
+      and(eq(staffServices.serviceId, serviceId), eq(staffServices.staffMemberId, staffMemberId)),
+    );
   return result;
 }

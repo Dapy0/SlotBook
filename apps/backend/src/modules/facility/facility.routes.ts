@@ -22,6 +22,7 @@ import {
   type UpdateFacilityRequest,
 } from '@slotbook/shared/facilities';
 import { staffRoutes } from '../staff/staff.routes.ts';
+import { bookingRoutes } from '../booking/booking.routes.ts';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
 
@@ -110,4 +111,5 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     removeFacilityById,
   );
   fastify.register(staffRoutes, { prefix: '/' });
+  fastify.register(bookingRoutes, { prefix: '/' });
 }
