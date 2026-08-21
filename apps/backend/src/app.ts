@@ -23,6 +23,7 @@ import {
 import fastifyEtag from '@fastify/etag';
 import fastifyCaching from '@fastify/caching';
 import { AppError } from './lib/errors.ts';
+import { mineBookingsRoutes } from './modules/booking/booking.routes.ts';
 
 export async function createServer() {
   const app = Fastify({
@@ -64,6 +65,7 @@ export async function createServer() {
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(facilityRoutes, { prefix: '/facilities' });
   await app.register(serviceRoutes, { prefix: '/facilities' });
+  await app.register(mineBookingsRoutes, { prefix: '/bookings' });
 
   app.get('/health', async (req, res) => res.send('All is ok'));
 

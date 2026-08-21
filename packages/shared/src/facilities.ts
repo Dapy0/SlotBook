@@ -17,6 +17,8 @@ const dayScheduleSchema = z
     close: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format HH:MM'),
   })
   .nullable();
+
+export type DaySchedule = z.infer<typeof dayScheduleSchema>;
 const weekScheduleSchema = z.object({
   1: dayScheduleSchema,
   2: dayScheduleSchema,
@@ -59,10 +61,5 @@ export const facilityResponseSchema = createFacilityRequestSchema.extend({
   ownerId: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
-
 });
 export type FacilityResponseDTO = z.infer<typeof facilityResponseSchema>;
-
-
-
-

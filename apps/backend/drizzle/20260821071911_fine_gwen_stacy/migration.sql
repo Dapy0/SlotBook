@@ -1,0 +1,1 @@
+CREATE INDEX "bookings_facilities_idx" ON "bookings" ("facility_id");
