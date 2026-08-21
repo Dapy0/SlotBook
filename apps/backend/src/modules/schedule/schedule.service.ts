@@ -24,8 +24,8 @@ export async function receiveStaffSchedule(db: DB, facilityID: string, staffId: 
   if (staffMemberFacility.facilityId !== facility.id) {
     throw new NotFoundError('No such worker found in this facility');
   }
-  const [staffSchedule] = await findScheduleByStaffId(db, staffId);
-  
+  const staffSchedule = await findScheduleByStaffId(db, staffId);
+
   return staffSchedule;
 }
 export async function changeWeekSchedule(

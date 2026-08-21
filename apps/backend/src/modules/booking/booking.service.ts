@@ -11,7 +11,7 @@ import {
   checkIfStaffIsFacilityWorker,
   checkIfStaffMemberIsDoingService,
 } from '../staff/staff.service.ts';
-import { findBookingsByFacilityId } from './booking.repository.ts';
+import { findBookingsByFacilityId, insertBooking } from './booking.repository.ts';
 import type { BookingBody } from './booking.schema.ts';
 export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
@@ -20,7 +20,6 @@ export async function getAllFacilityBookings(db: DB, userId: string, facilityId:
 
   return facilityBookings;
 }
-
 export async function createBookingForFacility(
   db: DB,
   userId: string,
@@ -36,18 +35,40 @@ export async function createBookingForFacility(
   if (userId === facility.ownerId) {
     throw new ForbiddenError('No self bookings allowed');
   }
-  const isValidTime = data.startDatetime > new Date();
-  if (!isValidTime) {
+  if (data.startDatetime <= new Date()) {
     throw new ConflictError('Start time is in the past');
   }
+
   const localDay = ((data.startDatetime.getDay() + 6) % 7) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  const staffDaySchedules = staffMemberSchedule.filter((s) => s.dayOfTheWeek === localDay);
+
   await checkIfBookingFitsAllSchedules(
     data.startDatetime,
     serviceDetails.durationMinutes,
-    staffMemberSchedule,
+    staffDaySchedules,
     facility.workingHours[localDay],
   );
 
+  const endDatetime = new Date(
+    data.startDatetime.getTime() + serviceDetails.durationMinutes * 60_000,
+  );
+
+  const booking = await insertBooking(db, {
+    clientId: userId,
+    facilityId,
+    staffMemberId: staffMember.id,
+    serviceId: data.serviceId,
+    startDatetime: data.startDatetime,
+    endDatetime,
+  }).catch((e) => {
+    const pgError = (e as any)?.cause ?? e;
+    if (pgError?.code === '23P01') {
+      throw new ConflictError('This time slot is already booked');
+    }
+    throw e;
+  });
+
+  return booking;
 }
 function toTimeString(date: Date): string {
   const hours = date.getHours().toString().padStart(2, '0');
@@ -57,7 +78,7 @@ function toTimeString(date: Date): string {
 export async function checkIfBookingFitsAllSchedules(
   startDatetime: Date,
   serviceDuration: number,
-  staffDaySchedules: StaffScheduleEntity,
+  staffDaySchedules: StaffScheduleEntity[],
   facilitySchedule: DaySchedule,
 ) {
   if (facilitySchedule === null) {
