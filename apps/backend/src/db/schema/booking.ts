@@ -29,15 +29,13 @@ export const bookings = pgTable(
     serviceId: uuid('service_id')
       .notNull()
       .references(() => services.id),
-    time_range: tstzrange('time_range').notNull(),
+    timeRange: tstzrange('time_range').notNull(),
     status: text('status', { enum: ['pending', 'confirmed', 'canceled'] })
       .notNull()
       .default('pending'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
-    index('bookings_facilities_idx').on(table.facilityId),
-  ],
+  (table) => [index('bookings_facilities_idx').on(table.facilityId)],
 );
 
 export type BookingEntity = typeof bookings.$inferSelect;
