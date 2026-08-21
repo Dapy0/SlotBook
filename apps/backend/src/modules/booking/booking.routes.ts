@@ -38,6 +38,6 @@ export async function mineBookingsRoutes(fastify: FastifyInstance) {
     {
       onRequest: [fastify.authenticate],
     },
-    getMineBookings,
+    // getMineBookings,
   );
 }
