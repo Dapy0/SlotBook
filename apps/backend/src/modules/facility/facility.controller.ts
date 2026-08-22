@@ -3,6 +3,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
 import type { FacilityParams } from './facility.schema.ts';
 import {
+  changeFacilityWeekSchedule,
+  changeWeekSchedule,
   createFacilityByUserId,
   getAllPublicFacilities,
   getFacilityDetails,
@@ -10,6 +12,7 @@ import {
   removeOwnedFacilityById,
   updateOwnedFacility,
 } from './facility.service.ts';
+import type { CreateFacilitySchedule } from '@slotbook/shared/facilitySchedule';
 
 export async function getAllFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await getAllPublicFacilities(request.server.drizzle);
@@ -62,4 +65,19 @@ export async function removeFacilityById(
   await removeOwnedFacilityById(request.server.drizzle, request.params.id, request.user.id);
 
   return response.status(204).send();
+}
+
+export async function putFacilitySchedule(
+  request: FastifyRequest<{
+    Params: FacilityParams;
+    Body: CreateFacilitySchedule[];
+  }>,
+  response: FastifyReply,
+) {
+  const schedule = await changeFacilityWeekSchedule(
+    request.server.drizzle,
+    request.params.id,
+    request.user.id,
+    request.body,
+  );
 }

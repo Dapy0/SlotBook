@@ -58,7 +58,7 @@ export async function changeWeekSchedule(
 
     const day = Number(key) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
     const facilitySchedule = facilityGeneralWorkingSchedule[day];
-
+    console.log(facilitySchedule);
     if (facilitySchedule === null) {
       throw new ConflictError(`Facility is closed on day ${day}`);
     }

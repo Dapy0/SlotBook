@@ -2,19 +2,21 @@ import z from 'zod';
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
+export type DayOfTheWeek = z.infer<typeof dayOfTheWeekSchema>;
 export const facilityScheduleSchema = z.object({
   facilityId: z.uuid(),
   dayOfTheWeek: dayOfTheWeekSchema,
   startTime: z.iso.time({ precision: -1 }),
   endTime: z.iso.time({ precision: -1 }),
 });
-export const createFacilityScheduleSchema = facilityScheduleSchema.refine(
-  (obj) => obj.startTime < obj.endTime,
-  {
+export const createFacilityScheduleSchema = facilityScheduleSchema
+  .omit({
+    facilityId: true,
+  })
+  .refine((obj) => obj.startTime < obj.endTime, {
     message: 'Open time must be before close time',
     path: ['endTime'],
-  },
-);
+  });
 export type CreateFacilitySchedule = z.infer<typeof createFacilityScheduleSchema>;
 export const updateFacilitySchedule = facilityScheduleSchema.partial().superRefine((obj, ctx) => {
   if (!obj.startTime) {

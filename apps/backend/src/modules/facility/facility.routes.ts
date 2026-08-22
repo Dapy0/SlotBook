@@ -5,6 +5,7 @@ import {
   getFacilityById,
   getOwnFacilities,
   patchFacilityById,
+  putFacilitySchedule,
   removeFacilityById,
 } from './facility.controller.ts';
 import {
@@ -23,9 +24,13 @@ import {
 } from '@slotbook/shared/facility';
 import { staffRoutes } from '../staff/staff.routes.ts';
 import { bookingRoutes } from '../booking/booking.routes.ts';
+import {
+  createFacilityScheduleSchema,
+  responseFacilityScheduleSchema,
+  type CreateFacilitySchedule,
+} from '@slotbook/shared/facilitySchedule';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
-
   fastify.get(
     '/',
     {
@@ -94,6 +99,23 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     patchFacilityById,
+  );
+  fastify.put<{
+    Body: CreateFacilitySchedule[];
+    Params: FacilityParams;
+  }>(
+    '/:id/schedule',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: facilityParamsSchema,
+        body: z.array(createFacilityScheduleSchema),
+        response: {
+          200: z.array(responseFacilityScheduleSchema),
+        },
+      },
+    },
+    putFacilitySchedule,
   );
   fastify.delete<{
     Params: FacilityParams;

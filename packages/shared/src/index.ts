@@ -1,5 +1,6 @@
 export * from './auth.ts';
 export * from './facility.ts';
+export * from './facilitySchedule';
 export * from './user.ts';
 export * from './service.ts';
 export * from './staffMembers.ts';

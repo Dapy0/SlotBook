@@ -9,6 +9,13 @@ import {
   deleteFacilityById,
 } from './facility.repository.ts';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
+import {
+  deleteFacilityScheduleByFacilityId,
+  findFacilityScheduleByDay,
+  insertFacilityScheduleByFacilityId,
+} from './facilitySchedule.repository.ts';
+import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/facilitySchedule';
+import { deleteScheduleByStaffId } from '../schedule/schedule.repository.ts';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -75,4 +82,26 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
     throw new NotFoundError('Facility not found');
   }
   return deletedFacility;
+}
+export async function changeFacilityWeekSchedule(
+  db: DB,
+  facilityId: string,
+  requestedUserId: string,
+  newSchedule: CreateFacilitySchedule[],
+) {
+  await checkFacilityOwnership(db, facilityId, requestedUserId);
+
+  const transaction = await db.transaction(async (tx) => {
+    await deleteFacilityScheduleByFacilityId(tx, facilityId);
+    const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
+    return inserted;
+  });
+  if (!transaction) {
+    throw new Error('Something in transaction went wrong');
+  }
+}
+
+export async function getFacilityScheduleForDay(db: DB, facilityId: string, day: DayOfTheWeek) {
+  const facility = await getFacilityDetails(db, facilityId);
+  return findFacilityScheduleByDay(db, facility.id, day);
 }
