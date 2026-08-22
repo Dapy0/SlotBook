@@ -1,4 +1,4 @@
-import { FACILITY_CATEGORIES, type WeekSchedule } from '@slotbook/shared/facilities';
+
 import {
   varchar,
   numeric,
@@ -12,6 +12,7 @@ import {
   pgTable,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.ts';
+import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
 
 export const facilityCategoryEnum = pgEnum('facility_category', FACILITY_CATEGORIES);
 
@@ -33,8 +34,8 @@ export const facilities = pgTable(
     phone: varchar({ length: 32 }).notNull(),
     email: varchar({ length: 255 }).notNull(),
     images: jsonb().$type<string[]>().notNull(),
-    workingHours: jsonb('working_hours').$type<WeekSchedule>().notNull(),
     isPublished: boolean('is_published').notNull().default(false),
+    timezoneIANA: text('timezone_IANA').notNull().default('Europe/Warsaw'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     // telegram_chat_id

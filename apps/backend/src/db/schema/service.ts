@@ -31,7 +31,6 @@ export const services = pgTable(
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-    // telegram_chat_id
   },
   (table) => [index('services_facility_idx').on(table.facilityId)],
 );

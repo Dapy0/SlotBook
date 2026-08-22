@@ -9,7 +9,7 @@
   "exports": {
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
-    "./facilities": "./src/facilities.ts",
+    "./facility": "./src/facility.ts",
     "./service": "./src/service.ts",
     "./staffMembers": "./src/staffMembers.ts",
     "./staffServices": "./src/staffServices.ts",

@@ -20,7 +20,7 @@ import {
   updateFacilityRequestSchema,
   type CreateFacilityRequest,
   type UpdateFacilityRequest,
-} from '@slotbook/shared/facilities';
+} from '@slotbook/shared/facility';
 import { staffRoutes } from '../staff/staff.routes.ts';
 import { bookingRoutes } from '../booking/booking.routes.ts';
 

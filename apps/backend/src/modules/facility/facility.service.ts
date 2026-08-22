@@ -1,4 +1,4 @@
-import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facilities';
+import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import {
   findAllFacilities,
@@ -9,7 +9,6 @@ import {
   deleteFacilityById,
 } from './facility.repository.ts';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
-import { DrizzleError } from 'drizzle-orm';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -43,7 +42,7 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
       ownerId: userId,
     });
   } catch (e) {
-    const pgError = (e as any)?.cause ?? e; 
+    const pgError = (e as any)?.cause ?? e;
     if (pgError?.code === '23505') {
       throw new ConflictError('Slug already exists');
     }

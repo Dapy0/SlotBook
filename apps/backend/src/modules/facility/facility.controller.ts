@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
-import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facilities';
+import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
 import type { FacilityParams } from './facility.schema.ts';
 import {
   createFacilityByUserId,

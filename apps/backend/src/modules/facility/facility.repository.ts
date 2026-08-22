@@ -5,9 +5,7 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from '../../db/schema/facility.ts';
-import type {
-  UpdateFacilityRequest,
-} from '@slotbook/shared/facilities';
+import type { UpdateFacilityRequest } from '@slotbook/shared/facility';
 
 export async function findAllFacilities(db: DB): Promise<Array<FacilityEntity>> {
   return db.select().from(facilities).where(eq(facilities.isPublished, true));
