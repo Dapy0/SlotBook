@@ -10,6 +10,7 @@
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
     "./facility": "./src/facility.ts",
+    "./facilitySchedule": "./src/facilitySchedule.ts",
     "./service": "./src/service.ts",
     "./staffMembers": "./src/staffMembers.ts",
     "./staffServices": "./src/staffServices.ts",

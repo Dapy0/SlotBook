@@ -11,11 +11,13 @@ import {
 import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
 import {
   deleteFacilityScheduleByFacilityId,
+  findFacilitySchedule,
   findFacilityScheduleByDay,
   insertFacilityScheduleByFacilityId,
 } from './facilitySchedule.repository.ts';
 import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/facilitySchedule';
 import { deleteScheduleByStaffId } from '../schedule/schedule.repository.ts';
+import { checkNoOverlapWithinSchedule } from '../../lib/scheduleHelpers.ts';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -83,6 +85,7 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
   }
   return deletedFacility;
 }
+
 export async function changeFacilityWeekSchedule(
   db: DB,
   facilityId: string,
@@ -90,6 +93,7 @@ export async function changeFacilityWeekSchedule(
   newSchedule: CreateFacilitySchedule[],
 ) {
   await checkFacilityOwnership(db, facilityId, requestedUserId);
+  await checkNoOverlapWithinSchedule(newSchedule);
 
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
@@ -101,7 +105,3 @@ export async function changeFacilityWeekSchedule(
   }
 }
 
-export async function getFacilityScheduleForDay(db: DB, facilityId: string, day: DayOfTheWeek) {
-  const facility = await getFacilityDetails(db, facilityId);
-  return findFacilityScheduleByDay(db, facility.id, day);
-}

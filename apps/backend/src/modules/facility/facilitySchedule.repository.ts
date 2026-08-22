@@ -1,9 +1,20 @@
-import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/facilitySchedule';
+import type { CreateFacilitySchedule, DayOfTheWeek, ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import { facilitySchedules } from '../../db/schema/facilitySchedule.ts';
 import { and, eq } from 'drizzle-orm';
+export async function findFacilitySchedule(
+  db: DB,
+  facilityId: string,
+): Promise<ResponseFacilityScheduleSchema[]> {
+  const schedule = await db
+    .select()
+    .from(facilitySchedules)
+    .where(eq(facilitySchedules.facilityId, facilityId));
+  return schedule ?? null;
+}
+
 export async function findFacilityScheduleByDay(db: DB, facilityId: string, day: DayOfTheWeek) {
-  const schedule = db
+  const schedule = await db
     .select()
     .from(facilitySchedules)
     .where(

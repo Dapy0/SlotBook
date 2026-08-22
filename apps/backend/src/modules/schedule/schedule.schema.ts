@@ -3,7 +3,7 @@ import z from 'zod';
 
 export const scheduleParamsSchema = z.object({
   staffId: z.uuid().nonempty(),
-  facilityId: z.uuid().nonempty(),
+  id: z.uuid().nonempty(),
 });
 export type ScheduleParams = z.infer<typeof scheduleParamsSchema>;
 const scheduleObjectWithoutIdSchema = staffScheduleSchema

@@ -8,7 +8,7 @@ export async function getStaffSchedule(
 ) {
   const schedule = await receiveStaffSchedule(
     request.server.drizzle,
-    request.params.facilityId,
+    request.params.id,
     request.params.staffId,
   );
   return response.send(schedule);
@@ -21,7 +21,7 @@ export async function updateStaffSchedule(
   const schedule = await changeWeekSchedule(
     request.server.drizzle,
     request.user.id,
-    request.params.facilityId,
+    request.params.id,
     request.params.staffId,
     request.body,
   );

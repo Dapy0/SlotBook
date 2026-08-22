@@ -4,7 +4,6 @@ import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/sha
 import type { FacilityParams } from './facility.schema.ts';
 import {
   changeFacilityWeekSchedule,
-  changeWeekSchedule,
   createFacilityByUserId,
   getAllPublicFacilities,
   getFacilityDetails,

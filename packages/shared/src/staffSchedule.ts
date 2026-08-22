@@ -8,13 +8,14 @@ export const staffScheduleSchema = z.object({
   startTime: z.iso.time({ precision: -1 }),
   endTime: z.iso.time({ precision: -1 }),
 });
-export const createStaffScheduleSchema = staffScheduleSchema.refine(
-  (obj) => obj.startTime < obj.endTime,
-  {
+export const createStaffScheduleSchema = staffScheduleSchema
+  .omit({
+    staffMemberId: true,
+  })
+  .refine((obj) => obj.startTime < obj.endTime, {
     message: 'Start Time must be before end time',
     path: ['endTime'],
-  },
-);
+  });
 export type CreateStaffSchedule = z.infer<typeof createStaffScheduleSchema>;
 export const updateStaffSchedule = staffScheduleSchema.partial().superRefine((obj, ctx) => {
   if (!obj.startTime) {
@@ -27,7 +28,7 @@ export const updateStaffSchedule = staffScheduleSchema.partial().superRefine((ob
   }
   if (obj.startTime >= obj.endTime) {
     ctx.addIssue('Start Time must be before end time');
-     return;
+    return;
   }
 });
 export type UpdateStaffSchedule = z.infer<typeof updateStaffSchedule>;
