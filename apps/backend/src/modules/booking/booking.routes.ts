@@ -33,11 +33,11 @@ export async function bookingRoutes(fastify: FastifyInstance) {
 }
 
 export async function mineBookingsRoutes(fastify: FastifyInstance) {
-  fastify.get(
-    '/mine',
-    {
-      onRequest: [fastify.authenticate],
-    },
-    // getMineBookings,
-  );
+  // fastify.get(
+  //   '/mine',
+  //   {
+  //     onRequest: [fastify.authenticate],
+  //   },
+  //   // getMineBookings,
+  // );
 }
