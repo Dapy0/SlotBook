@@ -5,3 +5,4 @@ export * from './staffMember.ts';
 export * from './staffService.ts';
 export * from './staffSchedule.ts';
 export * from './booking.ts';
+export * from './facilitySchedule.ts';
