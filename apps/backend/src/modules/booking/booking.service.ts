@@ -13,6 +13,11 @@ import {
 } from '../staff/staff.service.ts';
 import { findBookingsByFacilityId, insertBooking } from './booking.repository.ts';
 import type { BookingBody } from './booking.schema.ts';
+import {
+  checkNoOverlapWithinSchedule,
+  checkStaffScheduleFitsFacility,
+} from '../../lib/scheduleHelpers.ts';
+import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';
 export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
 
@@ -30,6 +35,7 @@ export async function createBookingForFacility(
   const staffMember = await checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId);
   const staffMemberSchedule = await receiveStaffSchedule(db, facilityId, staffMember.id);
   const serviceDetails = await checkIfServiceIsMadeInFacility(db, data.serviceId, facilityId);
+  const facilitySchedule = await findFacilitySchedule(db, facility.id);
   await checkIfStaffMemberIsDoingService(db, staffMember.id, data.serviceId);
 
   if (userId === facility.ownerId) {
@@ -40,14 +46,9 @@ export async function createBookingForFacility(
   }
 
   const localDay = ((data.startDatetime.getDay() + 6) % 7) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  const staffDaySchedules = staffMemberSchedule.filter((s) => s.dayOfTheWeek === localDay);
 
-  await checkIfBookingFitsAllSchedules(
-    data.startDatetime,
-    serviceDetails.durationMinutes,
-    staffDaySchedules,
-    facility.workingHours[localDay],
-  );
+  await checkNoOverlapWithinSchedule(staffMemberSchedule);
+  await checkStaffScheduleFitsFacility(staffMemberSchedule, facilitySchedule);
 
   const endDatetime = new Date(
     data.startDatetime.getTime() + serviceDetails.durationMinutes * 60_000,
@@ -69,39 +70,4 @@ export async function createBookingForFacility(
   });
 
   return booking;
-}
-function toTimeString(date: Date): string {
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
-}
-export async function checkIfBookingFitsAllSchedules(
-  startDatetime: Date,
-  serviceDuration: number,
-  staffDaySchedules: StaffScheduleEntity[],
-  facilitySchedule: DaySchedule,
-) {
-  if (facilitySchedule === null) {
-    throw new ConflictError('Facility is closed on this day');
-  }
-
-  const endDatetime = new Date(startDatetime.getTime() + serviceDuration * 60_000);
-  const startTimeStr = toTimeString(startDatetime);
-  const endTimeStr = toTimeString(endDatetime);
-
-  if (startTimeStr < facilitySchedule.open || endTimeStr > facilitySchedule.close) {
-    throw new ConflictError('Booking is outside facility working hours');
-  }
-
-  if (staffDaySchedules.length === 0) {
-    throw new ConflictError('Staff member does not work on this day');
-  }
-
-  const fitsStaffSchedule = staffDaySchedules.some(
-    (schedule) => schedule.startTime <= startTimeStr && endTimeStr <= schedule.endTime,
-  );
-
-  if (!fitsStaffSchedule) {
-    throw new ConflictError('Booking is outside staff working hours');
-  }
 }

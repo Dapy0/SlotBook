@@ -1,6 +1,6 @@
 import type { CreateFacilitySchedule, ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
 import { BadRequestError, ConflictError } from './errors.ts';
-import type { CreateStaffSchedule } from '@slotbook/shared/staffSchedule';
+import type { CreateStaffSchedule, ResponseStaffScheduleSchema } from '@slotbook/shared/staffSchedule';
 
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
@@ -23,7 +23,7 @@ export function checkNoOverlapWithinSchedule(
 }
 
 export function checkStaffScheduleFitsFacility(
-  staffSchedule: CreateStaffSchedule[],
+  staffSchedule: ResponseStaffScheduleSchema[],
   facilitySchedule: ResponseFacilityScheduleSchema[],
 ) {
   for (const current of staffSchedule) {
