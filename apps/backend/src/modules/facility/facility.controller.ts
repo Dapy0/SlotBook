@@ -7,6 +7,7 @@ import {
   createFacilityByUserId,
   getAllPublicFacilities,
   getFacilityDetails,
+  getFacilityScheduleByIdForOwner,
   getOwnFacilitiesByUserId,
   removeOwnedFacilityById,
   updateOwnedFacility,
@@ -65,7 +66,19 @@ export async function removeFacilityById(
 
   return response.status(204).send();
 }
-
+export async function getFacilitySchedule(
+  request: FastifyRequest<{
+    Params: FacilityParams;
+  }>,
+  response: FastifyReply,
+) {
+  const schedule = await getFacilityScheduleByIdForOwner(
+    request.server.drizzle,
+    request.params.id,
+    request.user.id,
+  );
+  return response.send(schedule);
+}
 export async function putFacilitySchedule(
   request: FastifyRequest<{
     Params: FacilityParams;
@@ -79,4 +92,5 @@ export async function putFacilitySchedule(
     request.user.id,
     request.body,
   );
+  return response.status(201).send(schedule);
 }

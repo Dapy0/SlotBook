@@ -42,7 +42,8 @@ export const fastifyEnvOptions: FastifyEnvOptions = {
 // cors options
 
 export const fastifyCorsOptions: FastifyCorsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  methods: 'GET,PUT,POST,PATCH,DELETE',
   credentials: true,
 };
 

@@ -58,7 +58,8 @@ export async function findServiceByServiceIdAndMemberId(
     .select({
       name: services.name,
     })
-    .from(staffServices)
+    .from(services)
+    .innerJoin(staffServices, eq(staffServices.serviceId, services.id))
     .where(
       and(eq(staffServices.serviceId, serviceId), eq(staffServices.staffMemberId, staffMemberId)),
     );

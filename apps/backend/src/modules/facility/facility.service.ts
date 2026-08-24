@@ -18,6 +18,7 @@ import {
 import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/facilitySchedule';
 import { deleteScheduleByStaffId } from '../schedule/schedule.repository.ts';
 import { checkNoOverlapWithinSchedule } from '../../lib/scheduleHelpers.ts';
+import { string } from 'zod';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -85,16 +86,28 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
   }
   return deletedFacility;
 }
-
+export async function getFacilityScheduleByIdForOwner(
+  db: DB,
+  facilityId: string,
+  userRequestedId: string,
+) {
+  await checkFacilityOwnership(db, facilityId, userRequestedId);
+  const schedule = findFacilitySchedule(db, facilityId);
+  if (!schedule) {
+    throw new NotFoundError('No schedule for this facility');
+  }
+  return schedule;
+}
 export async function changeFacilityWeekSchedule(
   db: DB,
   facilityId: string,
   requestedUserId: string,
   newSchedule: CreateFacilitySchedule[],
 ) {
+  console.log(newSchedule);
   await checkFacilityOwnership(db, facilityId, requestedUserId);
   await checkNoOverlapWithinSchedule(newSchedule);
-
+  console.log("passed checks")
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
     const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
@@ -103,5 +116,5 @@ export async function changeFacilityWeekSchedule(
   if (!transaction) {
     throw new Error('Something in transaction went wrong');
   }
+  return transaction;
 }
-

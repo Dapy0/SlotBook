@@ -3,6 +3,7 @@ import {
   createFacility,
   getAllFacilities,
   getFacilityById,
+  getFacilitySchedule,
   getOwnFacilities,
   patchFacilityById,
   putFacilitySchedule,
@@ -99,6 +100,21 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     patchFacilityById,
+  );
+  fastify.get<{
+    Params: FacilityParams;
+  }>(
+    '/:id/schedule',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: z.array(responseFacilityScheduleSchema),
+        },
+      },
+    },
+    getFacilitySchedule,
   );
   fastify.put<{
     Body: CreateFacilitySchedule[];
