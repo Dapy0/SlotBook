@@ -9,16 +9,18 @@ const facilityScheduleSchema = z.object({
   startTime: z.iso.time({ precision: -1 }),
   endTime: z.iso.time({ precision: -1 }),
 });
-export const createFacilityScheduleSchema = facilityScheduleSchema
-  .omit({
-    facilityId: true,
-  })
-  .refine((obj) => obj.startTime < obj.endTime, {
+export const facilityScheduleSchemaWithoutFacilityId = facilityScheduleSchema.omit({
+  facilityId: true,
+});
+export const createFacilityScheduleSchema = facilityScheduleSchemaWithoutFacilityId.refine(
+  (obj) => obj.startTime < obj.endTime,
+  {
     message: 'Open time must be before close time',
     path: ['endTime'],
-  });
+  },
+);
 export type CreateFacilitySchedule = z.infer<typeof createFacilityScheduleSchema>;
-export const updateFacilitySchedule = createFacilityScheduleSchema
+export const updateFacilitySchedule = facilityScheduleSchemaWithoutFacilityId
   .partial()
   .superRefine((obj, ctx) => {
     if (!obj.startTime) {

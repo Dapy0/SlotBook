@@ -8,16 +8,18 @@ export const staffScheduleSchema = z.object({
   startTime: z.iso.time({ precision: -1 }),
   endTime: z.iso.time({ precision: -1 }),
 });
-export const createStaffScheduleSchema = staffScheduleSchema
-  .omit({
-    staffMemberId: true,
-  })
-  .refine((obj) => obj.startTime < obj.endTime, {
+export const staffScheduleSchemaWithoutStaffId = staffScheduleSchema.omit({
+  staffMemberId: true,
+});
+export const createStaffScheduleSchema = staffScheduleSchemaWithoutStaffId.refine(
+  (obj) => obj.startTime < obj.endTime,
+  {
     message: 'Start Time must be before end time',
     path: ['endTime'],
-  });
+  },
+);
 export type CreateStaffSchedule = z.infer<typeof createStaffScheduleSchema>;
-export const updateStaffSchedule = staffScheduleSchema.partial().superRefine((obj, ctx) => {
+export const updateStaffSchedule = staffScheduleSchemaWithoutStaffId.partial().superRefine((obj, ctx) => {
   if (!obj.startTime) {
     ctx.addIssue('No start time selected');
     return;
