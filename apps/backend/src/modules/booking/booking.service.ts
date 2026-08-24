@@ -1,4 +1,3 @@
-import type { DaySchedule } from '@slotbook/shared/facilities';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import type { StaffScheduleEntity } from '../../db/schema/staffSchedule.ts';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
