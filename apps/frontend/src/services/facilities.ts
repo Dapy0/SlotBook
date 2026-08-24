@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { FacilityResponseDTO } from '@slotbook/shared/facilities';
+import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 
 export async function getFacilities(): Promise<FacilityResponseDTO[]> {
   const result = await api<FacilityResponseDTO[]>('/facilities/', {

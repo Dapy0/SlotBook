@@ -26,6 +26,7 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
+      console.log(values)
       const res = await login(values);
       // if (!res.ok) {
       //   const data = await res.json();

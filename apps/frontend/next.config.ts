@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   env: {
     BACKEND_URL: `http://localhost:${BACKEND_PORT}`,
   },
+  allowedDevOrigins: ['localhost', '127.0.0.1'],
 };
 
 export default nextConfig;

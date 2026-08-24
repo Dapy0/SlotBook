@@ -24,10 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FACILITY_CATEGORIES, type FacilityResponseDTO } from '@slotbook/shared/facilities';
+
 import { formatPrice } from '@/lib/utils';
 import { createService, getServicesByFacilityId } from '@/services/service';
 import { createServiceSchema, type ServiceResponseDTO } from '@slotbook/shared/service';
+import { FACILITY_CATEGORIES, type FacilityResponseDTO } from '@slotbook/shared/facility';
 
 function generateCategoryObj() {
   const obj: Array<{ label: string; value: string | null }> = [
