@@ -40,7 +40,6 @@ export type UpdateStaffSchedule = z.infer<typeof updateStaffSchedule>;
 export const responseStaffScheduleSchema = createStaffScheduleSchema.extend({
   id: z.uuid(),
   createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
 });
 
 export type ResponseStaffScheduleSchema = z.infer<typeof responseStaffScheduleSchema>;
