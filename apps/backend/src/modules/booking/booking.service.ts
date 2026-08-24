@@ -13,8 +13,10 @@ import {
 import { findBookingsByFacilityId, insertBooking } from './booking.repository.ts';
 import type { BookingBody } from './booking.schema.ts';
 import {
+  checkIfBookingFitsAllSchedules,
   checkNoOverlapWithinSchedule,
   checkStaffScheduleFitsFacility,
+  toTimeString,
 } from '../../lib/scheduleHelpers.ts';
 import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';
 export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
@@ -46,11 +48,16 @@ export async function createBookingForFacility(
 
   const localDay = ((data.startDatetime.getDay() + 6) % 7) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-  await checkNoOverlapWithinSchedule(staffMemberSchedule);
-  await checkStaffScheduleFitsFacility(staffMemberSchedule, facilitySchedule);
-
   const endDatetime = new Date(
     data.startDatetime.getTime() + serviceDetails.durationMinutes * 60_000,
+  );
+
+  await checkIfBookingFitsAllSchedules(
+    toTimeString(data.startDatetime),
+    toTimeString(endDatetime),
+    localDay,
+    staffMemberSchedule,
+    facilitySchedule,
   );
 
   const booking = await insertBooking(db, {

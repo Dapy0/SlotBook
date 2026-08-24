@@ -1,6 +1,13 @@
-import type { CreateFacilitySchedule, ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
+import type {
+  CreateFacilitySchedule,
+  DayOfTheWeek,
+  ResponseFacilityScheduleSchema,
+} from '@slotbook/shared/facilitySchedule';
 import { BadRequestError, ConflictError } from './errors.ts';
-import type { CreateStaffSchedule, ResponseStaffScheduleSchema } from '@slotbook/shared/staffSchedule';
+import type {
+  CreateStaffSchedule,
+  ResponseStaffScheduleSchema,
+} from '@slotbook/shared/staffSchedule';
 
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
@@ -37,4 +44,38 @@ export function checkStaffScheduleFitsFacility(
       );
     }
   }
+}
+export function checkIfBookingFitsAllSchedules(
+  startTime: string,
+  endTime: string,
+  dayOfTheWeek: DayOfTheWeek,
+  staffSchedule: ResponseStaffScheduleSchema[],
+  facilitySchedule: ResponseFacilityScheduleSchema[],
+) {
+  const facilityDaySchedules = facilitySchedule.filter((f) => f.dayOfTheWeek === dayOfTheWeek);
+  const staffDaySchedules = staffSchedule.filter((s) => s.dayOfTheWeek === dayOfTheWeek);
+
+  if (facilityDaySchedules.length === 0) {
+    throw new ConflictError(`Facility is closed on day ${dayOfTheWeek}`);
+  }
+  if (staffDaySchedules.length === 0) {
+    throw new ConflictError(`Staff does not work on day ${dayOfTheWeek}`);
+  }
+
+  const fitsFacility = facilityDaySchedules.some(
+    (f) => startTime >= f.startTime && endTime <= f.endTime,
+  );
+
+  if (!fitsFacility) {
+    throw new ConflictError(`Booking is outside facility working hours on day ${dayOfTheWeek}`);
+  }
+  const fitsStaff = staffDaySchedules.some((s) => startTime >= s.startTime && endTime <= s.endTime);
+  if (!fitsStaff) {
+    throw new ConflictError(`Booking is outside staff working hours on day ${dayOfTheWeek}`);
+  }
+}
+export function toTimeString(date: Date): string {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
