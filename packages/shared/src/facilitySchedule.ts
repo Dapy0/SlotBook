@@ -6,8 +6,8 @@ export type DayOfTheWeek = z.infer<typeof dayOfTheWeekSchema>;
 const facilityScheduleSchema = z.object({
   facilityId: z.uuid(),
   dayOfTheWeek: dayOfTheWeekSchema,
-  startTime: z.iso.time({ precision: -1 }),
-  endTime: z.iso.time({ precision: -1 }),
+  startTime: z.iso.time({ precision: 0 }),
+  endTime: z.iso.time({ precision: 0 }),
 });
 export const facilityScheduleSchemaWithoutFacilityId = facilityScheduleSchema.omit({
   facilityId: true,

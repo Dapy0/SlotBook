@@ -8,8 +8,8 @@ export const staffSchedules = pgTable('staff_schedule', {
     .notNull()
     .references(() => staffMembers.id, { onDelete: 'cascade' }),
   dayOfTheWeek: smallint().$type<DayOfTheWeek>().notNull(),
-  startTime: time().notNull(),
-  endTime: time().notNull(),
+  startTime: time({ precision: 0 }).notNull(),
+  endTime: time({ precision: 0 }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 export type StaffScheduleEntity = typeof staffSchedules.$inferSelect;

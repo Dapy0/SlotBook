@@ -5,8 +5,8 @@ const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
 export const staffScheduleSchema = z.object({
   staffMemberId: z.uuid(),
   dayOfTheWeek: dayOfTheWeekSchema,
-  startTime: z.iso.time({ precision: -1 }),
-  endTime: z.iso.time({ precision: -1 }),
+  startTime: z.iso.time({ precision: 0 }),
+  endTime: z.iso.time({ precision: 0 }),
 });
 export const staffScheduleSchemaWithoutStaffId = staffScheduleSchema.omit({
   staffMemberId: true,
