@@ -7,3 +7,4 @@ export * from './staffMembers.ts';
 export * from './staffServices.ts';
 export * from './staffSchedule.ts';
 export * from './bookings.ts';
+export * from './availability.ts';

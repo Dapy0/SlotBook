@@ -9,6 +9,7 @@ import {
 import { staffMemberResponseSchema } from '@slotbook/shared/staffMembers';
 import z from 'zod';
 import { scheduleRoutes } from '../schedule/schedule.routes.ts';
+import { availabilityRoutes } from '../availability/availability.routes.ts';
 
 export async function staffRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -37,4 +38,5 @@ export async function staffRoutes(fastify: FastifyInstance) {
     addStaffToFacility,
   );
   fastify.register(scheduleRoutes, { prefix: '/:id/staff/:staffId' });
+  fastify.register(availabilityRoutes, { prefix: '/:id/staff/:staffId' });
 }

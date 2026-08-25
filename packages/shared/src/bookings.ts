@@ -13,8 +13,7 @@ function normalizeTimestamp(raw: string): string {
     .replace(' ', 'T')
     .replace(/([+-]\d{2})(\d{2})?$/, (_, hh, mm) => `${hh}:${mm ?? '00'}`);
 }
-
-function parseTsRangeLiteral(raw: string) {
+export function parseTsRangeLiteral(raw: string) {
   if (raw === 'empty') {
     return { start: null, end: null, startInclusive: false, endInclusive: false };
   }

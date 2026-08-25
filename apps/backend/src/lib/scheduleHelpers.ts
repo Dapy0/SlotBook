@@ -79,3 +79,63 @@ export function toTimeString(date: Date): string {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   return `${hours}:${minutes}`;
 }
+
+const daysAndThereNames: Record<string, DayOfTheWeek> = {
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+  Sun: 7,
+};
+export function convertShortDayNameToDayNumber(dayName: string): DayOfTheWeek {
+  return daysAndThereNames[dayName];
+}
+export function addMinutesToTimeString(time: string, minutesToAdd: number): string {
+  const [hours, minutes, seconds] = time.split(':').map(Number);
+
+  const totalMinutes = hours * 60 + minutes + minutesToAdd;
+  const newHours = Math.floor(totalMinutes / 60) % 24;
+  const newMinutes = totalMinutes % 60;
+
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return `${pad(newHours)}:${pad(newMinutes)}:${pad(seconds)}`;
+}
+export function combineDateAndTimeInZone(date: string, time: string, timeZone: string): Date {
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute, second = 0] = time.split(':').map(Number);
+
+  // "Черновой" момент: считаем, будто date+time — это уже UTC
+  const naiveUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+
+  // Смотрим, какое время этот момент показывает в целевой таймзоне
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(naiveUtc));
+
+  const get = (type: string) => Number(parts.find((p) => p.type === type)!.value);
+
+  const displayedAsUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  );
+
+  // Разница между тем, что хотели, и тем, что показала таймзона на этот момент
+  const offset = naiveUtc - displayedAsUtc;
+
+  return new Date(naiveUtc + offset);
+}
+

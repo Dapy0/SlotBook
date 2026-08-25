@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, getColumns, getTableColumns } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import { staffMembers } from '../../db/schema/staffMember.ts';
 import { staffServices } from '../../db/schema/staffService.ts';
@@ -54,14 +54,14 @@ export async function findServiceByServiceIdAndMemberId(
   staffMemberId: string,
   serviceId: string,
 ) {
-  const [result] = await db
+  const [service] = await db
     .select({
-      name: services.name,
+      ...getColumns(services),
     })
     .from(services)
     .innerJoin(staffServices, eq(staffServices.serviceId, services.id))
     .where(
       and(eq(staffServices.serviceId, serviceId), eq(staffServices.staffMemberId, staffMemberId)),
     );
-  return result;
+  return service;
 }
