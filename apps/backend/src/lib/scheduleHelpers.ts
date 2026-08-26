@@ -30,8 +30,8 @@ export function checkNoOverlapWithinSchedule(
 }
 
 export function checkStaffScheduleFitsFacility(
-  staffSchedule: ResponseStaffScheduleSchema[],
-  facilitySchedule: ResponseFacilityScheduleSchema[],
+  staffSchedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
+  facilitySchedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
 ) {
   for (const current of staffSchedule) {
     const facilityDay = facilitySchedule.find((f) => f.dayOfTheWeek === current.dayOfTheWeek);

@@ -56,7 +56,6 @@ export async function getAvailableTimeByStaffAndServiceId(
     .map((b) => parseTsRangeLiteral(b.timeRange))
     .filter(hasBounds);
 
-
   const slots: Array<{ start: Date; end: Date }> = [];
   const now = new Date();
   for (const schedule of staffDaySchedule) {
@@ -67,7 +66,7 @@ export async function getAvailableTimeByStaffAndServiceId(
       ...computeSlotsForWindow(windowStart, windowEnd, service.durationMinutes, busyIntervals, now),
     );
   }
-  return slots
+  return slots;
 }
 
 function computeSlotsForWindow(
