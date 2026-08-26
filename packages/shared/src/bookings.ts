@@ -54,25 +54,21 @@ export const tsRangeSchema = z.codec(
     encode: parseTsRangeLiteral,
   },
 );
-export const bookingRequestSchema = z.object({
-  clientId: z.uuid(),
-
-  facilityId: z.uuid(),
-
-  staffMemberId: z.uuid(),
-  serviceId: z.uuid(),
-  timeRange: tsRangeSchema, // TEMP FIX
-});
-export type CreateBookingRequest = z.infer<typeof bookingRequestSchema>;
-const updateBookingSchema = bookingRequestSchema.partial()
-export type UpdateBookingRequest = z.infer<typeof updateBookingSchema>;
-
-
 // Response DTOs
 
-export const bookingResponseSchema = bookingRequestSchema.extend({
+export const bookingResponseSchema = z.object({
   id: z.uuid(),
+  clientId: z.uuid(),
+  facilityId: z.uuid(),
+  staffMemberId: z.uuid(),
+  serviceId: z.uuid(),
+  timeRange: tsRangeSchema,
   createdAt: z.coerce.date(),
-  status: z.enum(['pending', 'confirmed', 'canceled']).default('pending'),
+  status: z.enum(['pending', 'confirmed', 'canceled']),
 });
 export type BookingResponse = z.infer<typeof bookingResponseSchema>;
+
+export const patchBookingStatusSchema = z.object({
+  status: z.enum(['confirmed', 'canceled']),
+});
+export type PatchBookingStatus = z.infer<typeof patchBookingStatusSchema>;

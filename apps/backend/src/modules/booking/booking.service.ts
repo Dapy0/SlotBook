@@ -10,7 +10,12 @@ import {
   checkIfStaffIsFacilityWorker,
   checkIfStaffMemberIsDoingService,
 } from '../staff/staff.service.ts';
-import { findBookingsByFacilityId, insertBooking } from './booking.repository.ts';
+import {
+  findBookingById,
+  findBookingsByFacilityId,
+  insertBooking,
+  patchStatusByBookingId,
+} from './booking.repository.ts';
 import type { BookingBody } from './booking.schema.ts';
 import {
   checkIfBookingFitsAllSchedules,
@@ -19,6 +24,7 @@ import {
   toTimeString,
 } from '../../lib/scheduleHelpers.ts';
 import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';
+import type { PatchBookingStatus } from '@slotbook/shared/bookings';
 export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
 
@@ -76,4 +82,68 @@ export async function createBookingForFacility(
   });
 
   return booking;
+}
+
+export async function changeBookingStatus(
+  db: DB,
+  userId: string,
+  facilityId: string,
+  bookingId: string,
+  data: PatchBookingStatus,
+) {
+  const booking = await findBookingById(db, bookingId);
+  if (!booking) {
+    throw new NotFoundError('No such booking found');
+  }
+  switch (booking.status) {
+    case 'pending':
+      switch (data.status) {
+        case 'confirmed':
+          // console.log(userId, booking.clientId);
+          await checkFacilityOwnership(db, facilityId, userId).catch((err) => {
+            throw new ForbiddenError(
+              'Only facility owner can change booking status from pending to confirmed',
+            );
+          });
+          await patchStatusByBookingId(db, booking.id, data.status);
+          break;
+        case 'canceled':
+          if (booking.clientId === userId) {
+            await patchStatusByBookingId(db, booking.id, data.status);
+            return;
+          } else if (await checkFacilityOwnership(db, facilityId, userId)) {
+            await patchStatusByBookingId(db, booking.id, data.status);
+            return;
+          } else {
+            throw new ForbiddenError(
+              'Only facility owner or client can change booking status from pending to canceled',
+            );
+          }
+
+          break;
+      }
+
+      break;
+    case 'confirmed':
+      switch (data.status) {
+        case 'confirmed':
+          throw new ConflictError('Not allowed same state');
+        case 'canceled':
+          if (booking.clientId === userId) {
+            await patchStatusByBookingId(db, booking.id, data.status);
+            return;
+          } else if (await checkFacilityOwnership(db, facilityId, userId)) {
+            await patchStatusByBookingId(db, booking.id, data.status);
+            return;
+          } else {
+            throw new ForbiddenError(
+              'Only facility owner or client can change booking status from pending to canceled',
+            );
+          }
+      }
+
+      break;
+    default:
+      throw new ConflictError('Not allowed');
+  }
 }
