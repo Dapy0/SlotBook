@@ -62,4 +62,5 @@ export async function patchStatusByBookingId(
   if (!updatedBooking) {
     throw new Error('Failed to update booking');
   }
+  return updatedBooking;
 }
