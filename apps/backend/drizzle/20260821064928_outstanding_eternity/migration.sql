@@ -17,5 +17,5 @@ ALTER TABLE "bookings" ADD CONSTRAINT "bookings_service_id_services_id_fkey" FOR
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 --> statement-breakpoint
 ALTER TABLE "bookings" ADD CONSTRAINT "no_overlapping_bookings"
-  EXCLUDE USING GIST ("staff_member_id" WITH =, "time_range" WITH &&);
+  EXCLUDE USING GIST ("staff_member_id" WITH =, "time_range" WITH &&)
   WHERE (status <> 'canceled')
