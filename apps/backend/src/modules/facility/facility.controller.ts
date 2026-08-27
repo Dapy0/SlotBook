@@ -13,6 +13,7 @@ import {
   updateOwnedFacility,
 } from './facility.service.ts';
 import type { CreateFacilitySchedule } from '@slotbook/shared/facilitySchedule';
+import { getAllFacilityReviews } from '../review/review.service.ts';
 
 export async function getAllFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await getAllPublicFacilities(request.server.drizzle);
@@ -93,4 +94,14 @@ export async function putFacilitySchedule(
     request.body,
   );
   return response.status(201).send(schedule);
+}
+
+export async function getFacilityReviews(
+  request: FastifyRequest<{
+    Params: FacilityParams;
+  }>,
+  response: FastifyReply,
+) {
+  const reviews = await getAllFacilityReviews(request.server.drizzle, request.params.id);
+  return response.send(reviews);
 }

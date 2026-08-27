@@ -107,7 +107,7 @@ export async function changeFacilityWeekSchedule(
   console.log(newSchedule);
   await checkFacilityOwnership(db, facilityId, requestedUserId);
   await checkNoOverlapWithinSchedule(newSchedule);
-  console.log("passed checks")
+  console.log('passed checks');
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
     const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
@@ -118,3 +118,4 @@ export async function changeFacilityWeekSchedule(
   }
   return transaction;
 }
+

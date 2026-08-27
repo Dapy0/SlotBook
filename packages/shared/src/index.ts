@@ -8,3 +8,4 @@ export * from './staffServices.ts';
 export * from './staffSchedule.ts';
 export * from './bookings.ts';
 export * from './availability.ts';
+export * from './reviews';

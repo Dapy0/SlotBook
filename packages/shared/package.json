@@ -16,7 +16,8 @@
     "./staffServices": "./src/staffServices.ts",
     "./staffSchedule": "./src/staffSchedule.ts",
     "./bookings": "./src/bookings.ts",
-    "./availability": "./src/availability.ts"
+    "./availability": "./src/availability.ts",
+    "./reviews": "./src/reviews.ts"
   },
   "devDependencies": {
     "vitest": "^4.1.10"

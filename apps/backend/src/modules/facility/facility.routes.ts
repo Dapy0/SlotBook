@@ -3,6 +3,7 @@ import {
   createFacility,
   getAllFacilities,
   getFacilityById,
+  getFacilityReviews,
   getFacilitySchedule,
   getOwnFacilities,
   patchFacilityById,
@@ -30,6 +31,7 @@ import {
   responseFacilityScheduleSchema,
   type CreateFacilitySchedule,
 } from '@slotbook/shared/facilitySchedule';
+import { reviewResponseSchema } from '@slotbook/shared/reviews';
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -147,6 +149,19 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     removeFacilityById,
+  );
+  fastify.get<{ Params: FacilityParams }>(
+    '/:id/reviews',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: z.array(reviewResponseSchema),
+        },
+      },
+    },
+    getFacilityReviews,
   );
   fastify.register(staffRoutes, { prefix: '/' });
   fastify.register(bookingRoutes, { prefix: '/' });
