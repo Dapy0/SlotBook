@@ -1,7 +1,7 @@
 import type { AuthResponseDTO, LoginRequest, RegisterRequest } from '@slotbook/shared/auth';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import bcrypt from 'bcrypt';
-import { findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
+import { deleteUserDate, findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
 import {
   BadRequestError,
   ConflictError,
@@ -67,4 +67,8 @@ export async function authorizeUser(db: DB, userId: string) {
   return {
     user: newUser,
   };
+}
+export async function deleteUserById(db: DB, userId: string) {
+  await deleteUserDate(db,userId)
+
 }

@@ -8,7 +8,7 @@ export const staffMembers = pgTable(
     id: uuid().defaultRandom().primaryKey(),
     userId: uuid('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => users.id)
       .unique(),
 
     facilityId: uuid('facility_id')

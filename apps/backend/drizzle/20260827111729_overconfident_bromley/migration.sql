@@ -1,0 +1,4 @@
+ALTER TABLE "users" ADD COLUMN "deleted_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "staff_members" DROP CONSTRAINT "staff_members_user_id_users_id_fkey", ADD CONSTRAINT "staff_members_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id");--> statement-breakpoint
+ALTER TABLE "bookings" DROP CONSTRAINT "bookings_user_id_users_id_fkey", ADD CONSTRAINT "bookings_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id");--> statement-breakpoint
+ALTER TABLE "bookings" DROP CONSTRAINT "bookings_staff_member_id_staff_members_id_fkey", ADD CONSTRAINT "bookings_staff_member_id_staff_members_id_fkey" FOREIGN KEY ("staff_member_id") REFERENCES "staff_members"("id");

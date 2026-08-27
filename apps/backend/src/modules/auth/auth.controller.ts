@@ -1,9 +1,6 @@
-import {  type FastifyReply, type FastifyRequest } from 'fastify';
-import {
-  type LoginRequest,
-  type RegisterRequest,
-} from '@slotbook/shared/auth';
-import { authorizeUser, signInUser, signUpUser } from './auth.service.ts';
+import { type FastifyReply, type FastifyRequest } from 'fastify';
+import { type LoginRequest, type RegisterRequest } from '@slotbook/shared/auth';
+import { authorizeUser, deleteUserById, signInUser, signUpUser } from './auth.service.ts';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -28,7 +25,7 @@ export const postAuthRegister = async (
     request.body,
   );
   setAuthCookie(response, token);
-  return response.code(201).send({user: user});
+  return response.code(201).send({ user: user });
 };
 export const postAuthLogin = async (
   request: FastifyRequest<{ Body: LoginRequest }>,
@@ -47,7 +44,12 @@ export const getAuthMe = async (request: FastifyRequest, response: FastifyReply)
   response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
   return response.send({ user: user });
 };
-export const postAuthLogout = async (_request: FastifyRequest, response: FastifyReply) => {
+export const postAuthLogout = async (request: FastifyRequest, response: FastifyReply) => {
   response.clearCookie('token', { path: '/' });
   return response.send({ message: 'Logged out' });
 };
+
+export async function deleteUserAccount(request: FastifyRequest, response: FastifyReply) {
+  await deleteUserById(request.server.drizzle, request.user.id);
+  return response.send(204);
+}

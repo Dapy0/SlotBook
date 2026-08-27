@@ -42,6 +42,9 @@ export async function checkIfStaffIsFacilityWorker(db: DB, facilityId: string, s
   if (staffMember.facilityId !== facilityId) {
     throw new ConflictError('No such staff member working in this facility');
   }
+  if (staffMember.isActive === false) {
+    throw new ConflictError('Cant make a booking to a fired member');
+  }
   return staffMember;
 }
 

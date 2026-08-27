@@ -1,11 +1,14 @@
-import { and, eq, getColumns, getTableColumns } from 'drizzle-orm';
+import { and, eq, getColumns } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import { staffMembers } from '../../db/schema/staffMember.ts';
 import { staffServices } from '../../db/schema/staffService.ts';
 import { services } from '../../db/schema/service.ts';
 
 export async function findStaffByFacilityId(db: DB, facilityId: string) {
-  return await db.select().from(staffMembers).where(eq(staffMembers.facilityId, facilityId));
+  return await db
+    .select()
+    .from(staffMembers)
+    .where(and(eq(staffMembers.facilityId, facilityId), eq(staffMembers.isActive, true)));
 }
 
 export async function findStaffMemberById(db: DB, staffMemberId: string) {

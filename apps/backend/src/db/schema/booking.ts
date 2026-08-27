@@ -19,13 +19,13 @@ export const bookings = pgTable(
     id: uuid().defaultRandom().primaryKey(),
     clientId: uuid('user_id')
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+      .references(() => users.id),
     facilityId: uuid('facility_id')
       .notNull()
       .references(() => facilities.id, { onDelete: 'cascade' }),
     staffMemberId: uuid('staff_member_id')
       .notNull()
-      .references(() => staffMembers.id, { onDelete: 'cascade' }),
+      .references(() => staffMembers.id),
     serviceId: uuid('service_id')
       .notNull()
       .references(() => services.id),

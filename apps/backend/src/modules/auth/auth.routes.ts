@@ -1,5 +1,5 @@
 import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { getAuthMe, postAuthLogout, postAuthRegister, postAuthLogin } from './auth.controller.ts';
+import { getAuthMe, postAuthLogout, postAuthRegister, postAuthLogin, deleteUserAccount } from './auth.controller.ts';
 
 import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
 import z from 'zod';
@@ -41,6 +41,18 @@ export async function authRoutes(fastify: FastifyInstance) {
       },
     },
     getAuthMe,
+  );
+  fastify.delete(
+    '/me',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        response: {
+          204: {},
+        },
+      },
+    },
+    deleteUserAccount,
   );
   fastify.post('/logout', postAuthLogout);
 }
