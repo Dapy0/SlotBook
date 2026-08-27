@@ -49,9 +49,10 @@ export async function postReviewForBooking(
 ) {
   await createReviewForBooking(
     request.server.drizzle,
-    request.params.id,
+    request.user.id,
     request.params.bookingId,
+    request.params.id,
     request.body,
   );
-  response.code(201);
+  return response.code(201);
 }

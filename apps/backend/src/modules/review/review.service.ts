@@ -9,11 +9,15 @@ export async function createReviewForBooking(
   db: DB,
   userId: string,
   bookingId: string,
+  facilityId: string,
   reviewData: CreateReviewRequest,
 ) {
   const booking = await findBookingById(db, bookingId);
   if (!booking) {
     throw new NotFoundError('No such booking found');
+  }
+  if (booking.facilityId !== facilityId) {
+     throw new ForbiddenError('Can not review another facility service');
   }
   if (booking.clientId !== userId) {
     throw new ForbiddenError();
@@ -32,8 +36,9 @@ export async function createReviewForBooking(
 
     throw e;
   });
+  return;
 }
 export async function getAllFacilityReviews(db: DB, facilityId: string) {
-  const reviews = await findReviewsByFacilityId(db,facilityId)
+  const reviews = await findReviewsByFacilityId(db, facilityId);
   return reviews;
 }

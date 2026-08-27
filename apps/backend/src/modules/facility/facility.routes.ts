@@ -153,7 +153,6 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: FacilityParams }>(
     '/:id/reviews',
     {
-      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
