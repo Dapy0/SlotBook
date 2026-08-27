@@ -100,22 +100,14 @@ export async function changeBookingStatus(
       switch (data.status) {
         case 'confirmed':
           // console.log(userId, booking.clientId);
-          await checkFacilityOwnership(db, facilityId, userId).catch((err) => {
-            throw new ForbiddenError(
-              'Only facility owner can change booking status from pending to confirmed',
-            );
-          });
+          await checkFacilityOwnership(db, facilityId, userId);
           return await patchStatusByBookingId(db, booking.id, data.status);
         case 'canceled':
           if (booking.clientId === userId) {
             return await patchStatusByBookingId(db, booking.id, data.status);
-          } else if (await checkFacilityOwnership(db, facilityId, userId)) {
-            return await patchStatusByBookingId(db, booking.id, data.status);
-          } else {
-            throw new ForbiddenError(
-              'Only facility owner or client can change booking status from pending to canceled',
-            );
           }
+          await checkFacilityOwnership(db, facilityId, userId);
+          return await patchStatusByBookingId(db, booking.id, data.status);
       }
 
     case 'confirmed':
@@ -125,13 +117,9 @@ export async function changeBookingStatus(
         case 'canceled':
           if (booking.clientId === userId) {
             return await patchStatusByBookingId(db, booking.id, data.status);
-          } else if (await checkFacilityOwnership(db, facilityId, userId)) {
-            return await patchStatusByBookingId(db, booking.id, data.status);
-          } else {
-            throw new ForbiddenError(
-              'Only facility owner or client can change booking status from pending to canceled',
-            );
           }
+          await checkFacilityOwnership(db, facilityId, userId);
+          return await patchStatusByBookingId(db, booking.id, data.status);
       }
 
     default:
