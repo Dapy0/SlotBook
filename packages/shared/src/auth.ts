@@ -1,4 +1,4 @@
-import { userSchema } from './user.ts';
+import { userSchema } from './user';
 import z from 'zod';
 
 // Request DTOs

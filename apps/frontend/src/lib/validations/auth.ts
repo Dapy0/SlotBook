@@ -7,12 +7,11 @@ export const loginSchema = registerSchema.omit({
 
 export const signUpSchema = registerSchema
   .extend({
-    confirmPassword: z.string().min(1, 'Repeat your password'),
+    confirmPassword: z.string().min(8, 'Minimum 8 characters'),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword', 'password'],
+    path: ['confirmPassword'],
+    error: 'Passwords do not match',
   });
-
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof signUpSchema>;

@@ -39,7 +39,7 @@ export default function LoginPage() {
       const res = await login(values);
       router.push('/');
     } catch (err) {
-      setServerError('Server unavailable. Please try again later.' + err);
+      setServerError('' + err);
     }
   };
 
@@ -55,7 +55,7 @@ export default function LoginPage() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -102,7 +102,7 @@ export default function LoginPage() {
         )}
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button form="login-form" type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (

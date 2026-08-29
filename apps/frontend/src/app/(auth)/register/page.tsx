@@ -34,11 +34,12 @@ export default function RegisterPage() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError(null);
+    console.log(values);
     try {
       const res = await userRegister(values);
       router.push('/');
-    } catch {
-      setServerError('Server unavailable. Please try again later.');
+    } catch(err) {
+      setServerError('' + err);
     }
   };
   return (
@@ -55,7 +56,7 @@ export default function RegisterPage() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form id="register-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
@@ -118,7 +119,13 @@ export default function RegisterPage() {
         )}
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button
+          form="register-form"
+          aria-label="Submit"
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full"
+        >
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (

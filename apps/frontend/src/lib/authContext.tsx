@@ -3,7 +3,6 @@
 import type { UserResponse } from '@slotbook/shared/user';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-
 type AuthContextValue = {
   user: UserResponse | null;
   isLoading: boolean;
@@ -18,9 +17,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUser = async () => {
     try {
       const res = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
+        method: 'GET',
         credentials: 'include',
       });
-      const resp:{user:UserResponse} = await res.json()
+      const resp: { user: UserResponse } = await res.json();
       setUser(res.ok ? resp.user : null);
     } catch {
       setUser(null);
