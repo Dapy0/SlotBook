@@ -11,10 +11,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
 import { login } from '@/services/auth';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
-
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -26,74 +36,72 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
-      console.log(values)
       const res = await login(values);
-      // if (!res.ok) {
-      //   const data = await res.json();
-      //   setServerError(data?.message ?? 'Unable to sign in. Check your details.');
-      //   return;
-      // }
-
-      // window.location.href = '/';
+      router.push('/');
     } catch (err) {
       setServerError('Server unavailable. Please try again later.' + err);
     }
   };
 
   return (
-    <div>
-      <p className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">
-        Session
-      </p>
-      <h2 className="mt-3 font-heading text-3xl font-medium text-foreground">Sign in</h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-medium text-foreground underline underline-offset-4">
-          Sign up
-        </Link>
-      </p>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            {...register('email')}
-          />
-          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-muted-foreground underline underline-offset-4"
-            >
-              Forgot password?
-            </Link>
+    <Card className="w-full max-w-90">
+      <CardHeader>
+        <CardTitle>Sign in</CardTitle>
+        <CardDescription>Login to make an appointment!</CardDescription>
+        <CardAction>
+          <Button variant="link">
+            <Link href={'/register'}>Sign Up</Link>
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                autoComplete="email"
+                aria-invalid={!!errors.email}
+                {...register('email')}
+              />
+              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="#"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                autoComplete="current-password"
+                aria-invalid={!!errors.password}
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-xs text-destructive">{errors.password.message}</p>
+              )}
+            </div>
           </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="current-password"
-            aria-invalid={!!errors.password}
-            {...register('password')}
-          />
-          {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-        </div>
-
+        </form>
         {serverError && (
           <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {serverError}
           </div>
         )}
-
+      </CardContent>
+      <CardFooter className="flex-col gap-2">
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -103,7 +111,10 @@ export default function LoginPage() {
             </>
           )}
         </Button>
-      </form>
-    </div>
+        <Button variant="outline" disabled={true} className="w-full">
+          Login with Google
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

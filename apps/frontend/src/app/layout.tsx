@@ -38,8 +38,9 @@ export default function RootLayout({
         geistMono.variable,
         'font-sans',
         'font-sans',
-        publicSans.variable,
         montserratHeading.variable,
+        'font-sans',
+        publicSans.variable,
       )}
     >
       <body className="min-h-full flex flex-col">

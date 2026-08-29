@@ -1,4 +1,4 @@
-import { Header } from '@/components/header/Header';
+import { Header } from '@/components/layout/Header';
 
 export default function RootLayout({
   children,
@@ -7,7 +7,13 @@ export default function RootLayout({
 }>) {
   return (
     <div lang="en">
-      <Header />
+      <Header
+        navBtns={[{ variant: 'link', linkHref: '/categories', value: 'Categories' }]}
+        rightBtns={[
+          { variant: 'ghost', linkHref: '/login', value: 'Login In' },
+          { variant: 'outline', linkHref: '/register', value: 'Register' },
+        ]}
+      />
       {children}
     </div>
   );
