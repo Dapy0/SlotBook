@@ -48,7 +48,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       onRequest: [fastify.authenticate],
       schema: {
         response: {
-          204: {},
+
         },
       },
     },
