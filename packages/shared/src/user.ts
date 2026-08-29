@@ -10,6 +10,7 @@ export const userSchema = z.strictObject({
   email: z.email(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  deletedAt: z.coerce.date(),
 });
 
 export type UserResponse = z.infer<typeof userSchema>;
