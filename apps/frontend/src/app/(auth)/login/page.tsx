@@ -21,10 +21,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/authContext';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
+  const { refetch } = useAuth();
   const {
     register,
     handleSubmit,
@@ -36,7 +38,8 @@ export default function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
-      const res = await login(values);
+      await login(values);
+      await refetch();
       router.push('/');
     } catch (err) {
       setServerError('' + err);

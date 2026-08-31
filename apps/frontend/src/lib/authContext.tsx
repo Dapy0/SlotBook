@@ -1,5 +1,6 @@
 'use client';
 
+import { api } from '@/lib/api';
 import type { UserResponse } from '@slotbook/shared/user';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
@@ -14,15 +15,16 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
   const fetchUser = async () => {
     try {
-      const res = await fetch(`${process.env.BACKEND_URL}/auth/me`, {
+      const res: { user: UserResponse } = await api(`/auth/me`, {
         method: 'GET',
-        credentials: 'include',
       });
-      const resp: { user: UserResponse } = await res.json();
-      setUser(res.ok ? resp.user : null);
-    } catch {
+      setUser(res.user);
+    } catch (err) {
+      console.error(err);
+
       setUser(null);
     } finally {
       setIsLoading(false);
