@@ -54,5 +54,5 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     deleteUserAccount,
   );
-  fastify.post('/logout', postAuthLogout);
+  fastify.get('/logout', postAuthLogout);
 }
