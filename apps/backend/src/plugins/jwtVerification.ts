@@ -8,6 +8,7 @@ function jwtVerification(fastify: FastifyInstance, options = {}, done: any) {
         await request.jwtVerify({ onlyCookie: true });
       } catch (err) {
         request.log.error(err);
+        reply.clearCookie('token', { path: '/' });
         return reply.status(401).send({ message: 'Unauthorized: Session invalid or expired' });
       }
     }
