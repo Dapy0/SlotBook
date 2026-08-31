@@ -14,7 +14,9 @@ export default function RootLayout({
           { variant: 'outline', linkHref: '/register', value: 'Register' },
         ]}
       />
-      {children}
+      <div className="flex flex-1 items-center justify-center p-8 w-full max-w-7xl mx-auto ">
+        {children}
+      </div>
     </div>
   );
 }
