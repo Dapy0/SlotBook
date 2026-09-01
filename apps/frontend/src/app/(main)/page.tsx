@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Circle, Dot } from 'lucide-react';
 import s from './main.module.css';
 import { RotatingCategory } from '@/components/layout/RotatingCategory';
+import SmallFacilityPreviewCard from '@/components/layout/SmallFacilityPreviewCard';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -40,6 +41,19 @@ function Page() {
           </div>
         </div>
       </section>
+      <main className="mt-20">
+        <div>
+          <h1 className="text-3xl font-semibold">Close to you</h1>
+          <div className=" flex flex-wrap gap-8 mt-5">
+            <SmallFacilityPreviewCard score={4.8} />
+            <SmallFacilityPreviewCard score={4.8} />
+            <SmallFacilityPreviewCard score={3.8} />
+            <SmallFacilityPreviewCard score={3.8} />
+            <SmallFacilityPreviewCard score={4.8} />
+            <SmallFacilityPreviewCard score={4.8} />
+          </div>
+        </div>
+      </main>
       <footer className="w-full  mt-20">
         <div className="max-w-3xl my-0 mx-auto text-center  ">
           <p className="m-0 text-xl font-semibold">Как это работает</p>
