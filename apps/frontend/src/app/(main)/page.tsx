@@ -4,6 +4,7 @@ import { Circle, Dot } from 'lucide-react';
 import s from './main.module.css';
 import { RotatingCategory } from '@/components/layout/RotatingCategory';
 import SmallFacilityPreviewCard from '@/components/layout/SmallFacilityPreviewCard';
+import BigFacilityPreviewCard from '@/components/layout/BigFacilityPreviewCard';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -41,7 +42,7 @@ function Page() {
           </div>
         </div>
       </section>
-      <main className="mt-20">
+      <main className="mt-20 flex flex-col gap-5">
         <div>
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className=" flex flex-wrap gap-8 mt-5">
@@ -51,6 +52,13 @@ function Page() {
             <SmallFacilityPreviewCard score={3.8} />
             <SmallFacilityPreviewCard score={4.8} />
             <SmallFacilityPreviewCard score={4.8} />
+          </div>
+        </div>
+        <div>
+          <h1 className="text-3xl font-semibold">Promoted</h1>
+          <div className=" flex flex-col gap-3 mt-5">
+            <BigFacilityPreviewCard score={4.8} />
+            <BigFacilityPreviewCard score={4.8} />
           </div>
         </div>
       </main>
