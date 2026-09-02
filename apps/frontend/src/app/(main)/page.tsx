@@ -64,23 +64,23 @@ function Page() {
       </main>
       <footer className="w-full  mt-20">
         <div className="max-w-3xl my-0 mx-auto text-center  ">
-          <p className="m-0 text-xl font-semibold">Как это работает</p>
+          <p className="m-0 text-xl font-semibold">How it works</p>
           <p className="mt-2  text-gray-600">
-            Слоты приходят из расписания заведения, поэтому вы видите настоящее свободное время, а
-            не «перезвоним и уточним». Запись открыта на 30 дней вперёд, подтверждение приходит в
-            Telegram, отменить можно не позднее чем за 2 часа до начала.
+            Slots come directly from the venue's schedule, so you see actual availability — not
+            "we'll call you back to confirm." Bookings are open 30 days ahead, confirmation comes
+            via Telegram, and you can cancel up to 2 hours before the start.
           </p>
         </div>
         <div className="border rounded-md overflow-hidden  mt-20">
           <div className="flex items-center justify-between gpa-4 p-4 bg-muted flex-wrap">
             <div>
-              <p className="m-0 text-xl font-semibold">У вас своё заведение?</p>
+              <p className="m-0 text-xl font-semibold">Have your own venue?</p>
               <p className="mt-2  text-gray-600">
-                Заведите услуги, сотрудников и рабочие часы — расписание считается само.
+                Set up your services, staff, and working hours — the schedule builds itself.
               </p>
             </div>
             <Button className="" variant={'default'}>
-              Подключить заведение
+              Add your venue
             </Button>
           </div>
         </div>

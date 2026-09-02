@@ -12,7 +12,7 @@ function BigFacilityPreviewCard({ score }: { score: number }) {
         <div className="flex items-center  gap-2">
           {' '}
           <Badge variant={'default'} className="text-cyan-500 rounded-md bg-cyan-100 shadow-s">
-            Спорт
+            Sport
           </Badge>
           <Badge variant={'default'} className="text-gray-500 rounded-md bg-gray-200 shadow-s">
             Rent a racket
@@ -33,7 +33,7 @@ function BigFacilityPreviewCard({ score }: { score: number }) {
             <span className="text-sm text-gray-600">4.7 km</span>
           </div>
           <p className={'text-sm text-gray-700'}>
-            Четыре крытых корта, аренда ракеток и мячей, душевые. Бронь по часам, оплата на месте.
+            Four indoor courts, racket and ball rental, showers. Hourly booking, payment on site.
           </p>
         </div>
         <div className="flex items-center gap-3">
