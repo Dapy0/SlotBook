@@ -12,6 +12,8 @@ import WorkingHours from '@/components/layout/WorkingHours';
 import ContactInfo from '@/components/layout/ContactInfo';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ServicesList from '@/components/layout/ServicesList';
+import StaffList from '@/components/layout/StaffList';
+import ReviewsList from '@/components/layout/ReviewsList';
 // import StaffList from '@/components/layout/StaffList';
 // import ReviewsList from '@/components/layout/ReviewsList';
 
@@ -102,10 +104,10 @@ function Page({
                 <ServicesList query={query} />
               </TabsContent>
               <TabsContent value="staff" className="mt-3">
-                {/* <StaffList query={query} /> */}
+                <StaffList query={query} />
               </TabsContent>
               <TabsContent value="reviews" className="mt-3">
-                {/* <ReviewsList /> */}
+                <ReviewsList />
               </TabsContent>
             </Tabs>
           </main>

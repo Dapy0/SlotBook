@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const groups = [
   {
@@ -79,9 +80,8 @@ export default function ServicesList({ query = '' }: { query?: string }) {
 
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-semibold text-gray-900">{service.price}</span>
-                  <button className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-700">
-                    {service.cta}
-                  </button>
+                  <Button>{service.cta}</Button>
+
                 </div>
               </div>
             ))}
