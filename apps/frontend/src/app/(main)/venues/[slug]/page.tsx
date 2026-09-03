@@ -40,7 +40,7 @@ function Page({
     <div className="">
       <BreadCrumbs crumbsList={['categories', 'hair', name]} />
       <div className="flex gap-10">
-        <div className="flex flex-col gap-2 mb-6 flex-1">
+        <div className="flex flex-col gap-2 flex-1">
           <div className="flex items-center gap-2">
             <Badge variant={'default'} className="text-cyan-500 rounded-md bg-cyan-100 shadow-s">
               Sport
@@ -66,7 +66,7 @@ function Page({
             Four indoor courts, racket and ball rental, showers. Hourly booking, payment on site.
           </p>
 
-          <main className="flex flex-col gap-3">
+          <main className="flex flex-col gap-3 mt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="flex items-center justify-between">
                 <TabsList variant="line">
