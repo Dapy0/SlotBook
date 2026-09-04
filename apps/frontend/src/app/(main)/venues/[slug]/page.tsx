@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import BreadCrumbs from '@/components/layout/BreadCrumbs';
-import { facilities } from '../../../../../../backend/src/db/schema/facility';
 import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 import { Badge } from '@/components/ui/badge';
 import ScoreBadge from '@/components/layout/ScoreBadge';
