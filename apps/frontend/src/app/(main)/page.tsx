@@ -5,6 +5,10 @@ import s from './main.module.css';
 import { RotatingCategory } from '@/components/layout/RotatingCategory';
 import SmallFacilityPreviewCard from '@/components/layout/SmallFacilityPreviewCard';
 import BigFacilityPreviewCard from '@/components/layout/BigFacilityPreviewCard';
+import { getFacilities } from '@/services/facilities';
+import { getCategories } from '@/services/categories';
+import { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -14,7 +18,9 @@ const CATEGORY_WORDS = [
   'soccer',
 ];
 
-function Page() {
+async function Page() {
+  const [facilities, categories] = await Promise.all([getFacilities(), getCategories(4)]).catch();
+
   return (
     <div>
       <section className="text-center flex flex-col gap-3 justify-center">
@@ -28,17 +34,23 @@ function Page() {
         </div>
         <div className="mt-5">
           <div className="flex gap-2 flex-wrap justify-center">
-            {CATEGORY_WORDS.map((word) => (
-              <Button
-                key={word + 'category'}
-                variant={'outline'}
-                className={'text-center text-medium hover:bg-purple-50 hover:border-purple-200'}
-              >
-                <Dot className={' size-7 [&>circle]:text-purple-400'} />
-                {word}
-                <span className="text-gray-400 text-xs">4</span>
-              </Button>
-            ))}
+            <Suspense
+              fallback={Array.from({ length: 5 }).map((index) => (
+                <Skeleton key={`skel-cat-${index}`} className="w-20" />
+              ))}
+            >
+              {categories.map((categoryMeta) => (
+                <Button
+                  key={categoryMeta.categoryName}
+                  variant={'outline'}
+                  className={'text-center text-medium hover:bg-purple-50 hover:border-purple-200'}
+                >
+                  <Dot className={' size-7 [&>circle]:text-purple-400'} />
+                  {categoryMeta.categoryName}
+                  <span className="text-gray-400 text-xs">{categoryMeta.count}</span>
+                </Button>
+              ))}
+            </Suspense>
           </div>
         </div>
       </section>
@@ -46,6 +58,9 @@ function Page() {
         <div>
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className=" flex flex-wrap gap-8 mt-5">
+            {
+
+            }
             <SmallFacilityPreviewCard score={4.8} />
             <SmallFacilityPreviewCard score={4.8} />
             <SmallFacilityPreviewCard score={3.8} />

@@ -18,10 +18,10 @@ import Link from 'next/link';
 
 const supportedCounties = [
   { label: '🌍', value: null },
-  { label: 'Poland', value: 'pl' },
-  { label: 'Germany', value: 'ge' },
-  { label: 'Moldova', value: 'md' },
-  { label: 'Romania', value: 'ro' },
+  { label: 'Poland', value: 'PL' },
+  { label: 'Germany', value: 'GE' },
+  { label: 'Moldova', value: 'MD' },
+  { label: 'Romania', value: 'RO' },
 ];
 
 export function Header({
@@ -54,9 +54,9 @@ export function Header({
             items={supportedCounties}
             onValueChange={(val) => {
               if (!val) return;
-              document.cookie = `_sb_reg=${val}`;
+              document.cookie = `_sb_country=${val}`;
             }}
-            defaultValue={getCookie('_sb_reg') ?? supportedCounties[0].label}
+            defaultValue={getCookie('_sb_country') || '🌍'}
           >
             <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
               <SelectValue />

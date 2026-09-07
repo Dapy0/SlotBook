@@ -1,8 +1,15 @@
 import { api } from '@/lib/api';
 import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 
-export async function getFacilities(): Promise<FacilityResponseDTO[]> {
-  const result = await api<FacilityResponseDTO[]>('/facilities/', {
+export async function getFacilities(city: string, limit?: number): Promise<FacilityResponseDTO[]> {
+  const params = new URLSearchParams();
+  params.set('city', city);
+  if (limit !== undefined) params.set('limit', String(limit));
+
+  const query = params.toString();
+  const endpoint = query ? `/facilities/?${query}` : '/facilities/';
+
+  const result = await api<FacilityResponseDTO[]>(endpoint, {
     method: 'GET',
   });
 
