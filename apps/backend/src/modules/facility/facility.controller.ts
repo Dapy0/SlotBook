@@ -1,7 +1,11 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
-import type { FacilityParams } from './facility.schema.ts';
+import type {
+  FacilityCategoryQuerystring,
+  FacilityListQuery,
+  FacilityParams,
+} from './facility.schema.ts';
 import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
@@ -14,9 +18,17 @@ import {
 } from './facility.service.ts';
 import type { CreateFacilitySchedule } from '@slotbook/shared/facilitySchedule';
 import { getAllFacilityReviews } from '../review/review.service.ts';
+import { getAllCategories } from './facility.repository.ts';
 
-export async function getAllFacilities(request: FastifyRequest, response: FastifyReply) {
-  const facilities = await getAllPublicFacilities(request.server.drizzle);
+export async function getAllFacilities(
+  request: FastifyRequest<{ Querystring: FacilityListQuery }>,
+  response: FastifyReply,
+) {
+  const facilities = await getAllPublicFacilities(
+    request.server.drizzle,
+    request.query.city,
+    request.query.limit,
+  );
   response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');
   return response.send(facilities);
 }
@@ -104,4 +116,12 @@ export async function getFacilityReviews(
 ) {
   const reviews = await getAllFacilityReviews(request.server.drizzle, request.params.id);
   return response.send(reviews);
+}
+
+export async function getAllFacilitiesCategory(
+  request: FastifyRequest<{ Querystring: FacilityCategoryQuerystring }>,
+  response: FastifyReply,
+) {
+  const categories = await getAllCategories(request.server.drizzle, request.query.limit);
+  return response.send(categories);
 }

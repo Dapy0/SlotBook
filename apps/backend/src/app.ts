@@ -24,6 +24,7 @@ import fastifyEtag from '@fastify/etag';
 import fastifyCaching from '@fastify/caching';
 import { AppError } from './lib/errors.ts';
 import { mineBookingsRoutes } from './modules/booking/booking.routes.ts';
+import geoLocation from './plugins/geoLocation.ts';
 
 export async function createServer() {
   const app = Fastify({
@@ -60,7 +61,7 @@ export async function createServer() {
   await app.register(fastifyJwt, fastifyJwtOptions);
   await app.register(drizzlePlugin);
   await app.register(jwtVerification);
-
+  await app.register(geoLocation);
   // routes
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(facilityRoutes, { prefix: '/facilities' });

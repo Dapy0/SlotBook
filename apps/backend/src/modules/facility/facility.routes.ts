@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import {
   createFacility,
   getAllFacilities,
+  getAllFacilitiesCategory,
   getFacilityById,
   getFacilityReviews,
   getFacilitySchedule,
@@ -11,8 +12,10 @@ import {
   removeFacilityById,
 } from './facility.controller.ts';
 import {
+  facilityCategoryQuerystringSchema,
   facilityListQuerySchema,
   facilityParamsSchema,
+  type FacilityCategoryQuerystring,
   type FacilityParams,
 } from './facility.schema.ts';
 
@@ -161,6 +164,15 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     getFacilityReviews,
+  );
+  fastify.get<{ Querystring: FacilityCategoryQuerystring }>(
+    '/categories',
+    {
+      schema: {
+        querystring: facilityCategoryQuerystringSchema,
+      },
+    },
+    getAllFacilitiesCategory,
   );
   fastify.register(staffRoutes, { prefix: '/' });
   fastify.register(bookingRoutes, { prefix: '/' });
