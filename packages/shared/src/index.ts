@@ -9,3 +9,4 @@ export * from './staffSchedule.ts';
 export * from './bookings.ts';
 export * from './availability.ts';
 export * from './reviews';
+export * from './errors.ts';
