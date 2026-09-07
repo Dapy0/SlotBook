@@ -1,6 +1,8 @@
 'use client';
 
+import { toast } from '@/components/ui/toast';
 import { api } from '@/lib/api';
+import type { AuthResponseDTO } from '@slotbook/shared/auth';
 import type { UserResponse } from '@slotbook/shared/user';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
@@ -18,13 +20,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const res: { user: UserResponse } = await api(`/auth/me`, {
+      const res = await api<AuthResponseDTO>(`/auth/me`, {
         method: 'GET',
       });
       setUser(res.user);
     } catch (err) {
-      console.error(err);
-
+      if (err instanceof Error) {
+        toast.add({
+          title: err.message,
+          description: 'Error connecting to server',
+          priority: 'high',
+          timeout: 3000,
+        });
+      }
       setUser(null);
     } finally {
       setIsLoading(false);

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Instrument_Sans, Montserrat, Public_Sans } from 'nex
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/lib/authContext';
+import { Toaster } from '@/components/ui/toast';
 
 const montserratHeading = Montserrat({ subsets: ['latin'], variable: '--font-heading' });
 
@@ -45,6 +46,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>{children}</AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

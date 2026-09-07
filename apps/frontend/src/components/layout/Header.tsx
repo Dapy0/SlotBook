@@ -1,6 +1,7 @@
 'use client';
 import ProfileMenu from '@/components/layout/ProfileMenu';
 import { Button, type buttonVariants } from '@/components/ui/button';
+import { toast } from '@/components/ui/toast';
 import { useAuth } from '@/lib/authContext';
 import type { VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
@@ -35,7 +36,11 @@ export function Header({
             <ProfileMenu user={user} profilePicture={''} onLogout={logout} />
           ) : (
             rightBtns?.map((btn) => (
-              <Button key={btn.linkHref} variant={btn.variant}>
+              <Button
+                
+                key={btn.linkHref}
+                variant={btn.variant}
+              >
                 {' '}
                 <Link href={btn.linkHref ?? ''}>{btn.value}</Link>
               </Button>

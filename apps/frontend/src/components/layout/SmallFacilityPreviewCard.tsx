@@ -6,7 +6,7 @@ function SmallFacilityPreviewCard({ score }: { score: number }) {
     <div className="relative rounded-md p-4 max-w-60 border  overflow-hidden">
       <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>{' '}
       {/*Gradient*/}
-      <img src="" alt="" />
+      {/* <img src="" alt="" /> */}
       <div className="relative z-40">
         <div className="flex justify-between items-center  gap-17">
           {' '}

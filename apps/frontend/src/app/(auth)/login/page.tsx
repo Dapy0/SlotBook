@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -26,7 +26,7 @@ import { useAuth } from '@/lib/authContext';
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
-  const { refetch } = useAuth();
+  const { user, refetch } = useAuth();
   const {
     register,
     handleSubmit,
@@ -34,12 +34,15 @@ export default function LoginPage() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
+  useEffect(() => {
+    if (user) router.push('/');
+  }, [user]);
 
   const onSubmit = async (values: LoginFormValues) => {
     setServerError(null);
     try {
       await login(values);
-      await refetch(); 
+      await refetch();
       router.push('/');
     } catch (err) {
       setServerError('' + err);

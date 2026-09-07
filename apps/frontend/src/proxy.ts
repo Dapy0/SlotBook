@@ -9,13 +9,13 @@ export function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL('/register', request.url));
     }
   }
-  if (
-    (request.nextUrl.pathname.startsWith('/login') ||
-      request.nextUrl.pathname.startsWith('/register')) &&
-    token
-  ) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // if (
+  //   (request.nextUrl.pathname.startsWith('/login') ||
+  //     request.nextUrl.pathname.startsWith('/register')) &&
+  //   token
+  // ) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
   return NextResponse.next();
 }
 
