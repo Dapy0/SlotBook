@@ -15,7 +15,7 @@ export function Header({
 }) {
   const { user, isLoading, logout } = useAuth();
   return (
-    <header className="sticky top-0 z-40 bg-background border-border  border-b">
+    <header className="sticky top-0 z-400 bg-background border-border  border-b">
       <div className="flex justify-between align-center gap-4 p-4 max-w-7xl my-0 mx-auto">
         <button className=" bg-none border-0 p-0 cursor-pointer font-sans font-bold text-xl tracking-tight text-">
           <Link href={'/'}>
@@ -37,7 +37,7 @@ export function Header({
           ) : (
             rightBtns?.map((btn) => (
               <Button
-                
+
                 key={btn.linkHref}
                 variant={btn.variant}
               >
