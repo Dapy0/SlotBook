@@ -43,6 +43,7 @@ export const facilities = pgTable(
   (table) => [
     index('facilities_city_idx').on(table.city),
     index('facilities_owner_idx').on(table.ownerId),
+    index('facilities_category_idx').on(table.category),
   ],
 );
 export type FacilityEntity = typeof facilities.$inferSelect;

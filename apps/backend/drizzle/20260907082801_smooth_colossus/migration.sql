@@ -1,0 +1,1 @@
+CREATE INDEX "facilities_category_idx" ON "facilities" ("category");

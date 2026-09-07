@@ -7,9 +7,44 @@ export const FACILITY_CATEGORIES = [
   'EDUCATION',
   'OTHER',
 ] as const;
+export const CATEGORY_METADATA: Record<
+  (typeof FACILITY_CATEGORIES)[number],
+  { label: string; description: string; icon: string }
+> = {
+  BEAUTY: {
+    label: 'Beauty & Wellness',
+    description: 'Salons, barbers, nails, spa and massage',
+    icon: 'Sparkles',
+  },
+  SPORT_FITNESS: {
+    label: 'Sport & Fitness',
+    description: 'Gyms, personal training and fitness studios',
+    icon: 'Dumbbell',
+  },
+  MEDICAL: {
+    label: 'Medical & Health',
+    description: 'Clinics, dentists and health specialists',
+    icon: 'Stethoscope',
+  },
+  AUTO: {
+    label: 'Auto Services',
+    description: 'Car service, detailing and repair shops',
+    icon: 'Car',
+  },
+  EDUCATION: {
+    label: 'Education & Tutoring',
+    description: 'Private lessons, courses and tutors',
+    icon: 'GraduationCap',
+  },
+  OTHER: {
+    label: 'Other',
+    description: 'Everything else',
+    icon: 'Shapes',
+  },
+};
+
 export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
-
 
 const supportedTimezones = Intl.supportedValuesOf('timeZone');
 
