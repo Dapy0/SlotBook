@@ -7,7 +7,7 @@ function SmallFacilityPreviewCard({ score }: { score: number }) {
       <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>{' '}
       {/*Gradient*/}
       {/* <img src="" alt="" /> */}
-      <div className="relative z-40">
+      <div className="relative z-10">
         <div className="flex justify-between items-center  gap-17">
           {' '}
           <Badge variant={'outline'} className="text-pink-500 rounded-md bg-pink-100 shadow-s">
