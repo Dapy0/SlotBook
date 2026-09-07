@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signUpSchema, type RegisterFormValues } from '@/lib/validations/auth';
-import { register as userRegister } from '@/services/auth';
+import { register as userRegister } from '@/services/auth/auth';
 import {
   Card,
   CardAction,
@@ -21,6 +21,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/authContext';
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
@@ -31,11 +32,13 @@ export default function RegisterPage() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(signUpSchema),
   });
+  const { refetch } = useAuth();
 
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError(null);
     try {
-      const res = await userRegister(values);
+      await userRegister(values);
+      // await refetch();
       setTimeout(() => {}, 1000);
       router.push('/');
     } catch (err) {

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
-import { login } from '@/services/auth';
+import { login } from '@/services/auth/auth';
 import {
   Card,
   CardAction,
@@ -39,7 +39,7 @@ export default function LoginPage() {
     setServerError(null);
     try {
       await login(values);
-      await refetch();
+      await refetch(); 
       router.push('/');
     } catch (err) {
       setServerError('' + err);

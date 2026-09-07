@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { CameraIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
   { href: '/account/appointments', label: 'Bookings' },
@@ -36,7 +37,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <nav className="flex flex-col">
+        <nav className="flex flex-col mb-8">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -54,6 +55,10 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             );
           })}
         </nav>
+
+        <Button className={'w-full py-5'}>
+          <Link href={'/create'}>Create a venue</Link>
+        </Button>
       </aside>
 
       <div className="min-w-0 flex-1">{children}</div>
