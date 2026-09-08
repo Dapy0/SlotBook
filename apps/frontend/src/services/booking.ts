@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { BookingResponse, CreateBookingRequest } from '@slotbook/shared/bookings';
+import type { BookingResponse } from '@slotbook/shared/bookings';
 
 export type CreateBookingPayload = {
   staffMemberId: string;

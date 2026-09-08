@@ -1,18 +1,19 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import fp from 'fastify-plugin';
 import geoip from 'geoip-lite';
 
 const COOKIE_NAME = '_sb_country';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
-async function detectCountry(request: FastifyRequest, reply: FastifyReply) {
-  if (request.cookies[COOKIE_NAME]) return;
+export async function detectCountry(request: FastifyRequest, response: FastifyReply) {
+  if (request.cookies[COOKIE_NAME]) {
+    return response.code(200).send({ country: request.cookies[COOKIE_NAME] });
+  }
 
   const ip = request.ip.replace('::ffff:', '');
   const geo = geoip.lookup(ip);
   const country = geo?.country ?? 'PL';
 
-  reply.setCookie(COOKIE_NAME, country, {
+  response.setCookie(COOKIE_NAME, country, {
     httpOnly: false,
     secure: false,
     sameSite: 'lax',
@@ -20,11 +21,6 @@ async function detectCountry(request: FastifyRequest, reply: FastifyReply) {
     maxAge: COOKIE_MAX_AGE,
     signed: false,
   });
-}
 
-function geoLocation(fastify: FastifyInstance, options = {}, done: any) {
-  fastify.addHook('onRequest', detectCountry);
-  done();
+  return response.code(200).send({ country:country});
 }
-
-export default fp(geoLocation, { name: 'geoLocation' });

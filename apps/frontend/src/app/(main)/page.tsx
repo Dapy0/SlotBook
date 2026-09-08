@@ -19,7 +19,7 @@ const CATEGORY_WORDS = [
 ];
 
 async function Page() {
-  const [facilities, categories] = await Promise.all([getFacilities(), getCategories(4)]).catch();
+  const [facilities, categories] = await Promise.all([[], getCategories(4)]).catch();
 
   return (
     <div>
