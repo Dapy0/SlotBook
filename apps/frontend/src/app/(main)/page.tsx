@@ -63,9 +63,9 @@ async function Page() {
       <main className="mt-20 flex flex-col gap-5">
         <div>
           <h1 className="text-3xl font-semibold">Close to you</h1>
-          <div className=" flex flex-wrap gap-8 mt-5">
+          <div className="flex flex-wrap gap-8 mt-5">
             {facilities.map((facility) => (
-              <SmallFacilityPreviewCard key={facility.id} score={5} facility={facility} />
+              <SmallFacilityPreviewCard key={facility.id}facility={facility} />
             ))}
           </div>
         </div>

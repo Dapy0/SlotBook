@@ -4,6 +4,7 @@ import { findBookingById } from '../booking/booking.repository.ts';
 import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
 import { parseTsRangeLiteral } from '@slotbook/shared/bookings';
 import { findReviewsByFacilityId, insertReview } from './review.repository.ts';
+import { recalculateFacilityScore } from '../facility/facility.repository.ts';
 
 export async function createReviewForBooking(
   db: DB,
@@ -17,7 +18,7 @@ export async function createReviewForBooking(
     throw new NotFoundError('No such booking found');
   }
   if (booking.facilityId !== facilityId) {
-     throw new ForbiddenError('Can not review another facility service');
+    throw new ForbiddenError('Can not review another facility service');
   }
   if (booking.clientId !== userId) {
     throw new ForbiddenError();
@@ -36,6 +37,7 @@ export async function createReviewForBooking(
 
     throw e;
   });
+  await recalculateFacilityScore(db, facilityId);
   return;
 }
 export async function getAllFacilityReviews(db: DB, facilityId: string) {

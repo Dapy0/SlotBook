@@ -9,6 +9,7 @@ import {
   text,
   pgEnum,
   pgTable,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.ts';
 import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
@@ -34,6 +35,8 @@ export const facilities = pgTable(
     phone: varchar({ length: 32 }).notNull(),
     email: varchar({ length: 255 }).notNull(),
     images: jsonb().$type<string[]>().notNull(),
+    score: numeric({ precision: 3, scale: 1, mode: 'number' }),
+    reviewsCount: integer().notNull().default(0),
     isPublished: boolean('is_published').notNull().default(false),
     timezoneIANA: text('timezone_IANA').notNull().default('Europe/Warsaw'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

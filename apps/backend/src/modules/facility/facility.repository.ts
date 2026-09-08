@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq } from 'drizzle-orm';
+import { and, asc, avg, count, desc, eq } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import {
   facilities,
@@ -7,6 +7,8 @@ import {
 } from '../../db/schema/facility.ts';
 import type { UpdateFacilityRequest } from '@slotbook/shared/facility';
 import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
+import { reviews } from '../../db/schema/reviews.ts';
+import { bookings } from '../../db/schema/booking.ts';
 
 export async function findAllFacilities(
   db: DB,
@@ -85,4 +87,24 @@ export async function getAllCategories(
   }
 
   return await query;
+}
+
+export async function recalculateFacilityScore(db: DB, facilityId: string) {
+  const [result] = await db
+    .select({
+      avgRating: avg(reviews.rating),
+      count: count(reviews.id),
+    })
+    .from(reviews)
+    .innerJoin(bookings, eq(bookings.id, reviews.bookingId))
+    .where(eq(bookings.facilityId, facilityId));
+
+  const updatedFacility = await db
+    .update(facilities)
+    .set({
+      reviewsCount: result?.count ?? 0,
+      score: result?.avgRating ? Number(result.avgRating) : null,
+    })
+    .returning();
+  return updatedFacility;
 }
