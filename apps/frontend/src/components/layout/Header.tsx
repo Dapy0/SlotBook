@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/authContext';
@@ -22,7 +23,7 @@ import { Suspense, use, useEffect, useState } from 'react';
 const supportedCounties = [
   { label: '🌍', value: null },
   { label: 'Poland', value: 'PL' },
-  { label: 'Germany', value: 'GE' },
+  { label: 'Germany', value: 'DE' },
   { label: 'Moldova', value: 'MD' },
   { label: 'Romania', value: 'RO' },
 ];
@@ -62,13 +63,19 @@ export function Header({
           ))}
         </nav>
         <div className="flex gap-2 ml-auto items-center">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense
+            fallback={
+
+                <Spinner />
+
+            }
+          >
             <Select
               items={supportedCounties}
               onValueChange={(val) => {
                 if (!val) return;
                 document.cookie = `_sb_country=${val}`;
-                setLocation(val)
+                setLocation(val);
               }}
               value={location ?? null}
             >

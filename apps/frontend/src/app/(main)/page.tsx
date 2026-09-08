@@ -11,6 +11,7 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCookie } from '@/lib/utils';
 import { cookies } from 'next/headers';
+import { CATEGORY_METADATA } from '@slotbook/shared/facility';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -24,7 +25,7 @@ async function Page() {
   const cookieStore = await cookies();
   const local = cookieStore.get('_sb_country')?.value;
   const [facilities, categories] = await Promise.all([
-    getFacilities(local || 'PL'),
+    getFacilities(local || 'PL',8),
     getCategories(4),
   ]).catch();
   return (
@@ -45,15 +46,22 @@ async function Page() {
                 <Skeleton key={`skel-cat-${index}`} className="w-20" />
               ))}
             >
-              {categories.map((categoryMeta) => (
+              {categories.map((category) => (
                 <Button
-                  key={categoryMeta.categoryName}
+                  key={CATEGORY_METADATA[category.categoryName].label}
                   variant={'outline'}
-                  className={'text-center text-medium hover:bg-purple-50 hover:border-purple-200'}
+                  style={
+                    {
+                      '--icon-color-temp': CATEGORY_METADATA[category.categoryName].color,
+                    } as React.CSSProperties
+                  }
+                  className={
+                    'text-center text-medium hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)] hover:border-(--icon-color-temp)'
+                  }
                 >
-                  <Dot className={' size-7 [&>circle]:text-purple-400'} />
-                  {categoryMeta.categoryName}
-                  <span className="text-gray-400 text-xs">{categoryMeta.count}</span>
+                  <Dot className={` size-7 [&>circle]:text-(--icon-color-temp)`} />
+                  {CATEGORY_METADATA[category.categoryName].label}
+                  <span className="text-gray-400 text-xs">{category.count}</span>
                 </Button>
               ))}
             </Suspense>
@@ -65,7 +73,7 @@ async function Page() {
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className="flex flex-wrap gap-8 mt-5">
             {facilities.map((facility) => (
-              <SmallFacilityPreviewCard key={facility.id}facility={facility} />
+              <SmallFacilityPreviewCard key={facility.id} facility={facility} />
             ))}
           </div>
         </div>
