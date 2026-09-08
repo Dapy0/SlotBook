@@ -1,9 +1,12 @@
 import { api } from '@/lib/api';
 import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 
-export async function getFacilities(city: string, limit?: number): Promise<FacilityResponseDTO[]> {
+export async function getFacilities(
+  country: string,
+  limit?: number,
+): Promise<FacilityResponseDTO[]> {
   const params = new URLSearchParams();
-  params.set('city', city);
+  params.set('country', country);
   if (limit !== undefined) params.set('limit', String(limit));
 
   const query = params.toString();

@@ -26,7 +26,7 @@ export async function getAllFacilities(
 ) {
   const facilities = await getAllPublicFacilities(
     request.server.drizzle,
-    request.query.city,
+    request.query.country,
     request.query.limit,
   );
   response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');

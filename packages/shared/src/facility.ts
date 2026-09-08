@@ -60,6 +60,7 @@ export const createFacilityRequestSchema = z.object({
     .max(255)
     .regex(/^[a-z0-9-]+$/),
   city: z.string().min(1),
+  country: z.string().min(1).max(2),
   address: z.string().min(1),
   phone: z.string().min(5).max(32),
   email: z.email(),

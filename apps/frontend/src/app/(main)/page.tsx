@@ -9,6 +9,8 @@ import { getFacilities } from '@/services/facilities';
 import { getCategories } from '@/services/categories';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getCookie } from '@/lib/utils';
+import { cookies } from 'next/headers';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -19,8 +21,12 @@ const CATEGORY_WORDS = [
 ];
 
 async function Page() {
-  const [facilities, categories] = await Promise.all([[], getCategories(4)]).catch();
-
+  const cookieStore = await cookies();
+  const local = cookieStore.get('_sb_country')?.value;
+  const [facilities, categories] = await Promise.all([
+    getFacilities(local || 'PL'),
+    getCategories(4),
+  ]).catch();
   return (
     <div>
       <section className="text-center flex flex-col gap-3 justify-center">
@@ -58,15 +64,9 @@ async function Page() {
         <div>
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className=" flex flex-wrap gap-8 mt-5">
-            {
-
-            }
-            <SmallFacilityPreviewCard score={4.8} />
-            <SmallFacilityPreviewCard score={4.8} />
-            <SmallFacilityPreviewCard score={3.8} />
-            <SmallFacilityPreviewCard score={3.8} />
-            <SmallFacilityPreviewCard score={4.8} />
-            <SmallFacilityPreviewCard score={4.8} />
+            {facilities.map((facility) => (
+              <SmallFacilityPreviewCard key={facility.id} score={5} facility={facility} />
+            ))}
           </div>
         </div>
         <div>

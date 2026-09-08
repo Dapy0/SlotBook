@@ -16,6 +16,7 @@ import { useAuth } from '@/lib/authContext';
 import { getCookie, getLocation } from '@/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Suspense, use, useEffect, useState } from 'react';
 
 const supportedCounties = [
@@ -35,10 +36,13 @@ export function Header({
 }) {
   const { user, isLoading, logout } = useAuth();
   const [location, setLocation] = useState<string | null>(null);
-
+  const router = useRouter();
   useEffect(() => {
-    getLocation().then((vale) => setLocation(vale.country));
-  }, []);
+    getLocation().then((vale) => {
+      setLocation(vale.country);
+      router.refresh();
+    });
+  }, [location]);
 
   return (
     <header className="sticky top-0 z-30 bg-background border-border  border-b">
@@ -64,6 +68,7 @@ export function Header({
               onValueChange={(val) => {
                 if (!val) return;
                 document.cookie = `_sb_country=${val}`;
+                setLocation(val)
               }}
               value={location ?? null}
             >

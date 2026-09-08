@@ -1,0 +1,1 @@
+ALTER TABLE "facilities" ADD COLUMN "country" varchar(2) NOT NULL;

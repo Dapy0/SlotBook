@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export const facilityListQuerySchema = z.object({
-  city: z.string(),
+  country: z.string(),
   limit: z.coerce.number().nonnegative().optional(),
 });
 export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;

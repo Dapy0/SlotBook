@@ -1,4 +1,3 @@
-
 import {
   varchar,
   numeric,
@@ -28,6 +27,7 @@ export const facilities = pgTable(
     description: text().notNull(),
     category: facilityCategoryEnum('category').notNull(),
     city: varchar({ length: 120 }).notNull(),
+    country: varchar({ length: 2 }).notNull(),
     address: varchar({ length: 255 }).notNull(),
     latitude: numeric({ precision: 9, scale: 6, mode: 'number' }),
     longitude: numeric({ precision: 9, scale: 6, mode: 'number' }),

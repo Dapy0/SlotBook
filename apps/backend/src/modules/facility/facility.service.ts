@@ -32,8 +32,8 @@ export async function checkFacilityOwnership(db: DB, facilityId: string, userId:
   }
   return facility;
 }
-export async function getAllPublicFacilities(db: DB, city: string, limit?: number) {
-  return findAllFacilities(db, city, limit);
+export async function getAllPublicFacilities(db: DB, country: string, limit?: number) {
+  return findAllFacilities(db, country, limit)
 }
 export async function getFacilityDetails(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);

@@ -10,13 +10,13 @@ import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
 
 export async function findAllFacilities(
   db: DB,
-  city: string,
+  country: string,
   limit?: number,
 ): Promise<Array<FacilityEntity>> {
   const query = db
     .select()
     .from(facilities)
-    .where(and(eq(facilities.isPublished, true), eq(facilities.city, city)))
+    .where(and(eq(facilities.isPublished, true), eq(facilities.country, country)))
     .$dynamic();
   if (limit !== undefined) {
     query.limit(limit);
