@@ -81,8 +81,8 @@ export const createFacilityRequestSchema = z.object({
   description: z.string(),
   images: z.array(z.string()).default([]),
   isPublished: z.boolean().default(false),
-  latitude: z.number().nullable().optional(),
-  longitude: z.number().nullable().optional(),
+  latitude: z.number(),
+  longitude: z.number(),
 });
 export type CreateFacilityRequest = z.infer<typeof createFacilityRequestSchema>;
 // update

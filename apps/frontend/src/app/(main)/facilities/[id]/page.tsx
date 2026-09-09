@@ -1,4 +1,3 @@
-import { formatPrice } from '@/lib/utils';
 import { getFacilityById } from '@/services/facilities';
 import { getServicesByFacilityId } from '@/services/service';
 import type { Metadata } from 'next';

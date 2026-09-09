@@ -6,7 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
 
-export function Map() {
+export function Map({ latitude, longitude }: { longitude: number; latitude: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -16,14 +16,16 @@ export function Map() {
     mapRef.current = new mapboxgl.Map({
       container: containerRef.current,
       style: 'mapbox://styles/dapy0/cmtl6mkf200lo01sa5udw8nzl',
-      center: [21.0175, 52.2367],
+      center: [longitude, latitude],
       zoom: 15,
       bearing: -12.8,
       attributionControl: false,
       logoPosition: 'bottom-right',
     });
 
-    new mapboxgl.Marker({color: 'oklch(0.555 0.163 48.998)'}).setLngLat([21.0175, 52.2367]).addTo(mapRef.current);
+    new mapboxgl.Marker({ color: 'oklch(0.555 0.163 48.998)' })
+      .setLngLat([longitude, latitude])
+      .addTo(mapRef.current);
 
     return () => {
       mapRef.current?.remove();

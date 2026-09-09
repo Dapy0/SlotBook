@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import type { FacilityResponseDTO } from '@slotbook/shared/facility';
+import type { ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
 
 export async function getFacilities(
   country: string,
@@ -18,10 +19,24 @@ export async function getFacilities(
 
   return result;
 }
-export async function getFacilityById(id: string): Promise<FacilityResponseDTO | null> {
-  return await api<FacilityResponseDTO>(`/facilities/${id}`, {
+export async function getFacilityById(id: string): Promise<
+  FacilityResponseDTO & {
+    facilitySchedule: ResponseFacilityScheduleSchema[];
+  }
+> {
+  const facilityInfo = await api<FacilityResponseDTO>(`/facilities/${id}`, {
     method: 'GET',
   });
+  const facilitySchedule = await api<ResponseFacilityScheduleSchema[]>(
+    `/facilities/${id}/schedule`,
+    {
+      method: 'GET',
+    },
+  );
+  return {
+    ...facilityInfo,
+    facilitySchedule: facilitySchedule,
+  };
 }
 
 export async function getMyFacilities(): Promise<FacilityResponseDTO[]> {

@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { getCookie } from '@/lib/utils';
 import { cookies } from 'next/headers';
 import { CATEGORY_METADATA } from '@slotbook/shared/facility';
+import Link from 'next/link';
 const CATEGORY_WORDS = [
   'manicure',
   'for a haircut',
@@ -73,7 +74,8 @@ async function Page() {
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className="flex flex-wrap gap-8 mt-5">
             {facilities.map((facility) => (
-              <SmallFacilityPreviewCard key={facility.id} facility={facility} />
+
+                <SmallFacilityPreviewCard key={facility.id} facility={facility} />
             ))}
           </div>
         </div>

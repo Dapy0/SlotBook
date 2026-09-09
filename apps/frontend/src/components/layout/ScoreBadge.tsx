@@ -9,17 +9,26 @@ function getScoreColor(score: number) {
   return COLORS.find((tier) => score >= tier.from && score <= tier.to) ?? COLORS[0];
 }
 
-function ScoreBadge({ styles = '', score }: { styles?: string; score: number | string }) {
-  const numericScore = typeof score === 'string' ? parseFloat(score) : score;
-  const { color, tier } = getScoreColor(numericScore);
+function ScoreBadge({ styles = '', score }: { styles?: string; score: number | null }) {
+  if (score == null) {
+    return (
+      <span
+        className={`px-2 py-1 rounded-sm text-white font-medium text-sm ${styles}`}
+        style={{ backgroundColor: 'purple' }}
+      >
+        <span className="sb-score__n">{'NEW'}</span>
+      </span>
+    );
+  }
+  const { color, tier } = getScoreColor(score);
 
   return (
     <span
       className={`px-2 py-1 rounded-sm text-white font-medium text-sm ${styles}`}
-      style={{ backgroundColor:score==="NEW" ? 'purple': color }}
+      style={{ backgroundColor: color }}
     >
       <span className="sb-score__n" data-tier={tier}>
-        {score}
+        {score.toFixed(1)}
       </span>
     </span>
   );

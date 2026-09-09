@@ -2,6 +2,15 @@ import z from 'zod';
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
+export const daysAndThereNames: Record<string, DayOfTheWeek> = {
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+  Sun: 7,
+};
 export type DayOfTheWeek = z.infer<typeof dayOfTheWeekSchema>;
 const facilityScheduleSchema = z.object({
   facilityId: z.uuid(),

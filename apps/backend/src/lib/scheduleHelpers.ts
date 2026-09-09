@@ -1,7 +1,8 @@
-import type {
-  CreateFacilitySchedule,
-  DayOfTheWeek,
-  ResponseFacilityScheduleSchema,
+import {
+  daysAndThereNames,
+  type CreateFacilitySchedule,
+  type DayOfTheWeek,
+  type ResponseFacilityScheduleSchema,
 } from '@slotbook/shared/facilitySchedule';
 import { BadRequestError, ConflictError } from './errors.ts';
 import type {
@@ -80,15 +81,7 @@ export function toTimeString(date: Date): string {
   return `${hours}:${minutes}`;
 }
 
-const daysAndThereNames: Record<string, DayOfTheWeek> = {
-  Mon: 1,
-  Tue: 2,
-  Wed: 3,
-  Thu: 4,
-  Fri: 5,
-  Sat: 6,
-  Sun: 7,
-};
+
 export function convertShortDayNameToDayNumber(dayName: string): DayOfTheWeek {
   return daysAndThereNames[dayName];
 }

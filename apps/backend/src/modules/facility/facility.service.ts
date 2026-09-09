@@ -86,12 +86,10 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
   }
   return deletedFacility;
 }
-export async function getFacilityScheduleByIdForOwner(
+export async function getFacilityScheduleById(
   db: DB,
   facilityId: string,
-  userRequestedId: string,
 ) {
-  await checkFacilityOwnership(db, facilityId, userRequestedId);
   const schedule = findFacilitySchedule(db, facilityId);
   if (!schedule) {
     throw new NotFoundError('No schedule for this facility');

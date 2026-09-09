@@ -1,7 +1,7 @@
 import type { DB } from '../../db/drizzlePlugin.ts';
 import {
   getFacilityDetails,
-  getFacilityScheduleByIdForOwner,
+  getFacilityScheduleById,
 } from '../facility/facility.service.ts';
 import { checkIfStaffMemberIsDoingService } from '../staff/staff.service.ts';
 import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';

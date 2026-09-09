@@ -111,7 +111,6 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   }>(
     '/:id/schedule',
     {
-      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {

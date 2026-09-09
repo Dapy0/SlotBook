@@ -1,10 +1,9 @@
 import Link from 'next/link';
 
-export default function ContactInfo() {
+export default function ContactInfo({ phone, email }: { phone: string; email: string }) {
   const contacts = [
-    { label: 'Phone', value: '+48 604 771 350', href: 'tel:+48604771350' },
-    { label: 'Email', value: 'studio@yogaosrodek.pl', href: 'mailto:studio@yogaosrodek.pl' },
-    { label: 'Instagram', value: '@yoga.osrodek', href: 'https://instagram.com/yoga.osrodek' },
+    { label: 'Phone', value: phone, href: `tel:${phone}` },
+    { label: 'Email', value: email, href: `mailto:${email}` },
   ];
 
   return (

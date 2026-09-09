@@ -11,7 +11,7 @@ import {
   createFacilityByUserId,
   getAllPublicFacilities,
   getFacilityDetails,
-  getFacilityScheduleByIdForOwner,
+  getFacilityScheduleById,
   getOwnFacilitiesByUserId,
   removeOwnedFacilityById,
   updateOwnedFacility,
@@ -85,10 +85,9 @@ export async function getFacilitySchedule(
   }>,
   response: FastifyReply,
 ) {
-  const schedule = await getFacilityScheduleByIdForOwner(
+  const schedule = await getFacilityScheduleById(
     request.server.drizzle,
     request.params.id,
-    request.user.id,
   );
   return response.send(schedule);
 }
