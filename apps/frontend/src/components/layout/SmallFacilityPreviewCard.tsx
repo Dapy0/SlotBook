@@ -5,7 +5,7 @@ import * as Icons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO }) {
-  const { name, address, city, category, id } = facility;
+  const { name, address, city, category, id, score } = facility;
   const Icon = Icons[
     CATEGORY_METADATA[category].icon as keyof typeof Icons
   ] as unknown as LucideIcon;
@@ -25,7 +25,7 @@ function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO 
             <Icon />
             {CATEGORY_METADATA[category].label}
           </Badge>
-          <ScoreBadge score={facility.score} />
+          <ScoreBadge score={score} />
         </div>
         <div className="flex flex-col mt-6">
           <h3 className={'text-lg font-bold'}>{name}</h3>

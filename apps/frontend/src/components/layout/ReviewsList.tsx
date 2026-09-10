@@ -46,7 +46,7 @@ export default function ReviewsList({
   return (
     <div className="flex w-full flex-col items-start gap-4">
       <div className="flex w-full shrink-0 flex-col items-center justify-center gap-1 rounded-sm border border-gray-200 bg-white py-4 shadow-sm">
-        <span className="text-4xl font-bold text-gray-900">{avgRating.toFixed(2)}</span>
+        <span className="text-4xl font-bold text-gray-900">{avgRating.toFixed(1)}</span>
         <Stars rating={Math.round(avgRating)} />
         <span className="text-xs text-gray-400">{reviews.length} reviews</span>
       </div>

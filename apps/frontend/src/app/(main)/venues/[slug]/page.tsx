@@ -42,7 +42,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     getStaffMembersByFacilityId(facilityId),
     getFacilityReviews(facilityId),
   ]);
-
+  const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   return (
     <div className="w-full  mx-auto">
       <BreadCrumbs crumbsList={['facilities', name]} />
@@ -58,7 +58,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
           <h1 className="text-3xl font-bold">{name}</h1>
           <div className="flex gap-3 items-center">
             <ScoreBadge styles="text-sm py-0.5! px-0.5" score={score} />
-            <span className="text-xs text-gray-600">{reviewsCount} reviews</span>
+            <span className="text-xs text-gray-600">{reviews.length} reviews</span>
             <span className="flex text-gray-600 text-sm gap-0.5 items-center">
               <MapPinIcon size={13} />
               {city} · {address}
