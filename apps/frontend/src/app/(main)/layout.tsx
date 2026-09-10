@@ -5,9 +5,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
-    <div lang="en">
+    <div className="flex h-dvh flex-col">
       <Header
         navBtns={[{ variant: 'link', linkHref: '/categories', value: 'Categories' }]}
         rightBtns={[
@@ -15,9 +14,9 @@ export default function RootLayout({
           { variant: 'outline', linkHref: '/register', value: 'Register' },
         ]}
       />
-      <div className="flex flex-1 items-center justify-center p-8 w-full max-w-6xl mx-auto ">
-        {children}
-      </div>
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-6xl p-8">{children}</div>
+      </main>
     </div>
   );
 }

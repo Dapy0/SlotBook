@@ -46,7 +46,7 @@ export function Header({
   }, [location]);
 
   return (
-    <header className="sticky top-0 z-30 bg-background border-border  border-b">
+    <header className="shrink-0 bg-background border-border border-b">
       <div className="flex justify-between align-center gap-4 p-4 max-w-7xl my-0 mx-auto">
         <button className=" bg-none border-0 p-0 cursor-pointer font-sans font-bold text-xl tracking-tight text-">
           <Link href={'/'}>
