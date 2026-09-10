@@ -9,15 +9,17 @@ export const createStaffMemberSchema = z.object({
 });
 
 export type CreateStaffMemberRequest = z.infer<typeof createStaffMemberSchema>;
-export const updateStaffMemberSchema = createStaffMemberSchema.partial()
+export const updateStaffMemberSchema = createStaffMemberSchema.partial();
 export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberSchema>;
-
 
 // Response DTOs
 
 export const staffMemberResponseSchema = createStaffMemberSchema.extend({
   id: z.uuid(),
+  score: z.string().nullable(),
+  reviewsCount: z.number(),
+  name: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
-export type StaffMemberResponseDTO = z.infer<typeof staffMemberResponseSchema>
+export type StaffMemberResponseDTO = z.infer<typeof staffMemberResponseSchema>;

@@ -1,17 +1,14 @@
 import { Button } from '@/components/ui/button';
+import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
 import { StarIcon } from 'lucide-react';
 
-const staff = [
-  {
-    name: 'Dorota N.',
-    role: 'Instructor',
-    rating: 4.9,
-    reviews: 37,
-    available: true,
-  },
-];
-
-export default function StaffList({ query = '' }: { query?: string }) {
+export default function StaffList({
+  staff,
+  query = '',
+}: {
+  staff: StaffMemberResponseDTO[];
+  query?: string;
+}) {
   const q = query.trim().toLowerCase();
   const filtered = staff.filter((s) => s.name.toLowerCase().includes(q));
 
@@ -28,14 +25,13 @@ export default function StaffList({ query = '' }: { query?: string }) {
               <span className="text-sm font-medium text-gray-900">{member.name}</span>
               <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
                 <StarIcon size={12} className="fill-amber-400 text-amber-400" />
-                <span className="font-medium text-gray-700">{member.rating}</span>
-                <span className="text-gray-400">({member.reviews} reviews)</span>
+                <span className="font-medium text-gray-700">{member.score}</span>
+                <span className="text-gray-400">({member.reviewsCount} reviews)</span>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <Button variant={'outline'}>Book</Button>
-
             </div>
           </div>
         ))}

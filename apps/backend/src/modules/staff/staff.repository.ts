@@ -1,14 +1,30 @@
-import { and, eq, getColumns } from 'drizzle-orm';
+import { and, avg, count, eq, getColumns, getTableColumns } from 'drizzle-orm';
 import type { DB } from '../../db/drizzlePlugin.ts';
-import { staffMembers } from '../../db/schema/staffMember.ts';
+import { staffMembers, type StaffMemberEntity } from '../../db/schema/staffMember.ts';
 import { staffServices } from '../../db/schema/staffService.ts';
 import { services } from '../../db/schema/service.ts';
+import { users } from '../../db/schema/user.ts';
+import { reviews } from '../../db/schema/reviews.ts';
+import { bookings } from '../../db/schema/booking.ts';
+import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
 
-export async function findStaffByFacilityId(db: DB, facilityId: string) {
+export async function findStaffByFacilityId(
+  db: DB,
+  facilityId: string,
+): Promise<StaffMemberResponseDTO[]> {
   return await db
-    .select()
+    .select({
+      name: users.name,
+      score: avg(reviews.rating),
+      reviewsCount: count(reviews.id),
+      ...getColumns(staffMembers),
+    })
     .from(staffMembers)
-    .where(and(eq(staffMembers.facilityId, facilityId), eq(staffMembers.isActive, true)));
+    .innerJoin(users, eq(users.id, staffMembers.userId))
+    .leftJoin(bookings, eq(bookings.staffMemberId, staffMembers.id))
+    .leftJoin(reviews, eq(reviews.bookingId, bookings.id))
+    .where(and(eq(staffMembers.facilityId, facilityId), eq(staffMembers.isActive, true)))
+    .groupBy(staffMembers.id, users.name);
 }
 
 export async function findStaffMemberById(db: DB, staffMemberId: string) {

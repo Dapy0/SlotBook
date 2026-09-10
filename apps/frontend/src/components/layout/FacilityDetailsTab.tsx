@@ -1,20 +1,20 @@
-'use client'
+'use client';
 import ReviewsList from '@/components/layout/ReviewsList';
 import ServicesList from '@/components/layout/ServicesList';
 import StaffList from '@/components/layout/StaffList';
-import  { TabsTrigger, TabsContent, Tabs, TabsList } from '@/components/ui/tabs';
+import { TabsTrigger, TabsContent, Tabs, TabsList } from '@/components/ui/tabs';
 import type { ServiceResponseDTO } from '@slotbook/shared/service';
 import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
 import { SearchIcon } from 'lucide-react';
-import  { useState } from 'react';
+import { useState } from 'react';
 
 function FacilityDetailsTab({
   services,
-  // staff,
+  staff,
   // reviews,
 }: {
   services: ServiceResponseDTO[];
-  // staff: StaffMemberResponseDTO;
+  staff: StaffMemberResponseDTO[];
   // reviews;
 }) {
   const [activeTab, setActiveTab] = useState('services');
@@ -33,7 +33,7 @@ function FacilityDetailsTab({
               <span className="text-gray-400 font-light text-xs">{services.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="staff">
-              Staff <span className="text-gray-400 font-light text-xs">2</span>
+              Staff <span className="text-gray-400 font-light text-xs">{staff.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="reviews">
               Reviews <span className="text-gray-400 font-light text-xs">68</span>
@@ -61,7 +61,7 @@ function FacilityDetailsTab({
           <ServicesList services={services} query={query} />
         </TabsContent>
         <TabsContent value="staff" className="mt-3">
-          <StaffList query={query} />
+          <StaffList staff={staff} query={query} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-3">
           <ReviewsList />
