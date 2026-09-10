@@ -21,13 +21,13 @@ function FacilityDetailsTab({
   const [activeTab, setActiveTab] = useState('services');
   const [query, setQuery] = useState('');
 
-  const showSearch = activeTab === 'services' || activeTab === 'staff';
-  const searchPlaceholder = activeTab === 'services' ? 'Search services' : 'Search staff';
+  const showSearch = activeTab === 'services' || activeTab === 'staff' || activeTab === 'reviews';
+  const searchPlaceholder = activeTab === 'services' ? 'Search services' : activeTab === 'staff' ? 'Search staff' : "Search reviews";
 
   return (
-    <div>
+    <div className="w-full max-w-2xl">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex items-center justify-start">
+        <div className="flex w-full items-center gap-4">
           <TabsList variant="line">
             <TabsTrigger value="services">
               Services{' '}
@@ -66,7 +66,7 @@ function FacilityDetailsTab({
           <StaffList staff={staff} query={query} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-3">
-          <ReviewsList reviews={reviews} />
+          <ReviewsList reviews={reviews} query={query} />
         </TabsContent>
       </Tabs>
     </div>

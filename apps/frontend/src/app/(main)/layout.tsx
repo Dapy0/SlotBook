@@ -5,7 +5,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
   return (
     <div lang="en">
       <Header
@@ -15,7 +15,7 @@ export default function RootLayout({
           { variant: 'outline', linkHref: '/register', value: 'Register' },
         ]}
       />
-      <div className="flex flex-1 items-center justify-center p-8 w-full max-w-7xl mx-auto ">
+      <div className="flex flex-1 items-center justify-center p-8 w-full max-w-6xl mx-auto ">
         {children}
       </div>
     </div>
