@@ -16,12 +16,12 @@ function NotFound() {
         </p>
       </div>
       <div className="flex gap-3">
-        <Button variant="outline">
-          <Link href="/">Back to home</Link>
-        </Button>
-        <Button>
-          <Link href="/categories">Browse venues</Link>
-        </Button>
+        <Link href="/">
+          <Button variant="outline">Back to home</Button>
+        </Link>
+        <Link href="/categories">
+          <Button>Browse venues</Button>
+        </Link>
       </div>
     </div>
   );

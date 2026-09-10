@@ -14,6 +14,7 @@ import { CATEGORY_METADATA } from '@slotbook/shared/facility';
 import FacilityDetailsTab from '@/components/layout/FacilityDetailsTab';
 import { getStaffMembersByFacilityId } from '@/services/staff';
 import { getFacilityReviews } from '@/services/reviews';
+import { ApiError } from '@/lib/api';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -22,9 +23,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     name,
     category,
     score,
-    reviewsCount,
     city,
-    timezoneIANA,
     address,
     description,
     latitude,
@@ -32,7 +31,10 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     facilitySchedule,
     phone,
     email,
-  } = await getFacilityById(slug).catch(() => notFound());
+  } = await getFacilityById(slug).catch((err) => {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  });
   const Icon = Icons[
     CATEGORY_METADATA[category].icon as keyof typeof Icons
   ] as unknown as LucideIcon;
@@ -42,7 +44,6 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     getStaffMembersByFacilityId(facilityId),
     getFacilityReviews(facilityId),
   ]);
-  const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
   return (
     <div className="w-full  mx-auto">
       <BreadCrumbs crumbsList={['facilities', name]} />
