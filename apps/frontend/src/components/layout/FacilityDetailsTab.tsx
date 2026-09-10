@@ -3,6 +3,7 @@ import ReviewsList from '@/components/layout/ReviewsList';
 import ServicesList from '@/components/layout/ServicesList';
 import StaffList from '@/components/layout/StaffList';
 import { TabsTrigger, TabsContent, Tabs, TabsList } from '@/components/ui/tabs';
+import type { ReviewResponse } from '@slotbook/shared/reviews';
 import type { ServiceResponseDTO } from '@slotbook/shared/service';
 import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
 import { SearchIcon } from 'lucide-react';
@@ -11,11 +12,11 @@ import { useState } from 'react';
 function FacilityDetailsTab({
   services,
   staff,
-  // reviews,
+  reviews,
 }: {
   services: ServiceResponseDTO[];
   staff: StaffMemberResponseDTO[];
-  // reviews;
+  reviews: ReviewResponse[];
 }) {
   const [activeTab, setActiveTab] = useState('services');
   const [query, setQuery] = useState('');
@@ -26,7 +27,7 @@ function FacilityDetailsTab({
   return (
     <div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-start">
           <TabsList variant="line">
             <TabsTrigger value="services">
               Services{' '}
@@ -36,7 +37,8 @@ function FacilityDetailsTab({
               Staff <span className="text-gray-400 font-light text-xs">{staff.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="reviews">
-              Reviews <span className="text-gray-400 font-light text-xs">68</span>
+              Reviews{' '}
+              <span className="text-gray-400 font-light text-xs">{reviews.length || 0}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -64,7 +66,7 @@ function FacilityDetailsTab({
           <StaffList staff={staff} query={query} />
         </TabsContent>
         <TabsContent value="reviews" className="mt-3">
-          <ReviewsList />
+          <ReviewsList reviews={reviews} />
         </TabsContent>
       </Tabs>
     </div>

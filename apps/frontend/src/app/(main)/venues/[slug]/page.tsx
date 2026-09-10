@@ -13,6 +13,7 @@ import * as Icons from 'lucide-react';
 import { CATEGORY_METADATA } from '@slotbook/shared/facility';
 import FacilityDetailsTab from '@/components/layout/FacilityDetailsTab';
 import { getStaffMembersByFacilityId } from '@/services/staff';
+import { getFacilityReviews } from '@/services/reviews';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -39,8 +40,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const [services, staff, reviews] = await Promise.all([
     getFacilityServicesById(facilityId),
     getStaffMembersByFacilityId(facilityId),
-    [],
-    // getReviews(facilityId),
+    getFacilityReviews(facilityId),
   ]);
 
   return (
@@ -68,7 +68,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
           <p className={'text-sm text-gray-700'}>{description}</p>
 
           <main className="flex flex-col gap-3 mt-6">
-            <FacilityDetailsTab staff={staff} services={services} />
+            <FacilityDetailsTab staff={staff} services={services} reviews={reviews} />
           </main>
         </div>
         <div className="flex flex-col gap-3 w-80 shrink-0">

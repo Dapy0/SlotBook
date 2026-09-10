@@ -25,7 +25,7 @@ export default function StaffList({
               <span className="text-sm font-medium text-gray-900">{member.name}</span>
               <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
                 <StarIcon size={12} className="fill-amber-400 text-amber-400" />
-                <span className="font-medium text-gray-700">{member.score}</span>
+                <span className="font-medium text-gray-700">{Number(member.score).toFixed(2)}</span>
                 <span className="text-gray-400">({member.reviewsCount} reviews)</span>
               </div>
             </div>
