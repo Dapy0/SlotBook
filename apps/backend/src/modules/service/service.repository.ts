@@ -9,12 +9,12 @@ export async function getServiceByFacilityIdAndServiceId(
   db: DB,
   facilityId: string,
   serviceId: string,
-): Promise<ServiceEntity | undefined> {
-  const [service] = await db
+): Promise<ServiceEntity[]> {
+  const facilityServices = await db
     .select()
     .from(services)
     .where(and(eq(services.facilityId, facilityId), eq(services.id, serviceId)));
-  return service;
+  return facilityServices;
 }
 
 export async function insertService(db: DB, data: NewServiceEntity): Promise<ServiceEntity> {

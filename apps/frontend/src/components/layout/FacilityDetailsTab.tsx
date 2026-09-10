@@ -10,12 +10,12 @@ import  { useState } from 'react';
 
 function FacilityDetailsTab({
   services,
-  staff,
-  reviews,
+  // staff,
+  // reviews,
 }: {
-  services: ServiceResponseDTO;
-  staff: StaffMemberResponseDTO;
-  reviews;
+  services: ServiceResponseDTO[];
+  // staff: StaffMemberResponseDTO;
+  // reviews;
 }) {
   const [activeTab, setActiveTab] = useState('services');
   const [query, setQuery] = useState('');
@@ -29,7 +29,8 @@ function FacilityDetailsTab({
         <div className="flex items-center justify-between">
           <TabsList variant="line">
             <TabsTrigger value="services">
-              Services <span className="text-gray-400 font-light text-xs">3</span>
+              Services{' '}
+              <span className="text-gray-400 font-light text-xs">{services.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="staff">
               Staff <span className="text-gray-400 font-light text-xs">2</span>
@@ -57,7 +58,7 @@ function FacilityDetailsTab({
         </div>
 
         <TabsContent value="services" className="mt-3">
-          <ServicesList query={query} />
+          <ServicesList services={services} query={query} />
         </TabsContent>
         <TabsContent value="staff" className="mt-3">
           <StaffList query={query} />

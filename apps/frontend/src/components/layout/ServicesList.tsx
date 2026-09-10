@@ -1,52 +1,43 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { ServiceResponseDTO } from '@slotbook/shared/service';
 
-const groups = [
-  {
-    section: 'Courts',
-    items: [
-      {
-        title: 'Court Booking (1 court)',
-        badge: 'Popular',
-        duration: '60 min',
-        price: '80 zł',
-        cta: 'Book',
-      },
-      {
-        title: 'Private Coaching',
-        badge: 'Popular',
-        duration: '60 min',
-        price: '150 zł',
-        cta: 'Book',
-      },
-    ],
-  },
-  {
-    section: 'Rentals',
-    items: [
-      {
-        title: 'Racket Rental',
-        duration: 'per session',
-        price: '20 zł',
-        cta: 'Add',
-      },
-      {
-        title: 'Ball Set Rental',
-        duration: 'per session',
-        price: '15 zł',
-        cta: 'Add',
-      },
-    ],
-  },
-];
+function groupByCategory(
+  services: ServiceResponseDTO[],
+): { section: string; items: ServiceResponseDTO[] }[] {
+  return Array.from(
+    Map.groupBy(services, (s) => s.category),
+    ([section, items]) => ({ section, items }),
+  );
+}
+function convertMinutesToTime(durationMinutes: number) {
+  const hours = Math.trunc(durationMinutes / 60);
+  const minutes = durationMinutes - hours * 60;
+  return [hours, minutes];
+}
+function formatMoney(cents: number, currency: string, locale: string = 'pl') {
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
+  const divisor = 10 ** 2;
+  return formatter.format(cents / divisor);
+}
 
-export default function ServicesList({ query = '' }: { query?: string }) {
+export default function ServicesList({
+  services,
+  query = '',
+}: {
+  services: ServiceResponseDTO[];
+  query?: string;
+}) {
+  const prettifyItems = groupByCategory(services);
   const q = query.trim().toLowerCase();
+  const formatter = new Intl.DurationFormat('en', { style: 'narrow' });
 
-  const filteredGroups = groups
+  const filteredGroups = prettifyItems
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => item.title.toLowerCase().includes(q)),
+      items: group.items.filter(
+        (item) => item.name.toLowerCase().includes(q) || item.description.toLowerCase().includes(q),
+      ),
     }))
     .filter((group) => group.items.length > 0);
 
@@ -65,23 +56,29 @@ export default function ServicesList({ query = '' }: { query?: string }) {
           </p>
           <div className="divide-y divide-gray-100">
             {group.items.map((service) => (
-              <div key={service.title} className="flex items-center justify-between px-6 py-4">
+              <div key={service.name} className="flex items-center justify-between px-6 py-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">{service.title}</span>
-                    {service.badge && (
+                    <span className="text-sm font-medium text-gray-900">{service.name}</span>
+                    {/* {service.badge && (
                       <Badge className="bg-teal-50 text-xs font-medium text-teal-600">
                         {service.badge}
                       </Badge>
-                    )}
+                    )} */}
                   </div>
-                  <p className="mt-0.5 text-xs text-gray-400">{service.duration}</p>
+                  <p className="mt-0.5 text-xs text-gray-400">
+                    {formatter.format({
+                      hours: convertMinutesToTime(service.durationMinutes)[0],
+                      minutes: convertMinutesToTime(service.durationMinutes)[1],
+                    })}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-semibold text-gray-900">{service.price}</span>
-                  <Button>{service.cta}</Button>
-
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatMoney(service.priceCents, service.currency)}
+                  </span>
+                  <Button>Book</Button>
                 </div>
               </div>
             ))}

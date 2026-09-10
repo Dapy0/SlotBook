@@ -5,21 +5,44 @@ import { MapPinIcon, type LucideIcon } from 'lucide-react';
 import CardWithMap from '@/components/layout/CardWithMap';
 import WorkingHours from '@/components/layout/WorkingHours';
 import ContactInfo from '@/components/layout/ContactInfo';
-import {  getFacilityById } from '@/services/facilities';
+import { getFacilityById, getFacilityServicesById } from '@/services/facilities';
 import { notFound } from 'next/navigation';
 // import StaffList from '@/components/layout/StaffList';
 // import ReviewsList from '@/components/layout/ReviewsList';
 import * as Icons from 'lucide-react';
 import { CATEGORY_METADATA } from '@slotbook/shared/facility';
+import FacilityDetailsTab from '@/components/layout/FacilityDetailsTab';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { name, category, score, reviewsCount, city, address, description, latitude, longitude,facilitySchedule,phone,email } =
-    await getFacilityById(slug).catch(() => notFound());
-
+  const {
+    id: facilityId,
+    name,
+    category,
+    score,
+    reviewsCount,
+    city,
+    timezoneIANA,
+    address,
+    description,
+    latitude,
+    longitude,
+    facilitySchedule,
+    phone,
+    email,
+  } = await getFacilityById(slug).catch(() => notFound());
   const Icon = Icons[
     CATEGORY_METADATA[category].icon as keyof typeof Icons
   ] as unknown as LucideIcon;
+
+  const [services, staff, reviews] = await Promise.all([
+    getFacilityServicesById(facilityId),
+    [],
+    [],
+    // getStaff(facilityId),
+    // getReviews(facilityId),
+  ]);
+
   return (
     <div className="">
       <BreadCrumbs crumbsList={['facilities', name]} />
@@ -44,7 +67,9 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
           </div>
           <p className={'text-sm text-gray-700'}>{description}</p>
 
-          <main className="flex flex-col gap-3 mt-6"></main>
+          <main className="flex flex-col gap-3 mt-6">
+            <FacilityDetailsTab  services={services} />
+          </main>
         </div>
         <div className="flex flex-col gap-3 w-80 shrink-0">
           <CardWithMap address={address} latitude={latitude} longitude={longitude} />
