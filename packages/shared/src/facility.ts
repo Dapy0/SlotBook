@@ -1,6 +1,5 @@
 import z from 'zod';
 export const FACILITY_CATEGORIES = [
-  'ALL',
   'BEAUTY',
   'SPORT_FITNESS',
   'MEDICAL',
@@ -19,14 +18,7 @@ export const CATEGORY_METADATA: Record<
     slug: string;
   }
 > = {
-  ALL: {
-    slug: '',
-    label: 'All',
-    description: 'All available venues',
-    icon: 'FileStack',
-    color: 'blue',
-    badgeClassName: 'text-pink-500 rounded-md bg-pink-100 shadow-s',
-  },
+
   BEAUTY: {
     slug: 'beauty',
     label: 'Beauty & Wellness',

@@ -11,67 +11,80 @@ import {
 } from '@/components/ui/select';
 import { getCategories } from '@/services/categories';
 import { getFacilities } from '@/services/facilities';
-import { CATEGORY_BY_SLUG } from '@slotbook/shared/facility';
+import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from '@slotbook/shared/facility';
 import { SearchIcon } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { count } from 'drizzle-orm';
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import ResultsToolbar from '@/components/layout/ResultsToolbar';
 
 async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; city?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    city?: string;
+    rating?: string;
+    priceMax?: string;
+    q?: string;
+    sort?: string;
+  }>;
 }) {
-  let { category = '' } = await searchParams;
-  const cookieStore = await cookies();
-  const local = cookieStore.get('_sb_country')?.value || 'PL';
-  const categoryName = CATEGORY_BY_SLUG[category];
-  const facilities = await getFacilities({ country: local, category: categoryName });
-  const categories = await getCategories({ country: local });
-  const countAll = categories.reduce((prev, next) => {
-    return prev + next.count;
-  }, 0);
-  categories.push({
-    categoryName: 'ALL',
-    count: countAll,
-  });
+  const { category, rating, priceMax, q, sort } = await searchParams;
+  const country = (await cookies()).get('_sb_country')?.value || 'PL';
+
+  const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
+  console.log(categoryName);
+  if (category && !categoryName) notFound();
+
+  const [facilities, categories] = await Promise.all([
+    getFacilities({ country, category: categoryName, rating, priceMax, q, sort }),
+    getCategories({ country }),
+  ]);
+
+  const countAll = categories.reduce((sum, c) => sum + c.count, 0);
+  const shown = categoryName
+    ? (categories.find((c) => c.categoryName === categoryName)?.count ?? 0)
+    : countAll;
+  const title = categoryName ? CATEGORY_METADATA[categoryName].label : 'All';
+
   return (
     <div className="">
-      <BreadCrumbs crumbsList={['categories', category]} />
+      <BreadCrumbs
+        crumbsList={[
+          'categories',
+          ...(categoryName ? [CATEGORY_METADATA[categoryName].label] : []),
+        ]}
+      />
       <div className="flex items-baseline gap-2 mb-6">
-        <h1 className="text-3xl font-bold">{category} Venues</h1>
+        <h1 className="text-3xl font-bold">{title} Venues</h1>
         <span className="text-gray-400 text-lg">
-          {categories.find((el) => el.categoryName == categoryName)?.count || 0} of {countAll}
+          {shown} of {countAll}
         </span>
       </div>
 
       <div className="flex gap-8 items-start">
-        <FiltersSidebar activeCategory={categoryName} counts={categories} />
+        <Suspense>
+          <FiltersSidebar counts={categories} />
+        </Suspense>
 
         <div className="flex-1 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
-              <Input placeholder="Refine results" className="pl-9" />
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs text-gray-500">SORT BY</span>
-              <Select defaultValue="rating">
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rating">By rating</SelectItem>
-                  <SelectItem value="distance">By distance</SelectItem>
-                  <SelectItem value="price">By price</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <Suspense>
+            <ResultsToolbar />
+          </Suspense>
 
           <div className="flex flex-col gap-4">
-            {facilities.map((facility) => (
-              <BigFacilityPreviewCard key={facility.name} score={4.6} />
-            ))}
+            {}
+            {facilities.length > 0 ? (
+              facilities.map((facility) => (
+                <BigFacilityPreviewCard facility={facility} key={facility.name} />
+              ))
+            ) : (
+              <div className="flex items-center self-center text-3xl pt-10 text-gray-400">
+                No facilities in this category
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
 import ScoreBadge from '@/components/layout/ScoreBadge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 import { MapPinIcon } from 'lucide-react';
 
-function BigFacilityPreviewCard({ score }: { score: number }) {
+function BigFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO }) {
+  const { name, address, city, category, score, reviewsCount, description } = facility;
   return (
     <div className="relative rounded-md grid grid-cols-[1fr_300px]  border  overflow-hidden w-full">
       <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>
@@ -22,18 +24,18 @@ function BigFacilityPreviewCard({ score }: { score: number }) {
           </Badge>
         </div>
         <div className="flex flex-col  gap-1">
-          <h3 className={'text-xl font-bold'}>Padel Krakow</h3>
+          <h3 className={'text-xl font-bold'}>{name}</h3>
           <div className="flex gap-3 items-center">
             <ScoreBadge styles="text-sm py-0.5! px-0.5" score={score} />
-            <span className="text-xs text-gray-600">84 reviews</span>
+            <span className="text-xs text-gray-600">{reviewsCount} reviews</span>
             <span className="flex text-gray-600 text-sm gap-0.5 items-center">
               <MapPinIcon size={13} />
-              Kraków · Wielicka 44
+              {city} · {address}
             </span>
             <span className="text-sm text-gray-600">4.7 km</span>
           </div>
           <p className={'text-sm text-gray-700'}>
-            Four indoor courts, racket and ball rental, showers. Hourly booking, payment on site.
+            {description}
           </p>
         </div>
         <div className="flex items-center gap-3">

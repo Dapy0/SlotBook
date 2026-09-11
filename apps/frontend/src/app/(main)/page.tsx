@@ -81,8 +81,9 @@ async function Page() {
         <div>
           <h1 className="text-3xl font-semibold">Promoted</h1>
           <div className=" flex flex-col gap-3 mt-5">
-            <BigFacilityPreviewCard score={4.8} />
-            <BigFacilityPreviewCard score={4.8} />
+            {facilities.slice(1,6).map((facility) => (
+              <BigFacilityPreviewCard facility={facility} />
+            ))}
           </div>
         </div>
       </main>

@@ -6,13 +6,17 @@ import type { ServiceResponseDTO } from '@slotbook/shared/service';
 export async function getFacilities(getParams: {
   country: string;
   category?: string;
+  rating?: string;
+  priceMax?: string;
+  q?: string;
+  sort?: string;
   limit?: number;
 }): Promise<FacilityResponseDTO[]> {
   const params = new URLSearchParams();
-  params.set('country', getParams.country);
-  getParams.category && getParams.category !== 'ALL' && params.set('category', getParams.category);
-  getParams.limit && params.set('limit', String(getParams.limit));
-
+  for (const [param, value] of Object.entries(getParams)) {
+    if (value === undefined || value === null || value === '') continue;
+    params.set(param, String(value));
+  }
   const query = params.toString();
   const endpoint = query ? `/facilities/?${query}` : '/facilities/';
 

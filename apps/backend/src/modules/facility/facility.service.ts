@@ -1,4 +1,8 @@
-import type { CreateFacilityRequest, FacilityCategory, UpdateFacilityRequest } from '@slotbook/shared/facility';
+import type {
+  CreateFacilityRequest,
+  FacilityCategory,
+  UpdateFacilityRequest,
+} from '@slotbook/shared/facility';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import {
   findAllFacilities,
@@ -19,6 +23,7 @@ import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/faci
 import { deleteScheduleByStaffId } from '../schedule/schedule.repository.ts';
 import { checkNoOverlapWithinSchedule } from '../../lib/scheduleHelpers.ts';
 import { string } from 'zod';
+import type { FacilityListQuery } from './facility.schema.ts';
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -32,13 +37,8 @@ export async function checkFacilityOwnership(db: DB, facilityId: string, userId:
   }
   return facility;
 }
-export async function getAllPublicFacilities(
-  db: DB,
-  country: string,
-  limit?: number,
-  category?: FacilityCategory,
-) {
-  return findAllFacilities(db, country, limit, category);
+export async function getAllPublicFacilities(db: DB, query: FacilityListQuery) {
+  return findAllFacilities(db, query);
 }
 export async function getFacilityDetails(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);
