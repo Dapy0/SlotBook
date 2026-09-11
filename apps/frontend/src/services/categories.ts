@@ -1,9 +1,13 @@
 import { api } from '@/lib/api';
 import { CATEGORY_METADATA, type FACILITY_CATEGORIES } from '@slotbook/shared/facility';
 
-export async function getCategories(limit?: number) {
+export async function getCategories(getParams: {
+  country: string;
+  limit?: number;
+}) {
   const params = new URLSearchParams();
-  if (limit !== undefined) params.set('limit', String(limit));
+  params.set('country', String(getParams.country));
+  if (getParams.limit !== undefined) params.set('limit', String(getParams.limit));
 
   const query = params.toString();
   const endpoint = query ? `/facilities/categories?${query}` : '/facilities/categories';

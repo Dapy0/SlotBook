@@ -24,10 +24,10 @@ const CATEGORY_WORDS = [
 
 async function Page() {
   const cookieStore = await cookies();
-  const local = cookieStore.get('_sb_country')?.value;
+  const local = cookieStore.get('_sb_country')?.value || 'PL';
   const [facilities, categories] = await Promise.all([
-    getFacilities(local || 'PL',8),
-    getCategories(4),
+    getFacilities({ country: local, limit: 8 }),
+    getCategories({ country: local, limit: 4 }),
   ]).catch();
   return (
     <div>
@@ -74,8 +74,7 @@ async function Page() {
           <h1 className="text-3xl font-semibold">Close to you</h1>
           <div className="flex flex-wrap gap-8 mt-5">
             {facilities.map((facility) => (
-
-                <SmallFacilityPreviewCard key={facility.id} facility={facility} />
+              <SmallFacilityPreviewCard key={facility.id} facility={facility} />
             ))}
           </div>
         </div>

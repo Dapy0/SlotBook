@@ -5,7 +5,7 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from '../../db/schema/facility.ts';
-import type { UpdateFacilityRequest } from '@slotbook/shared/facility';
+import type { FacilityCategory, UpdateFacilityRequest } from '@slotbook/shared/facility';
 import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
 import { reviews } from '../../db/schema/reviews.ts';
 import { bookings } from '../../db/schema/booking.ts';
@@ -14,15 +14,20 @@ export async function findAllFacilities(
   db: DB,
   country: string,
   limit?: number,
+  category?: FacilityCategory,
 ): Promise<Array<FacilityEntity>> {
+  const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
+  if (category !== undefined) filters.push(eq(facilities.category, category));
+
   const query = db
     .select()
     .from(facilities)
-    .where(and(eq(facilities.isPublished, true), eq(facilities.country, country)))
+    .where(and(...filters))
     .$dynamic();
   if (limit !== undefined) {
     query.limit(limit);
   }
+
   return await query;
 }
 
@@ -68,6 +73,7 @@ export async function deleteFacilityById(db: DB, id: string): Promise<FacilityEn
 
 export async function getAllCategories(
   db: DB,
+  country: string,
   limit?: number,
 ): Promise<
   Array<{
@@ -75,9 +81,12 @@ export async function getAllCategories(
     count: number;
   }>
 > {
+  const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
+
   const query = db
     .select({ categoryName: facilities.category, count: count() })
     .from(facilities)
+    .where(and(...filters))
     .groupBy(facilities.category)
     .orderBy(desc(count()))
     .$dynamic();

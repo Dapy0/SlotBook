@@ -1,111 +1,71 @@
 import BreadCrumbs from '@/components/layout/BreadCrumbs';
 import { Badge } from '@/components/ui/badge';
-import {
-  Scissors,
-  Sparkles,
-  Waves,
-  Dumbbell,
-  Music,
-  GraduationCap,
-  PersonStanding,
-  Camera,
-} from 'lucide-react';
+import { getCategories } from '@/services/categories';
+import { CATEGORY_METADATA } from '@slotbook/shared/facility';
+import * as Icons from 'lucide-react';
+import { FileStack, type LucideIcon } from 'lucide-react';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 
-const CATEGORIES = [
-  {
-    name: 'Hair',
-    count: 24,
-    Icon: Scissors,
-    tags: ['Haircut', 'Coloring', 'Styling'],
-    priceFrom: '40 zl',
-  },
-  {
-    name: 'Nails & beauty',
-    count: 18,
-    Icon: Sparkles,
-    tags: ['Manicure', 'Lashes', 'Brows'],
-    priceFrom: '60 zl',
-  },
-  {
-    name: 'Massage & spa',
-    count: 12,
-    Icon: Waves,
-    tags: ['Relax massage', 'Sauna'],
-    priceFrom: '120 zl',
-  },
-  {
-    name: 'Sport & fitness',
-    count: 31,
-    Icon: Dumbbell,
-    tags: ['Padel', 'Gym pass', 'Personal training'],
-    priceFrom: '50 zl',
-  },
-  {
-    name: 'Music lessons',
-    count: 9,
-    Icon: Music,
-    tags: ['Guitar', 'Piano', 'Vocals'],
-    priceFrom: '80 zl',
-  },
-  {
-    name: 'Language lessons',
-    count: 14,
-    Icon: GraduationCap,
-    tags: ['English', 'Polish', 'Spanish'],
-    priceFrom: '70 zl',
-  },
-  {
-    name: 'Kids activities',
-    count: 7,
-    Icon: PersonStanding,
-    tags: ['Swimming', 'Dance'],
-    priceFrom: '45 zl',
-  },
-  {
-    name: 'Photography',
-    count: 5,
-    Icon: Camera,
-    tags: ['Portrait', 'Studio rent'],
-    priceFrom: '150 zl',
-  },
-];
+async function CategoriesPage() {
+  const cookieStore = await cookies();
+  const local = cookieStore.get('_sb_country')?.value || 'PL';
+  const categories = await getCategories({ country: local });
 
-function CategoriesPage() {
   return (
     <div>
       <BreadCrumbs crumbsList={['categories']} />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-5">
-        {CATEGORIES.map(({ name, count, Icon, tags }) => (
-          <Link
-            key={name}
-            className="group rounded-md border p-5 flex flex-col gap-4 text-left transition-colors hover:border-purple-200 hover:bg-purple-50"
-            href={`categories/${'hair'}`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="flex items-center justify-center size-11 rounded-md bg-gray-100 group-hover:bg-purple-100 transition-colors">
-                <Icon className="size-5 text-gray-600 group-hover:text-purple-500 transition-colors" />
-              </span>
-              <Badge
-                variant="default"
-                className="text-gray-500 rounded-md bg-gray-200 shadow-s group-hover:text-purple-600 group-hover:bg-purple-100"
-              >
-                {count}
-              </Badge>
-            </div>
-            <p className="font-medium">{name}</p>
-            <div className="flex flex-wrap gap-1.5">
-              {tags.slice(0, 2).map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs text-gray-500 border rounded-md px-2 py-0.5 group-hover:border-purple-200 group-hover:text-purple-600 transition-colors"
-                >
-                  {tag}
+        <Link
+          key={'All'}
+          href={`/venues`}
+          style={{ '--category-color': 'blue' } as React.CSSProperties}
+          className="group flex flex-col gap-3 rounded-md border p-5 text-left transition-colors hover:border-[color-mix(in_oklch,var(--category-color)_30%,white)] hover:bg-[color-mix(in_oklch,var(--category-color)_7%,white)]"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex size-11 items-center justify-center rounded-md bg-gray-100 transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)]">
+              <FileStack className="size-5 text-gray-600 transition-colors group-hover:text-(--category-color)" />
+            </span>
+            <Badge
+              variant="default"
+              className="rounded-md bg-gray-200 text-gray-500 shadow-s transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
+            >
+              {categories.reduce((prev, next) => {
+                return prev + next.count;
+              }, 0)}
+            </Badge>
+          </div>
+          <p className="font-medium">All categories</p>
+          <p className="text-sm text-gray-500">Look through all available categories</p>
+        </Link>
+        {categories.map(({ count, categoryName }) => {
+          const { label, description, icon, color, slug } = CATEGORY_METADATA[categoryName];
+          const Icon = Icons[icon as keyof typeof Icons] as unknown as LucideIcon;
+          const hrefUrl = new URLSearchParams({ category: slug }).toString();
+          const endpoint = `/venues?${hrefUrl}`;
+          return (
+            <Link
+              key={categoryName}
+              href={endpoint}
+              style={{ '--category-color': color } as React.CSSProperties}
+              className="group flex flex-col gap-3 rounded-md border p-5 text-left transition-colors hover:border-[color-mix(in_oklch,var(--category-color)_30%,white)] hover:bg-[color-mix(in_oklch,var(--category-color)_7%,white)]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="flex size-11 items-center justify-center rounded-md bg-gray-100 transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)]">
+                  <Icon className="size-5 text-gray-600 transition-colors group-hover:text-(--category-color)" />
                 </span>
-              ))}
-            </div>
-          </Link>
-        ))}
+                <Badge
+                  variant="default"
+                  className="rounded-md bg-gray-200 text-gray-500 shadow-s transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
+                >
+                  {count}
+                </Badge>
+              </div>
+              <p className="font-medium">{label}</p>
+              <p className="text-sm text-gray-500">{description}</p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

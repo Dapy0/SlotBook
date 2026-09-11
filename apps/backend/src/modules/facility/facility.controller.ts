@@ -28,6 +28,7 @@ export async function getAllFacilities(
     request.server.drizzle,
     request.query.country,
     request.query.limit,
+    request.query.category,
   );
   response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');
   return response.send(facilities);
@@ -85,10 +86,7 @@ export async function getFacilitySchedule(
   }>,
   response: FastifyReply,
 ) {
-  const schedule = await getFacilityScheduleById(
-    request.server.drizzle,
-    request.params.id,
-  );
+  const schedule = await getFacilityScheduleById(request.server.drizzle, request.params.id);
   return response.send(schedule);
 }
 export async function putFacilitySchedule(
@@ -121,6 +119,6 @@ export async function getAllFacilitiesCategory(
   request: FastifyRequest<{ Querystring: FacilityCategoryQuerystring }>,
   response: FastifyReply,
 ) {
-  const categories = await getAllCategories(request.server.drizzle, request.query.limit);
+  const categories = await getAllCategories(request.server.drizzle,request.query.country, request.query.limit);
   return response.send(categories);
 }

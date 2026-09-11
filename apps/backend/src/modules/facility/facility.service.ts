@@ -1,4 +1,4 @@
-import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
+import type { CreateFacilityRequest, FacilityCategory, UpdateFacilityRequest } from '@slotbook/shared/facility';
 import type { DB } from '../../db/drizzlePlugin.ts';
 import {
   findAllFacilities,
@@ -32,8 +32,13 @@ export async function checkFacilityOwnership(db: DB, facilityId: string, userId:
   }
   return facility;
 }
-export async function getAllPublicFacilities(db: DB, country: string, limit?: number) {
-  return findAllFacilities(db, country, limit)
+export async function getAllPublicFacilities(
+  db: DB,
+  country: string,
+  limit?: number,
+  category?: FacilityCategory,
+) {
+  return findAllFacilities(db, country, limit, category);
 }
 export async function getFacilityDetails(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -86,10 +91,7 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
   }
   return deletedFacility;
 }
-export async function getFacilityScheduleById(
-  db: DB,
-  facilityId: string,
-) {
+export async function getFacilityScheduleById(db: DB, facilityId: string) {
   const schedule = findFacilitySchedule(db, facilityId);
   if (!schedule) {
     throw new NotFoundError('No schedule for this facility');

@@ -1,5 +1,6 @@
 import z from 'zod';
 export const FACILITY_CATEGORIES = [
+  'ALL',
   'BEAUTY',
   'SPORT_FITNESS',
   'MEDICAL',
@@ -9,9 +10,25 @@ export const FACILITY_CATEGORIES = [
 ] as const;
 export const CATEGORY_METADATA: Record<
   (typeof FACILITY_CATEGORIES)[number],
-  { label: string; description: string; icon: string; color: string; badgeClassName: string }
+  {
+    label: string;
+    description: string;
+    icon: string;
+    color: string;
+    badgeClassName: string;
+    slug: string;
+  }
 > = {
+  ALL: {
+    slug: '',
+    label: 'All',
+    description: 'All available venues',
+    icon: 'FileStack',
+    color: 'blue',
+    badgeClassName: 'text-pink-500 rounded-md bg-pink-100 shadow-s',
+  },
   BEAUTY: {
+    slug: 'beauty',
     label: 'Beauty & Wellness',
     description: 'Salons, barbers, nails, spa and massage',
     icon: 'Sparkles',
@@ -19,6 +36,7 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-pink-500 rounded-md bg-pink-100 shadow-s',
   },
   SPORT_FITNESS: {
+    slug: 'sport-fitness',
     label: 'Sport & Fitness',
     description: 'Gyms, personal training and fitness studios',
     icon: 'Dumbbell',
@@ -26,6 +44,7 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-orange-500 rounded-md bg-orange-100 shadow-s',
   },
   MEDICAL: {
+    slug: 'medical',
     label: 'Medical & Health',
     description: 'Clinics, dentists and health specialists',
     icon: 'Stethoscope',
@@ -33,6 +52,7 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-sky-500 rounded-md bg-sky-100 shadow-s',
   },
   AUTO: {
+    slug: 'auto',
     label: 'Auto Services',
     description: 'Car service, detailing and repair shops',
     icon: 'Car',
@@ -40,6 +60,7 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-slate-500 rounded-md bg-slate-100 shadow-s',
   },
   EDUCATION: {
+    slug: 'education',
     label: 'Education & Tutoring',
     description: 'Private lessons, courses and tutors',
     icon: 'GraduationCap',
@@ -47,6 +68,7 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-indigo-500 rounded-md bg-indigo-100 shadow-s',
   },
   OTHER: {
+    slug: 'other',
     label: 'Other',
     description: 'Everything else',
     icon: 'Shapes',
@@ -54,6 +76,10 @@ export const CATEGORY_METADATA: Record<
     badgeClassName: 'text-zinc-500 rounded-md bg-zinc-100 shadow-s',
   },
 };
+
+export const CATEGORY_BY_SLUG = Object.fromEntries(
+  Object.entries(CATEGORY_METADATA).map(([key, meta]) => [meta.slug, key]),
+) as Record<string, FacilityCategory>;
 
 export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;

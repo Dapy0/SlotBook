@@ -3,13 +3,15 @@ import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 import type { ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
 import type { ServiceResponseDTO } from '@slotbook/shared/service';
 
-export async function getFacilities(
-  country: string,
-  limit?: number,
-): Promise<FacilityResponseDTO[]> {
+export async function getFacilities(getParams: {
+  country: string;
+  category?: string;
+  limit?: number;
+}): Promise<FacilityResponseDTO[]> {
   const params = new URLSearchParams();
-  params.set('country', country);
-  if (limit !== undefined) params.set('limit', String(limit));
+  params.set('country', getParams.country);
+  getParams.category && getParams.category !== 'ALL' && params.set('category', getParams.category);
+  getParams.limit && params.set('limit', String(getParams.limit));
 
   const query = params.toString();
   const endpoint = query ? `/facilities/?${query}` : '/facilities/';
