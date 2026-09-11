@@ -18,6 +18,7 @@ import { count } from 'drizzle-orm';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import ResultsToolbar from '@/components/layout/ResultsToolbar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 async function Page({
   searchParams,
@@ -65,12 +66,12 @@ async function Page({
       </div>
 
       <div className="flex gap-8 items-start">
-        <Suspense>
+        <Suspense fallback={<Skeleton className="w-65 h-160" />}>
           <FiltersSidebar counts={categories} />
         </Suspense>
 
         <div className="flex-1 flex flex-col gap-4">
-          <Suspense>
+          <Suspense fallback={<Skeleton className="w-full h-10" />}>
             <ResultsToolbar />
           </Suspense>
 
