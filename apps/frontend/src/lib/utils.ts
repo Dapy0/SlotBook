@@ -69,3 +69,14 @@ export function removeExtraSecondsFromTime(time: string) {
   const [hours, minutes, seconds] = time.split(':');
   return `${hours}:${minutes}`;
 }
+
+export function convertMinutesToTime(durationMinutes: number) {
+  const hours = Math.trunc(durationMinutes / 60);
+  const minutes = durationMinutes - hours * 60;
+  return [hours, minutes];
+}
+export function formatMoney(cents: number, currency: string, locale: string = 'pl') {
+  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
+  const divisor = 10 ** 2;
+  return formatter.format(cents / divisor);
+}

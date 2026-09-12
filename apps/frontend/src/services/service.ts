@@ -7,6 +7,18 @@ export async function getServicesByFacilityId(id: string): Promise<ServiceRespon
   });
   return result;
 }
+export async function getServiceByFacilityIdServiceId(
+  facilityId: string,
+  serviceId: string,
+): Promise<ServiceResponseDTO> {
+  const result = await api<ServiceResponseDTO>(
+    `/facilities/${facilityId}/services/${serviceId}`,
+    {
+      method: 'GET',
+    },
+  );
+  return result;
+}
 export async function createService(
   facilityId: string,
   payload: CreateServiceRequest,

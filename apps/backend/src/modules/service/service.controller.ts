@@ -4,7 +4,11 @@ import { findFacilityById } from '../facility/facility.repository.ts';
 import type { ServiceParams } from './service.schema.ts';
 import type { CreateServiceRequest } from '@slotbook/shared/service';
 import type { NewServiceEntity } from '../../db/schema/service.ts';
-import { createServiceByFacilityId, getFacilityServicesById } from './service.service.ts';
+import {
+  createServiceByFacilityId,
+  getFacilityServiceById,
+  getFacilityServicesById,
+} from './service.service.ts';
 
 export async function getFacilityServices(
   request: FastifyRequest<{
@@ -15,6 +19,23 @@ export async function getFacilityServices(
   const services = await getFacilityServicesById(request.server.drizzle, request.params.id);
 
   return response.send(services);
+}
+export async function getFacilityServiceDataById(
+  request: FastifyRequest<{
+    Params: {
+      id: string;
+      serviceId: string;
+    };
+  }>,
+  response: FastifyReply,
+) {
+  const service = await getFacilityServiceById(
+    request.server.drizzle,
+    request.params.serviceId,
+    request.params.id,
+  );
+
+  return response.send(service);
 }
 export async function createService(
   request: FastifyRequest<{

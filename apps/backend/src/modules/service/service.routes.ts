@@ -1,12 +1,17 @@
 import type { FastifyInstance } from 'fastify';
 import z from 'zod';
-import { createService, getFacilityServices } from './service.controller.ts';
+import {
+  createService,
+  getFacilityServiceDataById,
+  getFacilityServices,
+} from './service.controller.ts';
 import { serviceParamsSchema, type ServiceParams } from './service.schema.ts';
 import {
   createServiceSchema,
   serviceResponseSchema,
   type ServiceResponseDTO,
 } from '@slotbook/shared/service';
+import { getFacilityServiceById } from './service.service.ts';
 
 export async function serviceRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -20,6 +25,20 @@ export async function serviceRoutes(fastify: FastifyInstance) {
       },
     },
     getFacilityServices,
+  );
+  fastify.get(
+    '/:id/services/:serviceId',
+    {
+      schema: {
+        params: serviceParamsSchema.extend({
+          serviceId: z.string(),
+        }),
+        response: {
+          200: serviceResponseSchema,
+        },
+      },
+    },
+    getFacilityServiceDataById,
   );
   fastify.post<{
     Params: ServiceParams;

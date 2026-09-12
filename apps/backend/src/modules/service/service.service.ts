@@ -20,16 +20,13 @@ export async function getFacilityServicesById(db: DB, facilityId: string) {
   const services = await getServicesByFacilityId(db, facilityId);
   return services;
 }
-export async function checkIfServiceIsMadeInFacility(
-  db: DB,
-  serviceId: string,
-  facilityId: string,
-) {
+
+export async function getFacilityServiceById(db: DB, serviceId: string, facilityId: string) {
   const service = await getServiceByFacilityIdAndServiceId(db, facilityId, serviceId);
   if (!service) {
     throw new NotFoundError('No such service found');
   }
-  return service
+  return service;
 }
 
 export async function createServiceByFacilityId(

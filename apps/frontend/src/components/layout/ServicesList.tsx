@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { convertMinutesToTime, formatMoney } from '@/lib/utils';
 import type { ServiceResponseDTO } from '@slotbook/shared/service';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -12,16 +13,8 @@ function groupByCategory(
     ([section, items]) => ({ section, items }),
   );
 }
-function convertMinutesToTime(durationMinutes: number) {
-  const hours = Math.trunc(durationMinutes / 60);
-  const minutes = durationMinutes - hours * 60;
-  return [hours, minutes];
-}
-function formatMoney(cents: number, currency: string, locale: string = 'pl') {
-  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
-  const divisor = 10 ** 2;
-  return formatter.format(cents / divisor);
-}
+
+
 
 export default function ServicesList({
   services,
@@ -61,7 +54,7 @@ export default function ServicesList({
             <div className="divide-y divide-gray-100">
               {group.items.map((service) => {
                 const query = new URLSearchParams();
-                query.append('service', service.name);
+                query.append('service', service.id);
                 return (
                   <div key={service.name} className="flex items-center justify-between px-6 py-4">
                     <div>

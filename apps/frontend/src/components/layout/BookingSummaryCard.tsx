@@ -5,7 +5,7 @@ type BookingSummaryProps = {
   businessName: string;
   city: string;
   address: string;
-  score: number;
+  score: number | null;
   reviewsCount: number;
   service: string;
   duration: string;

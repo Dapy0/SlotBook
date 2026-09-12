@@ -4,7 +4,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.t
 import { findFacilitiesByOwnerId } from '../facility/facility.repository.ts';
 import { checkFacilityOwnership, getFacilityDetails } from '../facility/facility.service.ts';
 import { receiveStaffSchedule } from '../schedule/schedule.service.ts';
-import { checkIfServiceIsMadeInFacility } from '../service/service.service.ts';
+import { getFacilityServiceById } from '../service/service.service.ts';
 import { findStaffMemberById } from '../staff/staff.repository.ts';
 import {
   checkIfStaffIsFacilityWorker,
@@ -41,7 +41,7 @@ export async function createBookingForFacility(
   const facility = await getFacilityDetails(db, facilityId);
   const staffMember = await checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId);
   const staffMemberSchedule = await receiveStaffSchedule(db, facilityId, staffMember.id);
-  const serviceDetails = await checkIfServiceIsMadeInFacility(db, data.serviceId, facilityId);
+  const serviceDetails = await getFacilityServiceById(db, data.serviceId, facilityId);
   const facilitySchedule = await findFacilitySchedule(db, facility.id);
   await checkIfStaffMemberIsDoingService(db, staffMember.id, data.serviceId);
 
