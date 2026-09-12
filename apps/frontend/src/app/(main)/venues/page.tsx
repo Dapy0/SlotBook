@@ -79,7 +79,7 @@ async function Page({
             {}
             {facilities.length > 0 ? (
               facilities.map((facility) => (
-                <BigFacilityPreviewCard facility={facility} key={facility.name} />
+                <BigFacilityPreviewCard facility={facility} key={facility.id} />
               ))
             ) : (
               <div className="flex items-center self-center text-3xl pt-10 text-gray-400">

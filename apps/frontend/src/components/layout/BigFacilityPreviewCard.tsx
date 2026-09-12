@@ -3,11 +3,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { FacilityResponseDTO } from '@slotbook/shared/facility';
 import { MapPinIcon } from 'lucide-react';
+import Link from 'next/link';
 
 function BigFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO }) {
   const { name, address, city, category, score, reviewsCount, description } = facility;
   return (
-    <div className="relative rounded-md grid grid-cols-[1fr_300px]  border  overflow-hidden w-full">
+    <Link
+      href={`venues/${facility.id}`}
+      className="relative rounded-md grid grid-cols-[1fr_300px]  border  overflow-hidden w-full"
+    >
       <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>
       {/* <img src="" alt="" /> */}
       <div className="relative z-40 p-4 flex flex-col gap-6">
@@ -34,9 +38,7 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO })
             </span>
             <span className="text-sm text-gray-600">4.7 km</span>
           </div>
-          <p className={'text-sm text-gray-700'}>
-            {description}
-          </p>
+          <p className={'text-sm text-gray-700'}>{description}</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant={'outline'}>All services and time</Button>
@@ -86,7 +88,7 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponseDTO })
           </Button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
