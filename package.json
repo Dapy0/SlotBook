@@ -12,8 +12,10 @@
     "shared:test": "npm run test --workspace=packages/shared",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "lint:fix": "npm run lint:fix --workspaces --if-present"
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "workspaces": [
     "apps/*",
@@ -25,7 +27,8 @@
   "type": "module",
   "devDependencies": {
     "concurrently": "^10.0.4",
-    "eslint-config-prettier": "10.1.8",
-    "prettier": "3.9.6"
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1"
   }
 }

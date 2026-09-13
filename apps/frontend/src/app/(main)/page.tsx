@@ -4,7 +4,7 @@ import { Circle, Dot } from "lucide-react";
 import s from "./main.module.css";
 import { RotatingCategory } from "@/components/layout/RotatingCategory";
 import SmallFacilityPreviewCard from "@/components/layout/SmallFacilityPreviewCard";
-import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
+import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
 import { getFacilities } from "@/services/facilities";
 import { getCategories } from "@/services/categories";
 import { Suspense } from "react";

@@ -1,6 +1,6 @@
-import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
+import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
-import FiltersSidebar from "@/components/layout/FiltersSidebar";
+import FiltersSidebar from "@/app/(main)/venues/_components/FiltersSidebar";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,7 +17,7 @@ import { cookies } from "next/headers";
 import { count } from "drizzle-orm";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import ResultsToolbar from "@/components/layout/ResultsToolbar";
+import ResultsToolbar from "@/app/(main)/venues/_components/ResultsToolbar";
 import { Skeleton } from "@/components/ui/skeleton";
 
 async function Page({
