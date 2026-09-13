@@ -1,30 +1,30 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const businesses = [
-  { key: 'studio-nord', label: 'Studio Nord', active: true },
-  { key: 'padel-krakow', label: 'Padel Kraków' },
+  { key: "studio-nord", label: "Studio Nord", active: true },
+  { key: "padel-krakow", label: "Padel Kraków" },
 ];
 
 const services = [
   {
     title: "Men's Haircut",
-    category: 'BEAUTY',
-    duration: '30 min',
-    price: '90,00 zł',
+    category: "BEAUTY",
+    duration: "30 min",
+    price: "90,00 zł",
   },
   {
-    title: 'Single Tone Coloring',
-    category: 'BEAUTY',
-    duration: '120 min',
-    price: '320,00 zł',
+    title: "Single Tone Coloring",
+    category: "BEAUTY",
+    duration: "120 min",
+    price: "320,00 zł",
   },
   {
-    title: 'Classic Back Massage',
-    category: 'BEAUTY',
-    duration: '60 min',
-    price: '150,00 zł',
+    title: "Classic Back Massage",
+    category: "BEAUTY",
+    duration: "60 min",
+    price: "150,00 zł",
   },
 ];
 
@@ -41,8 +41,8 @@ export default function ServicesPage() {
             key={b.key}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
               b.active
-                ? 'bg-primary text-white'
-                : 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                ? "bg-primary text-white"
+                : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300"
             }`}
           >
             {b.label}

@@ -1,6 +1,6 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import type { AvailabilityParamsAndQuery } from './availability.schema.ts';
-import { getAvailableTimeByStaffAndServiceId } from './availability.service.ts';
+import type { FastifyReply, FastifyRequest } from "fastify";
+import type { AvailabilityParamsAndQuery } from "./availability.schema.ts";
+import { getAvailableTimeByStaffAndServiceId } from "./availability.service.ts";
 
 export async function getAvailableTime(
   request: FastifyRequest<AvailabilityParamsAndQuery>,

@@ -1,30 +1,30 @@
-import 'dotenv/config';
-import cors from '@fastify/cors';
-import Fastify from 'fastify';
-import { authRoutes } from './modules/auth/auth.routes.ts';
-import fastifyEnv from '@fastify/env';
-import cookie from '@fastify/cookie';
+import "dotenv/config";
+import cors from "@fastify/cors";
+import Fastify from "fastify";
+import { authRoutes } from "./modules/auth/auth.routes.ts";
+import fastifyEnv from "@fastify/env";
+import cookie from "@fastify/cookie";
 import {
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
-} from 'fastify-type-provider-zod';
-import drizzlePlugin from './db/drizzlePlugin.ts';
-import fastifyJwt from '@fastify/jwt';
-import jwtVerification from './plugins/jwtVerification.ts';
-import { facilityRoutes } from './modules/facility/facility.routes.ts';
-import { serviceRoutes } from './modules/service/service.routes.ts';
+} from "fastify-type-provider-zod";
+import drizzlePlugin from "./db/drizzlePlugin.ts";
+import fastifyJwt from "@fastify/jwt";
+import jwtVerification from "./plugins/jwtVerification.ts";
+import { facilityRoutes } from "./modules/facility/facility.routes.ts";
+import { serviceRoutes } from "./modules/service/service.routes.ts";
 import {
   fastifyCookieOptions,
   fastifyCorsOptions,
   fastifyEnvOptions,
   fastifyJwtOptions,
-} from './app.config.ts';
-import fastifyEtag from '@fastify/etag';
-import fastifyCaching from '@fastify/caching';
-import { AppError } from './lib/errors.ts';
-import { mineBookingsRoutes } from './modules/booking/booking.routes.ts';
-import { detectCountry } from './modules/geoLocation.ts';
+} from "./app.config.ts";
+import fastifyEtag from "@fastify/etag";
+import fastifyCaching from "@fastify/caching";
+import { AppError } from "./lib/errors.ts";
+import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
+import { detectCountry } from "./modules/geoLocation.ts";
 
 export async function createServer() {
   const app = Fastify({
@@ -40,14 +40,14 @@ export async function createServer() {
     request.log.error(error);
     if (error.validation) {
       return reply.status(400).send({
-        code: 'BAD_REQUEST',
-        message: 'Data validation Error.',
+        code: "BAD_REQUEST",
+        message: "Data validation Error.",
       });
     }
     if (error instanceof AppError) {
       return reply.status(error.statusCode).send({ code: error.code, message: error.message });
     }
-    return reply.status(500).send({ message: 'Internal server error' });
+    return reply.status(500).send({ message: "Internal server error" });
   });
 
   // Plugins
@@ -63,12 +63,12 @@ export async function createServer() {
   await app.register(jwtVerification);
   // await app.register(geoLocation);
   // routes
-  await app.register(authRoutes, { prefix: '/auth' });
-  await app.register(facilityRoutes, { prefix: '/facilities' });
-  await app.register(serviceRoutes, { prefix: '/facilities' });
-  await app.register(mineBookingsRoutes, { prefix: '/bookings' });
+  await app.register(authRoutes, { prefix: "/auth" });
+  await app.register(facilityRoutes, { prefix: "/facilities" });
+  await app.register(serviceRoutes, { prefix: "/facilities" });
+  await app.register(mineBookingsRoutes, { prefix: "/bookings" });
 
-  app.get('/geo', async (req, res) => {
+  app.get("/geo", async (req, res) => {
     return detectCountry(req, res);
   });
 

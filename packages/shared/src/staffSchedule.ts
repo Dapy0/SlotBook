@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
@@ -14,25 +14,27 @@ export const staffScheduleSchemaWithoutStaffId = staffScheduleSchema.omit({
 export const createStaffScheduleSchema = staffScheduleSchemaWithoutStaffId.refine(
   (obj) => obj.startTime < obj.endTime,
   {
-    message: 'Start Time must be before end time',
-    path: ['endTime'],
+    message: "Start Time must be before end time",
+    path: ["endTime"],
   },
 );
 export type CreateStaffSchedule = z.infer<typeof createStaffScheduleSchema>;
-export const updateStaffSchedule = staffScheduleSchemaWithoutStaffId.partial().superRefine((obj, ctx) => {
-  if (!obj.startTime) {
-    ctx.addIssue('No start time selected');
-    return;
-  }
-  if (!obj.endTime) {
-    ctx.addIssue('No end time selected');
-    return;
-  }
-  if (obj.startTime >= obj.endTime) {
-    ctx.addIssue('Start Time must be before end time');
-    return;
-  }
-});
+export const updateStaffSchedule = staffScheduleSchemaWithoutStaffId
+  .partial()
+  .superRefine((obj, ctx) => {
+    if (!obj.startTime) {
+      ctx.addIssue("No start time selected");
+      return;
+    }
+    if (!obj.endTime) {
+      ctx.addIssue("No end time selected");
+      return;
+    }
+    if (obj.startTime >= obj.endTime) {
+      ctx.addIssue("Start Time must be before end time");
+      return;
+    }
+  });
 export type UpdateStaffSchedule = z.infer<typeof updateStaffSchedule>;
 
 // Response DTOs

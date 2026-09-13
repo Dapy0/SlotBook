@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, ArrowRight } from 'lucide-react';
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, ArrowRight } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { signUpSchema, type RegisterFormValues } from '@/lib/validations/auth';
-import { register as userRegister } from '@/services/auth/auth';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signUpSchema, type RegisterFormValues } from "@/lib/validations/auth";
+import { register as userRegister } from "@/services/auth/auth";
 import {
   Card,
   CardAction,
@@ -19,9 +19,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/authContext';
+} from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/authContext";
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function RegisterPage() {
   });
   const { user, refetch } = useAuth();
   useEffect(() => {
-    if (user) router.push('/');
+    if (user) router.push("/");
   }, [user]);
   const onSubmit = async (values: RegisterFormValues) => {
     setServerError(null);
@@ -42,9 +42,9 @@ export default function RegisterPage() {
       await userRegister(values);
       // await refetch();
       setTimeout(() => {}, 1000);
-      router.push('/');
+      router.push("/");
     } catch (err) {
-      setServerError('' + err);
+      setServerError("" + err);
     }
   };
   return (
@@ -56,7 +56,7 @@ export default function RegisterPage() {
         </CardDescription>
         <CardAction>
           <Button variant="link">
-            <Link href={'/login'}>Sign In</Link>
+            <Link href={"/login"}>Sign In</Link>
           </Button>
         </CardAction>
       </CardHeader>
@@ -76,7 +76,7 @@ export default function RegisterPage() {
                 placeholder="John Doe"
                 autoComplete="name"
                 aria-invalid={!!errors.name}
-                {...register('name')}
+                {...register("name")}
               />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 placeholder="you@example.com"
                 autoComplete="email"
                 aria-invalid={!!errors.email}
-                {...register('email')}
+                {...register("email")}
               />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                 placeholder="At least 8 characters"
                 autoComplete="new-password"
                 aria-invalid={!!errors.password}
-                {...register('password')}
+                {...register("password")}
               />
               {errors.password && (
                 <p className="text-xs text-destructive">{errors.password.message}</p>
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                 placeholder="Repeat your password"
                 autoComplete="new-password"
                 aria-invalid={!!errors.confirmPassword}
-                {...register('confirmPassword')}
+                {...register("confirmPassword")}
               />
               {errors.confirmPassword && (
                 <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>

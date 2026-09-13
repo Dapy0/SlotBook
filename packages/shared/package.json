@@ -4,7 +4,9 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "exports": {
     "./auth": "./src/auth.ts",
@@ -21,6 +23,9 @@
     "./errors": "./src/errors.ts"
   },
   "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-plugin-zod": "^4.12.1",
+    "typescript-eslint": "^8.70.0",
     "vitest": "^4.1.10"
   }
 }

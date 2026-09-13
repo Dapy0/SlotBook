@@ -1,5 +1,5 @@
-import type { ReviewResponse } from '@slotbook/shared/reviews';
-import { StarIcon } from 'lucide-react';
+import type { ReviewResponse } from "@slotbook/shared/reviews";
+import { StarIcon } from "lucide-react";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -8,22 +8,22 @@ function Stars({ rating }: { rating: number }) {
         <StarIcon
           key={i}
           size={13}
-          className={i < rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}
+          className={i < rating ? "fill-amber-400 text-amber-400" : "fill-gray-200 text-gray-200"}
         />
       ))}
     </div>
   );
 }
 
-const dateFormatter = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
+const dateFormatter = new Intl.DateTimeFormat("en", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
 });
 
 export default function ReviewsList({
   reviews,
-  query = '',
+  query = "",
 }: {
   reviews: ReviewResponse[];
   query?: string;

@@ -2,29 +2,16 @@
   "version": "8",
   "dialect": "postgres",
   "id": "b5ce87e9-f3db-4032-a5d7-2ec81ced4ebc",
-  "prevIds": [
-    "00000000-0000-0000-0000-000000000000"
-  ],
+  "prevIds": ["00000000-0000-0000-0000-000000000000"],
   "ddl": [
     {
-      "values": [
-        "CLIENT",
-        "OWNER",
-        "ADMIN"
-      ],
+      "values": ["CLIENT", "OWNER", "ADMIN"],
       "name": "role",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "BEAUTY",
-        "SPORT_FITNESS",
-        "MEDICAL",
-        "AUTO",
-        "EDUCATION",
-        "OTHER"
-      ],
+      "values": ["BEAUTY", "SPORT_FITNESS", "MEDICAL", "AUTO", "EDUCATION", "OTHER"],
       "name": "facility_category",
       "entityType": "enums",
       "schema": "public"
@@ -567,14 +554,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "owner_id"
-      ],
+      "columns": ["owner_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "facilities_owner_id_users_id_fkey",
@@ -584,14 +567,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
+      "columns": ["facility_id"],
       "schemaTo": "public",
       "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "services_facility_id_facilities_id_fkey",
@@ -600,9 +579,7 @@
       "table": "services"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "users_pkey",
       "schema": "public",
@@ -610,9 +587,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "facilities_pkey",
       "schema": "public",
@@ -620,9 +595,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "services_pkey",
       "schema": "public",
@@ -631,9 +604,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nullsNotDistinct": false,
       "name": "users_email_key",
       "schema": "public",
@@ -642,9 +613,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
       "name": "facilities_slug_key",
       "schema": "public",

@@ -1,15 +1,15 @@
-'use client';
-import { useFilterHref } from '@/components/hooks/useFilterHref';
-import { Input } from '@/components/ui/input';
+"use client";
+import { useFilterHref } from "@/components/hooks/useFilterHref";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { SearchIcon } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+} from "@/components/ui/select";
+import { SearchIcon } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function ResultsToolbar() {
   const buildHref = useFilterHref();
@@ -22,14 +22,14 @@ function ResultsToolbar() {
         className="relative flex-1"
         onSubmit={(e) => {
           e.preventDefault();
-          const value = new FormData(e.currentTarget).get('q')?.toString().trim();
+          const value = new FormData(e.currentTarget).get("q")?.toString().trim();
           router.replace(buildHref({ q: value || null }));
         }}
       >
         <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
         <Input
           name="q"
-          defaultValue={searchParams.get('q') ?? ''}
+          defaultValue={searchParams.get("q") ?? ""}
           placeholder="Refine results"
           className="pl-9"
         />
@@ -38,8 +38,8 @@ function ResultsToolbar() {
       <div className="flex shrink-0 items-center gap-2">
         <span className="text-xs text-gray-500">SORT BY</span>
         <Select
-          value={searchParams.get('sort') ?? 'rating'}
-          onValueChange={(v) => router.replace(buildHref({ sort: v === 'rating' ? null : v }))}
+          value={searchParams.get("sort") ?? "rating"}
+          onValueChange={(v) => router.replace(buildHref({ sort: v === "rating" ? null : v }))}
         >
           <SelectTrigger className="w-40">
             <SelectValue />

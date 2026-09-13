@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const entities = [
-  { key: 'business', label: 'Business' },
-  { key: 'anna', label: 'Anna K.' },
-  { key: 'marek', label: 'Marek W.' },
+  { key: "business", label: "Business" },
+  { key: "anna", label: "Anna K." },
+  { key: "marek", label: "Marek W." },
 ];
 
 type DaySchedule = {
@@ -17,24 +17,24 @@ type DaySchedule = {
 };
 
 const initialSchedule: DaySchedule[] = [
-  { day: 'Monday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Tuesday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Wednesday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Thursday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Friday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Saturday', enabled: false, from: '10:00', to: '16:00' },
-  { day: 'Sunday', enabled: false, from: '10:00', to: '16:00' },
+  { day: "Monday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Tuesday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Wednesday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Thursday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Friday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Saturday", enabled: false, from: "10:00", to: "16:00" },
+  { day: "Sunday", enabled: false, from: "10:00", to: "16:00" },
 ];
 
 export default function SchedulePage() {
-  const [activeEntity, setActiveEntity] = useState('business');
+  const [activeEntity, setActiveEntity] = useState("business");
   const [schedule, setSchedule] = useState(initialSchedule);
 
   const toggleDay = (day: string) => {
     setSchedule((prev) => prev.map((d) => (d.day === day ? { ...d, enabled: !d.enabled } : d)));
   };
 
-  const updateTime = (day: string, field: 'from' | 'to', value: string) => {
+  const updateTime = (day: string, field: "from" | "to", value: string) => {
     setSchedule((prev) => prev.map((d) => (d.day === day ? { ...d, [field]: value } : d)));
   };
 
@@ -51,8 +51,8 @@ export default function SchedulePage() {
             onClick={() => setActiveEntity(e.key)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeEntity === e.key
-                ? 'bg-primary text-white'
-                : 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                ? "bg-primary text-white"
+                : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300"
             }`}
           >
             {e.label}
@@ -67,7 +67,7 @@ export default function SchedulePage() {
             <div
               key={d.day}
               className={`flex items-center justify-between px-6 py-4 ${
-                !d.enabled ? 'bg-gray-50' : ''
+                !d.enabled ? "bg-gray-50" : ""
               }`}
             >
               <label className="flex items-center gap-3">
@@ -78,7 +78,7 @@ export default function SchedulePage() {
                   className="size-4 accent-primary"
                 />
                 <span
-                  className={`text-sm font-medium ${d.enabled ? 'text-gray-900' : 'text-gray-400'}`}
+                  className={`text-sm font-medium ${d.enabled ? "text-gray-900" : "text-gray-400"}`}
                 >
                   {d.day}
                 </span>
@@ -91,7 +91,7 @@ export default function SchedulePage() {
                     type="time"
                     value={d.from}
                     disabled={!d.enabled}
-                    onChange={(e) => updateTime(d.day, 'from', e.target.value)}
+                    onChange={(e) => updateTime(d.day, "from", e.target.value)}
                     className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
                   />
                 </div>
@@ -101,7 +101,7 @@ export default function SchedulePage() {
                     type="time"
                     value={d.to}
                     disabled={!d.enabled}
-                    onChange={(e) => updateTime(d.day, 'to', e.target.value)}
+                    onChange={(e) => updateTime(d.day, "to", e.target.value)}
                     className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
                   />
                 </div>

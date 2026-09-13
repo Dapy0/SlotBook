@@ -1,16 +1,16 @@
-import { and, asc, avg, count, desc, eq, exists, gte, ilike, lte, or, sql } from 'drizzle-orm';
-import type { DB } from '../../db/drizzlePlugin.ts';
+import { and, asc, avg, count, desc, eq, exists, gte, ilike, lte, or, sql } from "drizzle-orm";
+import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   facilities,
   type FacilityEntity,
   type NewFacilityEntity,
-} from '../../db/schema/facility.ts';
-import type { FacilityCategory, UpdateFacilityRequest } from '@slotbook/shared/facility';
-import { FACILITY_CATEGORIES } from '@slotbook/shared/facility';
-import { reviews } from '../../db/schema/reviews.ts';
-import { bookings } from '../../db/schema/booking.ts';
-import type { FacilityListQuery } from './facility.schema.ts';
-import { services } from '../../db/schema/service.ts';
+} from "../../db/schema/facility.ts";
+import type { FacilityCategory, UpdateFacilityRequest } from "@slotbook/shared/facility";
+import { FACILITY_CATEGORIES } from "@slotbook/shared/facility";
+import { reviews } from "../../db/schema/reviews.ts";
+import { bookings } from "../../db/schema/booking.ts";
+import type { FacilityListQuery } from "./facility.schema.ts";
+import { services } from "../../db/schema/service.ts";
 
 export async function findAllFacilities(
   db: DB,
@@ -22,7 +22,7 @@ export async function findAllFacilities(
 
   if (category !== undefined) filters.push(eq(facilities.category, category));
   if (rating !== undefined) filters.push(gte(facilities.score, rating));
-  if (q !== undefined && q !== '') {
+  if (q !== undefined && q !== "") {
     filters.push(or(ilike(facilities.name, `%${q}%`), ilike(facilities.description, `%${q}%`))!);
   }
   if (priceMax !== undefined) {
@@ -48,7 +48,7 @@ export async function findAllFacilities(
     .where(and(...filters))
     .$dynamic();
 
-  if (sort === 'rating') query.orderBy(sql`${facilities.score} DESC NULLS LAST`);
+  if (sort === "rating") query.orderBy(sql`${facilities.score} DESC NULLS LAST`);
   else query.orderBy(asc(facilities.name));
 
   if (limit !== undefined) query.limit(limit);
@@ -72,7 +72,7 @@ export async function insertFacility(db: DB, data: NewFacilityEntity): Promise<F
     .values({ ...data })
     .returning();
   if (!facility) {
-    throw new Error('Failed to insert facility');
+    throw new Error("Failed to insert facility");
   }
   return facility;
 }

@@ -1,14 +1,14 @@
-import { api } from '@/lib/api';
+import { api } from "@/lib/api";
 import type {
   CreateStaffSchedule,
   ResponseStaffScheduleSchema,
-} from '@slotbook/shared/staffSchedule';
+} from "@slotbook/shared/staffSchedule";
 
-export async function getStaffSchedule(facilityId: string, staffId:string) {
+export async function getStaffSchedule(facilityId: string, staffId: string) {
   const result = await api<ResponseStaffScheduleSchema[]>(
     `/facilities/${facilityId}/staff/${staffId}/schedule`,
     {
-      method: 'GET',
+      method: "GET",
     },
   );
 
@@ -23,7 +23,7 @@ export async function putStaffSchedule(
   const result = await api<ResponseStaffScheduleSchema[]>(
     `/facilities/${facilityId}/staff/${staffId}/schedule`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     },
   );

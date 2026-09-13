@@ -1,5 +1,5 @@
-import { facilityCategorySchema } from '@slotbook/shared/facility';
-import z from 'zod';
+import { facilityCategorySchema } from "@slotbook/shared/facility";
+import z from "zod";
 
 export const facilityListQuerySchema = z.object({
   country: z.string(),

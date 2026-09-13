@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
@@ -24,8 +24,8 @@ export const facilityScheduleSchemaWithoutFacilityId = facilityScheduleSchema.om
 export const createFacilityScheduleSchema = facilityScheduleSchemaWithoutFacilityId.refine(
   (obj) => obj.startTime < obj.endTime,
   {
-    message: 'Open time must be before close time',
-    path: ['endTime'],
+    message: "Open time must be before close time",
+    path: ["endTime"],
   },
 );
 export type CreateFacilitySchedule = z.infer<typeof createFacilityScheduleSchema>;
@@ -33,15 +33,15 @@ export const updateFacilitySchedule = facilityScheduleSchemaWithoutFacilityId
   .partial()
   .superRefine((obj, ctx) => {
     if (!obj.startTime) {
-      ctx.addIssue('No open time selected');
+      ctx.addIssue("No open time selected");
       return;
     }
     if (!obj.endTime) {
-      ctx.addIssue('No close time selected');
+      ctx.addIssue("No close time selected");
       return;
     }
     if (obj.startTime >= obj.endTime) {
-      ctx.addIssue('Open time must be before close time');
+      ctx.addIssue("Open time must be before close time");
       return;
     }
   });

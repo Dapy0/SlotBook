@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type Status = 'confirmed' | 'pending' | 'cancelled';
+type Status = "confirmed" | "pending" | "cancelled";
 
 type Booking = {
   service: string;
@@ -18,56 +18,56 @@ type Booking = {
 
 const upcoming: Booking[] = [
   {
-    service: 'Single Tone Coloring',
-    business: 'Studio Nord',
-    staff: 'Anna K.',
-    date: '28 Aug 2026',
-    time: '11:00',
-    price: '320,00 zł',
-    status: 'confirmed',
+    service: "Single Tone Coloring",
+    business: "Studio Nord",
+    staff: "Anna K.",
+    date: "28 Aug 2026",
+    time: "11:00",
+    price: "320,00 zł",
+    status: "confirmed",
   },
   {
-    service: 'Court Rental',
-    business: 'Padel Kraków',
-    staff: 'Tomasz L.',
-    date: '30 Aug 2026',
-    time: '19:00',
-    price: '80,00 zł',
-    status: 'pending',
+    service: "Court Rental",
+    business: "Padel Kraków",
+    staff: "Tomasz L.",
+    date: "30 Aug 2026",
+    time: "19:00",
+    price: "80,00 zł",
+    status: "pending",
   },
 ];
 
 const past: Booking[] = [
   {
     service: "Men's Haircut",
-    business: 'Studio Nord',
-    staff: 'Marek W.',
-    date: '14 Aug 2026',
-    time: '10:30',
-    price: '90,00 zł',
-    status: 'cancelled',
+    business: "Studio Nord",
+    staff: "Marek W.",
+    date: "14 Aug 2026",
+    time: "10:30",
+    price: "90,00 zł",
+    status: "cancelled",
   },
   {
-    service: 'Oral Hygiene',
-    business: 'Klinika Dentim',
-    staff: 'Marta S.',
-    date: '2 Aug 2026',
-    time: '09:00',
-    price: '250,00 zł',
-    status: 'confirmed',
+    service: "Oral Hygiene",
+    business: "Klinika Dentim",
+    staff: "Marta S.",
+    date: "2 Aug 2026",
+    time: "09:00",
+    price: "250,00 zł",
+    status: "confirmed",
   },
 ];
 
 function StatusBadge({ status }: { status: Status }) {
   const styles: Record<Status, string> = {
-    confirmed: 'bg-green-50 text-green-600',
-    pending: 'bg-amber-50 text-amber-600',
-    cancelled: 'bg-red-50 text-red-600',
+    confirmed: "bg-green-50 text-green-600",
+    pending: "bg-amber-50 text-amber-600",
+    cancelled: "bg-red-50 text-red-600",
   };
   const labels: Record<Status, string> = {
-    confirmed: 'Confirmed',
-    pending: 'Pending',
-    cancelled: 'Cancelled',
+    confirmed: "Confirmed",
+    pending: "Pending",
+    cancelled: "Cancelled",
   };
   return (
     <span
@@ -78,7 +78,7 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
-function BookingRow({ booking, variant }: { booking: Booking; variant: 'upcoming' | 'past' }) {
+function BookingRow({ booking, variant }: { booking: Booking; variant: "upcoming" | "past" }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
       <div className="min-w-0">
@@ -92,18 +92,18 @@ function BookingRow({ booking, variant }: { booking: Booking; variant: 'upcoming
         <span className="text-sm font-semibold text-gray-900">{booking.price}</span>
         <StatusBadge status={booking.status} />
 
-        {variant === 'upcoming' && (
+        {variant === "upcoming" && (
           <Button variant="outline" className="border-gray-200 text-gray-900 hover:bg-gray-50">
             Cancel
           </Button>
         )}
 
-        {variant === 'past' && (
+        {variant === "past" && (
           <>
             <Button variant="outline" className="border-gray-200 text-gray-900 hover:bg-gray-50">
               Book again
             </Button>
-            {booking.status === 'confirmed' && (
+            {booking.status === "confirmed" && (
               <Button className="bg-primary text-white hover:bg-primary/90">Leave a review</Button>
             )}
           </>
@@ -114,7 +114,7 @@ function BookingRow({ booking, variant }: { booking: Booking; variant: 'upcoming
 }
 
 function Page() {
-  const [tab, setTab] = useState('upcoming');
+  const [tab, setTab] = useState("upcoming");
 
   return (
     <div className="min-w-0 flex-1">

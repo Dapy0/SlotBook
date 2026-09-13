@@ -1,8 +1,7 @@
-import { getFacilityById } from '@/services/facilities';
-import { getServicesByFacilityId } from '@/services/service';
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-
+import { getFacilityById } from "@/services/facilities";
+import { getServicesByFacilityId } from "@/services/service";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type FacilityPageProps = {
   params: Promise<{ id: string }>;
@@ -12,7 +11,7 @@ export async function generateMetadata({ params }: FacilityPageProps): Promise<M
   const { id } = await params;
   const facility = await getFacilityById(id);
   if (!facility) {
-    return { title: 'Заведение не найдено — SlotBook' };
+    return { title: "Заведение не найдено — SlotBook" };
   }
 
   return {
@@ -36,9 +35,7 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
       <span className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">
         {facility.category}
       </span>
-      <h1 className="mt-3 font-heading text-4xl font-medium text-foreground">
-        {facility.name}
-      </h1>
+      <h1 className="mt-3 font-heading text-4xl font-medium text-foreground">{facility.name}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         {facility.city} · {facility.address}
       </p>
@@ -47,9 +44,7 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
         <p className="mt-6 text-sm leading-relaxed text-foreground">{facility.description}</p>
       )}
 
-      <h2 className="mt-12 font-heading text-2xl font-medium text-foreground">
-        Услуги
-      </h2>
+      <h2 className="mt-12 font-heading text-2xl font-medium text-foreground">Услуги</h2>
 
       <div className="mt-4 divide-y divide-border rounded-lg border border-border bg-card">
         {services.map((service) => (

@@ -1,7 +1,7 @@
-import type { PatchBookingStatus } from '@slotbook/shared/bookings';
-import type { DB } from '../../db/drizzlePlugin.ts';
-import { bookings } from '../../db/schema/booking.ts';
-import { eq } from 'drizzle-orm';
+import type { PatchBookingStatus } from "@slotbook/shared/bookings";
+import type { DB } from "../../db/drizzlePlugin.ts";
+import { bookings } from "../../db/schema/booking.ts";
+import { eq } from "drizzle-orm";
 
 export async function findBookingsByFacilityId(db: DB, facilityId: string) {
   const facilityBookings = await db
@@ -41,7 +41,7 @@ export async function insertBooking(
     .returning();
 
   if (!booking) {
-    throw new Error('Failed to insert booking');
+    throw new Error("Failed to insert booking");
   }
   return booking;
 }
@@ -49,7 +49,7 @@ export async function insertBooking(
 export async function patchStatusByBookingId(
   db: DB,
   bookingId: string,
-  status: PatchBookingStatus['status'],
+  status: PatchBookingStatus["status"],
 ) {
   const [updatedBooking] = await db
     .update(bookings)
@@ -60,7 +60,7 @@ export async function patchStatusByBookingId(
     .returning();
 
   if (!updatedBooking) {
-    throw new Error('Failed to update booking');
+    throw new Error("Failed to update booking");
   }
   return updatedBooking;
 }

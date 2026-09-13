@@ -1,20 +1,20 @@
-import BreadCrumbs from '@/components/layout/BreadCrumbs';
-import { Badge } from '@/components/ui/badge';
-import ScoreBadge from '@/components/layout/ScoreBadge';
-import { MapPinIcon, type LucideIcon } from 'lucide-react';
-import CardWithMap from '@/components/layout/CardWithMap';
-import WorkingHours from '@/components/layout/WorkingHours';
-import ContactInfo from '@/components/layout/ContactInfo';
-import { getFacilityById, getFacilityServicesById } from '@/services/facilities';
-import { notFound } from 'next/navigation';
+import BreadCrumbs from "@/components/layout/BreadCrumbs";
+import { Badge } from "@/components/ui/badge";
+import ScoreBadge from "@/components/layout/ScoreBadge";
+import { MapPinIcon, type LucideIcon } from "lucide-react";
+import CardWithMap from "@/components/layout/CardWithMap";
+import WorkingHours from "@/components/layout/WorkingHours";
+import ContactInfo from "@/components/layout/ContactInfo";
+import { getFacilityById, getFacilityServicesById } from "@/services/facilities";
+import { notFound } from "next/navigation";
 // import StaffList from '@/components/layout/StaffList';
 // import ReviewsList from '@/components/layout/ReviewsList';
-import * as Icons from 'lucide-react';
-import { CATEGORY_METADATA } from '@slotbook/shared/facility';
-import FacilityDetailsTab from '@/components/layout/FacilityDetailsTab';
-import { getStaffMembersByFacilityId } from '@/services/staff';
-import { getFacilityReviews } from '@/services/reviews';
-import { ApiError } from '@/lib/api';
+import * as Icons from "lucide-react";
+import { CATEGORY_METADATA } from "@slotbook/shared/facility";
+import FacilityDetailsTab from "@/components/layout/FacilityDetailsTab";
+import { getStaffMembersByFacilityId } from "@/services/staff";
+import { getFacilityReviews } from "@/services/reviews";
+import { ApiError } from "@/lib/api";
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -46,7 +46,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
   ]);
   return (
     <div className="w-full  mx-auto">
-      <BreadCrumbs crumbsList={['facilities', name]} />
+      <BreadCrumbs crumbsList={["facilities", name]} />
       <div className="flex gap-10 items-start">
         <div className="flex flex-col gap-2 flex-1 min-w-0 ">
           <div className="flex items-center gap-2 shrink-0">
@@ -66,7 +66,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
             </span>
             {/* <span className="text-sm text-gray-600">4.7 km</span> */}
           </div>
-          <p className={'text-sm text-gray-700'}>{description}</p>
+          <p className={"text-sm text-gray-700"}>{description}</p>
 
           <main className="flex flex-col gap-3 mt-6">
             <FacilityDetailsTab staff={staff} services={services} reviews={reviews} />

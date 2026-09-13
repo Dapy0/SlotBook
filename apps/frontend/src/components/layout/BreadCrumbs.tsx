@@ -5,8 +5,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import Link from 'next/link';
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 function BreadCrumbs({ crumbsList }: { crumbsList: Array<string> }) {
   return (

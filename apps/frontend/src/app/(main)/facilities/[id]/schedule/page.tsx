@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { WeeklyScheduleForm, type ScheduleEntry } from '@/components/schedule/WeeklyScheduleForm';
-import { getFacilitySchedule, putFacilitySchedule } from '@/services/facilitySchedule';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { WeeklyScheduleForm, type ScheduleEntry } from "@/components/schedule/WeeklyScheduleForm";
+import { getFacilitySchedule, putFacilitySchedule } from "@/services/facilitySchedule";
 
 export default function FacilitySchedulePage() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +13,7 @@ export default function FacilitySchedulePage() {
     getFacilitySchedule(id)
       .then(setInitialData)
       .catch((err) => {
-        console.error('Failed to load schedule:', err);
+        console.error("Failed to load schedule:", err);
         setInitialData([]);
       });
   }, [id]);

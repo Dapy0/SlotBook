@@ -1,20 +1,20 @@
-import z from 'zod';
+import z from "zod";
 const TSRANGE_RE =
   /^([[(])(?:"((?:[^"\\]|\\.)*)"|([^",]*))?,(?:"((?:[^"\\]|\\.)*)"|([^\])"]*))?([)\]])$/;
 
 function unescapeBound(s: string): string {
-  return s.replace(/\\(.)/g, '$1');
+  return s.replace(/\\(.)/g, "$1");
 }
 
 function normalizeTimestamp(raw: string): string {
   // "2026-08-25 13:51:00+00" -> "2026-08-25T13:51:00+00:00"
   return raw
     .trim()
-    .replace(' ', 'T')
-    .replace(/([+-]\d{2})(\d{2})?$/, (_, hh, mm) => `${hh}:${mm ?? '00'}`);
+    .replace(" ", "T")
+    .replace(/([+-]\d{2})(\d{2})?$/, (_, hh, mm) => `${hh}:${mm ?? "00"}`);
 }
 export function parseTsRangeLiteral(raw: string) {
-  if (raw === 'empty') {
+  if (raw === "empty") {
     return { start: null, end: null, startInclusive: false, endInclusive: false };
   }
   const m = TSRANGE_RE.exec(raw.trim());
@@ -25,8 +25,8 @@ export function parseTsRangeLiteral(raw: string) {
   return {
     start: startRaw ? new Date(normalizeTimestamp(startRaw)) : null,
     end: endRaw ? new Date(normalizeTimestamp(endRaw)) : null,
-    startInclusive: open === '[',
-    endInclusive: close === ']',
+    startInclusive: open === "[",
+    endInclusive: close === "]",
   };
 }
 
@@ -36,9 +36,9 @@ function toTsRangeLiteral(obj: {
   startInclusive: boolean;
   endInclusive: boolean;
 }): string {
-  const s = obj.start ? obj.start.toISOString() : '';
-  const e = obj.end ? obj.end.toISOString() : '';
-  return `${obj.startInclusive ? '[' : '('}${s},${e}${obj.endInclusive ? ']' : ')'}`;
+  const s = obj.start ? obj.start.toISOString() : "";
+  const e = obj.end ? obj.end.toISOString() : "";
+  return `${obj.startInclusive ? "[" : "("}${s},${e}${obj.endInclusive ? "]" : ")"}`;
 }
 
 export const tsRangeSchema = z.codec(
@@ -64,11 +64,11 @@ export const bookingResponseSchema = z.object({
   serviceId: z.uuid(),
   timeRange: tsRangeSchema,
   createdAt: z.coerce.date(),
-  status: z.enum(['pending', 'confirmed', 'canceled']),
+  status: z.enum(["pending", "confirmed", "canceled"]),
 });
 export type BookingResponse = z.infer<typeof bookingResponseSchema>;
 
 export const patchBookingStatusSchema = z.object({
-  status: z.enum(['confirmed', 'canceled']),
+  status: z.enum(["confirmed", "canceled"]),
 });
 export type PatchBookingStatus = z.infer<typeof patchBookingStatusSchema>;

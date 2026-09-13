@@ -1,30 +1,30 @@
-import SearchPanel from '@/components/layout/SearchPanel';
-import { Button } from '@/components/ui/button';
-import { Circle, Dot } from 'lucide-react';
-import s from './main.module.css';
-import { RotatingCategory } from '@/components/layout/RotatingCategory';
-import SmallFacilityPreviewCard from '@/components/layout/SmallFacilityPreviewCard';
-import BigFacilityPreviewCard from '@/components/layout/BigFacilityPreviewCard';
-import { getFacilities } from '@/services/facilities';
-import { getCategories } from '@/services/categories';
-import { Suspense } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { getCookie } from '@/lib/utils';
-import { cookies } from 'next/headers';
-import { CATEGORY_METADATA } from '@slotbook/shared/facility';
-import Link from 'next/link';
+import SearchPanel from "@/components/layout/SearchPanel";
+import { Button } from "@/components/ui/button";
+import { Circle, Dot } from "lucide-react";
+import s from "./main.module.css";
+import { RotatingCategory } from "@/components/layout/RotatingCategory";
+import SmallFacilityPreviewCard from "@/components/layout/SmallFacilityPreviewCard";
+import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
+import { getFacilities } from "@/services/facilities";
+import { getCategories } from "@/services/categories";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getCookie } from "@/lib/utils";
+import { cookies } from "next/headers";
+import { CATEGORY_METADATA } from "@slotbook/shared/facility";
+import Link from "next/link";
 const CATEGORY_WORDS = [
-  'manicure',
-  'for a haircut',
-  'an english lesson',
-  'coloring',
-  'guitar lessons',
-  'soccer',
+  "manicure",
+  "for a haircut",
+  "an english lesson",
+  "coloring",
+  "guitar lessons",
+  "soccer",
 ];
 
 async function Page() {
   const cookieStore = await cookies();
-  const local = cookieStore.get('_sb_country')?.value || 'PL';
+  const local = cookieStore.get("_sb_country")?.value || "PL";
   const [facilities, categories] = await Promise.all([
     getFacilities({ country: local, limit: 8 }),
     getCategories({ country: local, limit: 4 }),
@@ -50,14 +50,14 @@ async function Page() {
               {categories.map((category) => (
                 <Button
                   key={CATEGORY_METADATA[category.categoryName].label}
-                  variant={'outline'}
+                  variant={"outline"}
                   style={
                     {
-                      '--icon-color-temp': CATEGORY_METADATA[category.categoryName].color,
+                      "--icon-color-temp": CATEGORY_METADATA[category.categoryName].color,
                     } as React.CSSProperties
                   }
                   className={
-                    'text-center text-medium hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)] hover:border-(--icon-color-temp)'
+                    "text-center text-medium hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)] hover:border-(--icon-color-temp)"
                   }
                 >
                   <Dot className={` size-7 [&>circle]:text-(--icon-color-temp)`} />
@@ -81,7 +81,7 @@ async function Page() {
         <div>
           <h1 className="text-3xl font-semibold">Promoted</h1>
           <div className=" flex flex-col gap-3 mt-5">
-            {facilities.slice(1,6).map((facility) => (
+            {facilities.slice(1, 6).map((facility) => (
               <BigFacilityPreviewCard facility={facility} />
             ))}
           </div>
@@ -104,7 +104,7 @@ async function Page() {
                 Set up your services, staff, and working hours — the schedule builds itself.
               </p>
             </div>
-            <Button className="" variant={'default'}>
+            <Button className="" variant={"default"}>
               Add your venue
             </Button>
           </div>

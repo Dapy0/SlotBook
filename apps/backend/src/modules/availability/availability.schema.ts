@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 export const availabilityParamSchema = z.object({
   id: z.uuid(),
@@ -12,4 +12,3 @@ export type AvailabilityParamsAndQuery = {
   Params: z.infer<typeof availabilityParamSchema>;
   Querystring: z.infer<typeof availabilityQuerySchema>;
 };
-

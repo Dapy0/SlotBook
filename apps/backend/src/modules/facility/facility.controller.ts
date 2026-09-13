@@ -1,11 +1,11 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from "fastify";
 
-import type { CreateFacilityRequest, UpdateFacilityRequest } from '@slotbook/shared/facility';
+import type { CreateFacilityRequest, UpdateFacilityRequest } from "@slotbook/shared/facility";
 import type {
   FacilityCategoryQuerystring,
   FacilityListQuery,
   FacilityParams,
-} from './facility.schema.ts';
+} from "./facility.schema.ts";
 import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
@@ -15,20 +15,17 @@ import {
   getOwnFacilitiesByUserId,
   removeOwnedFacilityById,
   updateOwnedFacility,
-} from './facility.service.ts';
-import type { CreateFacilitySchedule } from '@slotbook/shared/facilitySchedule';
-import { getAllFacilityReviews } from '../review/review.service.ts';
-import { getAllCategories } from './facility.repository.ts';
+} from "./facility.service.ts";
+import type { CreateFacilitySchedule } from "@slotbook/shared/facilitySchedule";
+import { getAllFacilityReviews } from "../review/review.service.ts";
+import { getAllCategories } from "./facility.repository.ts";
 
 export async function getAllFacilities(
   request: FastifyRequest<{ Querystring: FacilityListQuery }>,
   response: FastifyReply,
 ) {
-  const facilities = await getAllPublicFacilities(
-    request.server.drizzle,
-    request.query
-  );
-  response.header('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=30');
+  const facilities = await getAllPublicFacilities(request.server.drizzle, request.query);
+  response.header("Cache-Control", "public, max-age=60, s-maxage=600, stale-while-revalidate=30");
   return response.send(facilities);
 }
 export async function getFacilityById(
@@ -36,12 +33,12 @@ export async function getFacilityById(
   response: FastifyReply,
 ) {
   const facility = await getFacilityDetails(request.server.drizzle, request.params.id);
-  response.header('Cache-Control', 'public, no-cache');
+  response.header("Cache-Control", "public, no-cache");
   return response.send(facility);
 }
 export async function getOwnFacilities(request: FastifyRequest, response: FastifyReply) {
   const facilities = await getOwnFacilitiesByUserId(request.server.drizzle, request.user.id);
-  response.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  response.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
   return response.send(facilities);
 }
 export async function createFacility(
@@ -117,6 +114,10 @@ export async function getAllFacilitiesCategory(
   request: FastifyRequest<{ Querystring: FacilityCategoryQuerystring }>,
   response: FastifyReply,
 ) {
-  const categories = await getAllCategories(request.server.drizzle,request.query.country, request.query.limit);
+  const categories = await getAllCategories(
+    request.server.drizzle,
+    request.query.country,
+    request.query.limit,
+  );
   return response.send(categories);
 }

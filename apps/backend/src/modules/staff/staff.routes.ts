@@ -1,19 +1,19 @@
-import type { FastifyInstance } from 'fastify';
-import { addStaffToFacility, getFacilityStaff } from './staff.controller.ts';
+import type { FastifyInstance } from "fastify";
+import { addStaffToFacility, getFacilityStaff } from "./staff.controller.ts";
 import {
   staffParamsSchema,
   staffBodySchema,
   type StaffParams,
   type StaffBody,
-} from './staff.schema.ts';
-import { staffMemberResponseSchema } from '@slotbook/shared/staffMembers';
-import z from 'zod';
-import { scheduleRoutes } from '../schedule/schedule.routes.ts';
-import { availabilityRoutes } from '../availability/availability.routes.ts';
+} from "./staff.schema.ts";
+import { staffMemberResponseSchema } from "@slotbook/shared/staffMembers";
+import z from "zod";
+import { scheduleRoutes } from "../schedule/schedule.routes.ts";
+import { availabilityRoutes } from "../availability/availability.routes.ts";
 
 export async function staffRoutes(fastify: FastifyInstance) {
   fastify.get(
-    '/:id/staff',
+    "/:id/staff",
     {
       schema: {
         params: staffParamsSchema,
@@ -26,7 +26,7 @@ export async function staffRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post<{ Params: StaffParams; Body: StaffBody }>(
-    '/:id/staff',
+    "/:id/staff",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -37,6 +37,6 @@ export async function staffRoutes(fastify: FastifyInstance) {
     },
     addStaffToFacility,
   );
-  fastify.register(scheduleRoutes, { prefix: '/:id/staff/:staffId' });
-  fastify.register(availabilityRoutes, { prefix: '/:id/staff/:staffId' });
+  fastify.register(scheduleRoutes, { prefix: "/:id/staff/:staffId" });
+  fastify.register(availabilityRoutes, { prefix: "/:id/staff/:staffId" });
 }

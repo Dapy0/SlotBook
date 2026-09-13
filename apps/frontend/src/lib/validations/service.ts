@@ -1,5 +1,5 @@
-import type { createServiceSchema } from '@slotbook/shared/service';
-import { z } from 'zod';
+import type { createServiceSchema } from "@slotbook/shared/service";
+import { z } from "zod";
 
 // export const createServiceSchema = z.object({
 //   name: z.string().min(2, 'Min 2 characters').max(255, 'Too long'),

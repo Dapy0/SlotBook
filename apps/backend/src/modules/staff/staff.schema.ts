@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 export const staffParamsSchema = z.object({
   id: z.uuid(),
@@ -8,4 +8,4 @@ export const staffBodySchema = z.object({
   email: z.email(),
 });
 
-export type StaffBody = z.infer<typeof staffBodySchema>
+export type StaffBody = z.infer<typeof staffBodySchema>;

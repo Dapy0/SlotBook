@@ -1,7 +1,7 @@
-import { toast } from '@/components/ui/toast';
-import type { ApiErrorCodeShared } from '@slotbook/shared/errors';
+import { toast } from "@/components/ui/toast";
+import type { ApiErrorCodeShared } from "@slotbook/shared/errors";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
 export class ApiError extends Error {
   constructor(
@@ -20,20 +20,20 @@ export async function api<T>(endpoint: string, options: RequestInit = {}): Promi
   const config: RequestInit = {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     },
-    credentials: 'include',
+    credentials: "include",
   };
   const response = await fetch(url, config);
 
   if (!response.ok) {
     const errorData = await response
       .json()
-      .catch(() => ({ message: 'Unknown Error', code: 'UNKNOWN' }));
+      .catch(() => ({ message: "Unknown Error", code: "UNKNOWN" }));
     throw new ApiError(
       response.status,
-      errorData.code ?? 'UNKNOWN',
+      errorData.code ?? "UNKNOWN",
       errorData.message || `Server error (${response.status})`,
     );
   }

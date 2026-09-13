@@ -1,5 +1,5 @@
-import z from 'zod';
-import { timestamp } from 'drizzle-orm/pg-core';
+import z from "zod";
+import { timestamp } from "drizzle-orm/pg-core";
 
 export const paramsSchema = z.object({
   id: z.string().nonempty(),

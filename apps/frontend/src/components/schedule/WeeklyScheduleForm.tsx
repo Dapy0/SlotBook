@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const DAYS: { value: 1 | 2 | 3 | 4 | 5 | 6 | 7; label: string }[] = [
-  { value: 1, label: 'Monday' },
-  { value: 2, label: 'Tuesday' },
-  { value: 3, label: 'Wednesday' },
-  { value: 4, label: 'Thursday' },
-  { value: 5, label: 'Friday' },
-  { value: 6, label: 'Saturday' },
-  { value: 7, label: 'Sunday' },
+  { value: 1, label: "Monday" },
+  { value: 2, label: "Tuesday" },
+  { value: 3, label: "Wednesday" },
+  { value: 4, label: "Thursday" },
+  { value: 5, label: "Friday" },
+  { value: 6, label: "Saturday" },
+  { value: 7, label: "Sunday" },
 ];
 
 export type ScheduleEntry = {
@@ -37,7 +37,7 @@ function buildInitialRows(initialData: ScheduleEntry[]): DayRow[] {
     const existing = initialData.find((d) => d.dayOfTheWeek === value);
     return existing
       ? { enabled: true, startTime: existing.startTime, endTime: existing.endTime }
-      : { enabled: false, startTime: '09:00', endTime: '18:00' };
+      : { enabled: false, startTime: "09:00", endTime: "18:00" };
   });
 }
 
@@ -61,7 +61,7 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
       .filter((row) => row.enabled);
 
     if (enabledRows.length === 0) {
-      setError('Enable at least one working day');
+      setError("Enable at least one working day");
       return;
     }
     for (const row of enabledRows) {
@@ -84,7 +84,7 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
       await onSubmit(payload);
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save schedule');
+      setError(err instanceof Error ? err.message : "Failed to save schedule");
     } finally {
       setIsSubmitting(false);
     }
@@ -152,7 +152,7 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
       )}
 
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Saving…' : 'Save schedule'}
+        {isSubmitting ? "Saving…" : "Save schedule"}
       </Button>
     </form>
   );

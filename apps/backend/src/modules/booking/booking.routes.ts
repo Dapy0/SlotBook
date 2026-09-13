@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from "fastify";
 import {
   bodySchema,
   paramsPatchSchema,
@@ -7,20 +7,29 @@ import {
   type BookingParams,
   type BookingPatchParams,
   type UpdateBookingBody,
-} from './booking.schema.ts';
-import { getBookings, createBooking, patchBookingStatus, postReviewForBooking } from './booking.controller.ts';
-import z from 'zod';
+} from "./booking.schema.ts";
+import {
+  getBookings,
+  createBooking,
+  patchBookingStatus,
+  postReviewForBooking,
+} from "./booking.controller.ts";
+import z from "zod";
 import {
   bookingResponseSchema,
   patchBookingStatusSchema,
   type PatchBookingStatus,
-} from '@slotbook/shared/bookings';
-import { createReviewRequestSchema, reviewResponseSchema, type CreateReviewRequest } from '@slotbook/shared/reviews';
-import { createReviewForBooking } from '../review/review.service.ts';
+} from "@slotbook/shared/bookings";
+import {
+  createReviewRequestSchema,
+  reviewResponseSchema,
+  type CreateReviewRequest,
+} from "@slotbook/shared/reviews";
+import { createReviewForBooking } from "../review/review.service.ts";
 
 export async function bookingRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: BookingParams }>(
-    '/:id/bookings',
+    "/:id/bookings",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -34,7 +43,7 @@ export async function bookingRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post<{ Params: BookingParams; Body: BookingBody }>(
-    '/:id/bookings',
+    "/:id/bookings",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -46,7 +55,7 @@ export async function bookingRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post<{ Params: BookingPatchParams; Body: CreateReviewRequest }>(
-    '/:id/bookings/:bookingId/reviews',
+    "/:id/bookings/:bookingId/reviews",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -57,7 +66,7 @@ export async function bookingRoutes(fastify: FastifyInstance) {
     postReviewForBooking,
   );
   fastify.patch<{ Params: BookingPatchParams; Body: PatchBookingStatus }>(
-    '/:id/bookings/:bookingId',
+    "/:id/bookings/:bookingId",
     {
       onRequest: [fastify.authenticate],
       schema: {

@@ -1,24 +1,24 @@
-import BigFacilityPreviewCard from '@/components/layout/BigFacilityPreviewCard';
-import BreadCrumbs from '@/components/layout/BreadCrumbs';
-import FiltersSidebar from '@/components/layout/FiltersSidebar';
-import { Input } from '@/components/ui/input';
+import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
+import BreadCrumbs from "@/components/layout/BreadCrumbs";
+import FiltersSidebar from "@/components/layout/FiltersSidebar";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { getCategories } from '@/services/categories';
-import { getFacilities } from '@/services/facilities';
-import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from '@slotbook/shared/facility';
-import { SearchIcon } from 'lucide-react';
-import { cookies } from 'next/headers';
-import { count } from 'drizzle-orm';
-import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
-import ResultsToolbar from '@/components/layout/ResultsToolbar';
-import { Skeleton } from '@/components/ui/skeleton';
+} from "@/components/ui/select";
+import { getCategories } from "@/services/categories";
+import { getFacilities } from "@/services/facilities";
+import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@slotbook/shared/facility";
+import { SearchIcon } from "lucide-react";
+import { cookies } from "next/headers";
+import { count } from "drizzle-orm";
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import ResultsToolbar from "@/components/layout/ResultsToolbar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 async function Page({
   searchParams,
@@ -33,7 +33,7 @@ async function Page({
   }>;
 }) {
   const { category, rating, priceMax, q, sort } = await searchParams;
-  const country = (await cookies()).get('_sb_country')?.value || 'PL';
+  const country = (await cookies()).get("_sb_country")?.value || "PL";
 
   const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
   console.log(categoryName);
@@ -48,13 +48,13 @@ async function Page({
   const shown = categoryName
     ? (categories.find((c) => c.categoryName === categoryName)?.count ?? 0)
     : countAll;
-  const title = categoryName ? CATEGORY_METADATA[categoryName].label : 'All';
+  const title = categoryName ? CATEGORY_METADATA[categoryName].label : "All";
 
   return (
     <div className="">
       <BreadCrumbs
         crumbsList={[
-          'categories',
+          "categories",
           ...(categoryName ? [CATEGORY_METADATA[categoryName].label] : []),
         ]}
       />

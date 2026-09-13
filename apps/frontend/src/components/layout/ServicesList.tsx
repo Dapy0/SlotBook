@@ -1,9 +1,9 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { convertMinutesToTime, formatMoney } from '@/lib/utils';
-import type { ServiceResponseDTO } from '@slotbook/shared/service';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { convertMinutesToTime, formatMoney } from "@/lib/utils";
+import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function groupByCategory(
   services: ServiceResponseDTO[],
@@ -14,11 +14,9 @@ function groupByCategory(
   );
 }
 
-
-
 export default function ServicesList({
   services,
-  query = '',
+  query = "",
 }: {
   services: ServiceResponseDTO[];
   query?: string;
@@ -26,7 +24,7 @@ export default function ServicesList({
   const pathname = usePathname();
   const prettifyItems = groupByCategory(services);
   const q = query.trim().toLowerCase();
-  const formatter = new Intl.DurationFormat('en', { style: 'narrow' });
+  const formatter = new Intl.DurationFormat("en", { style: "narrow" });
 
   const filteredGroups = prettifyItems
     .map((group) => ({
@@ -47,14 +45,14 @@ export default function ServicesList({
 
       {filteredGroups.map((group, i) => {
         return (
-          <div key={group.section} className={i > 0 ? 'border-t border-gray-200' : ''}>
+          <div key={group.section} className={i > 0 ? "border-t border-gray-200" : ""}>
             <p className="px-6 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">
               {group.section}
             </p>
             <div className="divide-y divide-gray-100">
               {group.items.map((service) => {
                 const query = new URLSearchParams();
-                query.append('service', service.id);
+                query.append("service", service.id);
                 return (
                   <div key={service.name} className="flex items-center justify-between px-6 py-4">
                     <div>

@@ -1,42 +1,42 @@
 // apps/frontend/src/app/facilities/[id]/staff/[staffId]/availability/page.tsx
-'use client';
+"use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
-import { getServicesByFacilityId } from '@/services/service';
-import { getAvailability } from '@/services/availability';
-import { createBooking } from '@/services/booking';
-import type { ServiceResponseDTO } from '@slotbook/shared/service';
-import type { AvailabilitySlot } from '@slotbook/shared/availability';
+import { getServicesByFacilityId } from "@/services/service";
+import { getAvailability } from "@/services/availability";
+import { createBooking } from "@/services/booking";
+import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import type { AvailabilitySlot } from "@slotbook/shared/availability";
 
 function getTodayDateString() {
   const d = new Date();
   const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}`;
 }
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 export default function StaffAvailabilityPage() {
   const { id: facilityId, staffId } = useParams<{ id: string; staffId: string }>();
 
   const [services, setServices] = useState<ServiceResponseDTO[]>([]);
-  const [serviceId, setServiceId] = useState('');
+  const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState(getTodayDateString());
 
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
@@ -59,7 +59,7 @@ export default function StaffAvailabilityPage() {
     getAvailability(facilityId, staffId, serviceId, date)
       .then(setSlots)
       .catch((err) => {
-        setError(err instanceof Error ? err.message : 'Failed to load availability');
+        setError(err instanceof Error ? err.message : "Failed to load availability");
         setSlots([]);
       })
       .finally(() => setIsLoading(false));
@@ -82,7 +82,7 @@ export default function StaffAvailabilityPage() {
       setJustBooked(slot.start);
       fetchSlots();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create booking');
+      setError(err instanceof Error ? err.message : "Failed to create booking");
     } finally {
       setBookingStart(null);
     }
@@ -96,7 +96,7 @@ export default function StaffAvailabilityPage() {
       <div className="mt-8 flex flex-wrap items-end gap-4">
         <div className="min-w-48 flex-1 space-y-1.5">
           <Label>Service</Label>
-          <Select value={serviceId} onValueChange={(value) => setServiceId(value ?? '')}>
+          <Select value={serviceId} onValueChange={(value) => setServiceId(value ?? "")}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select service" />
             </SelectTrigger>
@@ -148,7 +148,7 @@ export default function StaffAvailabilityPage() {
                 disabled={bookingStart === slot.start}
                 onClick={() => handleBookSlot(slot)}
               >
-                {bookingStart === slot.start ? '…' : formatTime(slot.start)}
+                {bookingStart === slot.start ? "…" : formatTime(slot.start)}
               </Button>
             ))}
           </div>

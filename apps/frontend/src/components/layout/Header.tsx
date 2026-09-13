@@ -1,6 +1,6 @@
-'use client';
-import ProfileMenu from '@/components/layout/ProfileMenu';
-import { Button, type buttonVariants } from '@/components/ui/button';
+"use client";
+import ProfileMenu from "@/components/layout/ProfileMenu";
+import { Button, type buttonVariants } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -9,23 +9,23 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
-import { toast } from '@/components/ui/toast';
-import { api } from '@/lib/api';
-import { useAuth } from '@/lib/authContext';
-import { getCookie, getLocation } from '@/lib/utils';
-import type { VariantProps } from 'class-variance-authority';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Suspense, use, useEffect, useState } from 'react';
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/components/ui/toast";
+import { api } from "@/lib/api";
+import { useAuth } from "@/lib/authContext";
+import { getCookie, getLocation } from "@/lib/utils";
+import type { VariantProps } from "class-variance-authority";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Suspense, use, useEffect, useState } from "react";
 
 const supportedCounties = [
-  { label: '🌍', value: null },
-  { label: 'Poland', value: 'PL' },
-  { label: 'Germany', value: 'DE' },
-  { label: 'Moldova', value: 'MD' },
-  { label: 'Romania', value: 'RO' },
+  { label: "🌍", value: null },
+  { label: "Poland", value: "PL" },
+  { label: "Germany", value: "DE" },
+  { label: "Moldova", value: "MD" },
+  { label: "Romania", value: "RO" },
 ];
 
 export function Header({
@@ -49,7 +49,7 @@ export function Header({
     <header className="shrink-0 bg-background border-border border-b">
       <div className="flex justify-between align-center gap-4 p-4 max-w-7xl my-0 mx-auto">
         <button className=" bg-none border-0 p-0 cursor-pointer font-sans font-bold text-xl tracking-tight text-">
-          <Link href={'/'}>
+          <Link href={"/"}>
             slot
             <span className="text-primary">book</span>
           </Link>
@@ -57,19 +57,13 @@ export function Header({
         <nav className="flex gap-4 ml-auto ">
           {navBtns?.map((btn) => (
             <Button key={btn.linkHref} variant={btn.variant}>
-              {' '}
-              <Link href={btn.linkHref ?? ''}>{btn.value}</Link>
+              {" "}
+              <Link href={btn.linkHref ?? ""}>{btn.value}</Link>
             </Button>
           ))}
         </nav>
         <div className="flex gap-2 ml-auto items-center">
-          <Suspense
-            fallback={
-
-                <Spinner />
-
-            }
-          >
+          <Suspense fallback={<Spinner />}>
             <Select
               items={supportedCounties}
               onValueChange={(val) => {
@@ -94,12 +88,12 @@ export function Header({
             </Select>
           </Suspense>
           {!isLoading && user ? (
-            <ProfileMenu user={user} profilePicture={''} onLogout={logout} />
+            <ProfileMenu user={user} profilePicture={""} onLogout={logout} />
           ) : (
             rightBtns?.map((btn) => (
               <Button key={btn.linkHref} variant={btn.variant}>
-                {' '}
-                <Link href={btn.linkHref ?? ''}>{btn.value}</Link>
+                {" "}
+                <Link href={btn.linkHref ?? ""}>{btn.value}</Link>
               </Button>
             ))
           )}

@@ -2,19 +2,10 @@
   "version": "8",
   "dialect": "postgres",
   "id": "dc7d29e3-0c0c-49e8-b73c-95755b2dbc15",
-  "prevIds": [
-    "16b5c30e-63f0-4b4f-a0ef-604c366fb840"
-  ],
+  "prevIds": ["16b5c30e-63f0-4b4f-a0ef-604c366fb840"],
   "ddl": [
     {
-      "values": [
-        "BEAUTY",
-        "SPORT_FITNESS",
-        "MEDICAL",
-        "AUTO",
-        "EDUCATION",
-        "OTHER"
-      ],
+      "values": ["BEAUTY", "SPORT_FITNESS", "MEDICAL", "AUTO", "EDUCATION", "OTHER"],
       "name": "facility_category",
       "entityType": "enums",
       "schema": "public"
@@ -1001,14 +992,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "owner_id"
-      ],
+      "columns": ["owner_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "RESTRICT",
       "name": "facilities_owner_id_users_id_fkey",
@@ -1018,14 +1005,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
+      "columns": ["facility_id"],
       "schemaTo": "public",
       "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "services_facility_id_facilities_id_fkey",
@@ -1035,14 +1018,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "staff_members_user_id_users_id_fkey",
@@ -1052,14 +1031,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
+      "columns": ["facility_id"],
       "schemaTo": "public",
       "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "staff_members_facility_id_facilities_id_fkey",
@@ -1069,14 +1044,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "staff_member_id"
-      ],
+      "columns": ["staff_member_id"],
       "schemaTo": "public",
       "tableTo": "staff_members",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "staff_services_staff_member_id_staff_members_id_fkey",
@@ -1086,14 +1057,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "service_id"
-      ],
+      "columns": ["service_id"],
       "schemaTo": "public",
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "staff_services_service_id_services_id_fkey",
@@ -1103,14 +1070,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "staff_member_id"
-      ],
+      "columns": ["staff_member_id"],
       "schemaTo": "public",
       "tableTo": "staff_members",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "staff_schedule_staff_member_id_staff_members_id_fkey",
@@ -1120,14 +1083,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "schemaTo": "public",
       "tableTo": "users",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "bookings_user_id_users_id_fkey",
@@ -1137,14 +1096,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
+      "columns": ["facility_id"],
       "schemaTo": "public",
       "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "bookings_facility_id_facilities_id_fkey",
@@ -1154,14 +1109,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "staff_member_id"
-      ],
+      "columns": ["staff_member_id"],
       "schemaTo": "public",
       "tableTo": "staff_members",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "bookings_staff_member_id_staff_members_id_fkey",
@@ -1171,14 +1122,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "service_id"
-      ],
+      "columns": ["service_id"],
       "schemaTo": "public",
       "tableTo": "services",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "NO ACTION",
       "name": "bookings_service_id_services_id_fkey",
@@ -1188,14 +1135,10 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "facility_id"
-      ],
+      "columns": ["facility_id"],
       "schemaTo": "public",
       "tableTo": "facilities",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "NO ACTION",
       "onDelete": "CASCADE",
       "name": "facility_schedule_facility_id_facilities_id_fkey",
@@ -1204,10 +1147,7 @@
       "table": "facility_schedule"
     },
     {
-      "columns": [
-        "staff_member_id",
-        "service_id"
-      ],
+      "columns": ["staff_member_id", "service_id"],
       "nameExplicit": false,
       "name": "staff_services_pkey",
       "entityType": "pks",
@@ -1215,9 +1155,7 @@
       "table": "staff_services"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "users_pkey",
       "schema": "public",
@@ -1225,9 +1163,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "facilities_pkey",
       "schema": "public",
@@ -1235,9 +1171,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "services_pkey",
       "schema": "public",
@@ -1245,9 +1179,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "staff_members_pkey",
       "schema": "public",
@@ -1255,9 +1187,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "staff_schedule_pkey",
       "schema": "public",
@@ -1265,9 +1195,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "bookings_pkey",
       "schema": "public",
@@ -1275,9 +1203,7 @@
       "entityType": "pks"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": false,
       "name": "facility_schedule_pkey",
       "schema": "public",
@@ -1286,9 +1212,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "email"
-      ],
+      "columns": ["email"],
       "nullsNotDistinct": false,
       "name": "users_email_key",
       "schema": "public",
@@ -1297,9 +1221,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "slug"
-      ],
+      "columns": ["slug"],
       "nullsNotDistinct": false,
       "name": "facilities_slug_key",
       "schema": "public",
@@ -1308,9 +1230,7 @@
     },
     {
       "nameExplicit": false,
-      "columns": [
-        "user_id"
-      ],
+      "columns": ["user_id"],
       "nullsNotDistinct": false,
       "name": "staff_members_user_id_key",
       "schema": "public",

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, ArrowRight } from 'lucide-react';
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, ArrowRight } from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { loginSchema, type LoginFormValues } from '@/lib/validations/auth';
-import { login } from '@/services/auth/auth';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
+import { login } from "@/services/auth/auth";
 import {
   Card,
   CardAction,
@@ -19,9 +19,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/authContext';
+} from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/authContext";
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
   useEffect(() => {
-    if (user) router.push('/');
+    if (user) router.push("/");
   }, [user]);
 
   const onSubmit = async (values: LoginFormValues) => {
@@ -43,9 +43,9 @@ export default function LoginPage() {
     try {
       await login(values);
       await refetch();
-      router.push('/');
+      router.push("/");
     } catch (err) {
-      setServerError('' + err);
+      setServerError("" + err);
     }
   };
 
@@ -56,7 +56,7 @@ export default function LoginPage() {
         <CardDescription>Login to make an appointment!</CardDescription>
         <CardAction>
           <Button variant="link">
-            <Link href={'/register'}>Sign Up</Link>
+            <Link href={"/register"}>Sign Up</Link>
           </Button>
         </CardAction>
       </CardHeader>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 aria-invalid={!!errors.email}
-                {...register('email')}
+                {...register("email")}
               />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 autoComplete="current-password"
                 aria-invalid={!!errors.password}
-                {...register('password')}
+                {...register("password")}
               />
               {errors.password && (
                 <p className="text-xs text-destructive">{errors.password.message}</p>

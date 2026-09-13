@@ -1,9 +1,9 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function ContactInfo({ phone, email }: { phone: string; email: string }) {
   const contacts = [
-    { label: 'Phone', value: phone, href: `tel:${phone}` },
-    { label: 'Email', value: email, href: `mailto:${email}` },
+    { label: "Phone", value: phone, href: `tel:${phone}` },
+    { label: "Email", value: email, href: `mailto:${email}` },
   ];
 
   return (
@@ -16,8 +16,8 @@ export default function ContactInfo({ phone, email }: { phone: string; email: st
             <span className="text-teal-600">{row.label}</span>
             <Link
               href={row.href}
-              target={row.label === 'Instagram' ? '_blank' : undefined}
-              rel={row.label === 'Instagram' ? 'noopener noreferrer' : undefined}
+              target={row.label === "Instagram" ? "_blank" : undefined}
+              rel={row.label === "Instagram" ? "noopener noreferrer" : undefined}
               className="font-medium text-gray-900 hover:underline"
             >
               {row.value}

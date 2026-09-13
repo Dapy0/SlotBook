@@ -2,8 +2,8 @@ import type {
   CreateFacilityRequest,
   FacilityCategory,
   UpdateFacilityRequest,
-} from '@slotbook/shared/facility';
-import type { DB } from '../../db/drizzlePlugin.ts';
+} from "@slotbook/shared/facility";
+import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   findAllFacilities,
   findFacilitiesByOwnerId,
@@ -11,29 +11,29 @@ import {
   insertFacility,
   updateFacilityById,
   deleteFacilityById,
-} from './facility.repository.ts';
-import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
+} from "./facility.repository.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import {
   deleteFacilityScheduleByFacilityId,
   findFacilitySchedule,
   findFacilityScheduleByDay,
   insertFacilityScheduleByFacilityId,
-} from './facilitySchedule.repository.ts';
-import type { CreateFacilitySchedule, DayOfTheWeek } from '@slotbook/shared/facilitySchedule';
-import { deleteScheduleByStaffId } from '../schedule/schedule.repository.ts';
-import { checkNoOverlapWithinSchedule } from '../../lib/scheduleHelpers.ts';
-import { string } from 'zod';
-import type { FacilityListQuery } from './facility.schema.ts';
+} from "./facilitySchedule.repository.ts";
+import type { CreateFacilitySchedule, DayOfTheWeek } from "@slotbook/shared/facilitySchedule";
+import { deleteScheduleByStaffId } from "../schedule/schedule.repository.ts";
+import { checkNoOverlapWithinSchedule } from "../../lib/scheduleHelpers.ts";
+import { string } from "zod";
+import type { FacilityListQuery } from "./facility.schema.ts";
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
 
   if (!facility) {
-    throw new NotFoundError('Facility not found');
+    throw new NotFoundError("Facility not found");
   }
 
   if (userId !== facility.ownerId) {
-    throw new ForbiddenError('Not owned facility');
+    throw new ForbiddenError("Not owned facility");
   }
   return facility;
 }
@@ -43,7 +43,7 @@ export async function getAllPublicFacilities(db: DB, query: FacilityListQuery) {
 export async function getFacilityDetails(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);
   if (!facility) {
-    throw new NotFoundError('Facility not found');
+    throw new NotFoundError("Facility not found");
   }
   return facility;
 }
@@ -58,8 +58,8 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
     });
   } catch (e) {
     const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === '23505') {
-      throw new ConflictError('Slug already exists');
+    if (pgError?.code === "23505") {
+      throw new ConflictError("Slug already exists");
     }
 
     throw e;
@@ -77,7 +77,7 @@ export async function updateOwnedFacility(
   const updatedFacility = await updateFacilityById(db, facilityId, data);
 
   if (!updatedFacility) {
-    throw new NotFoundError('Facility not found');
+    throw new NotFoundError("Facility not found");
   }
   return updatedFacility;
 }
@@ -87,14 +87,14 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
 
   const deletedFacility = await deleteFacilityById(db, facilityId);
   if (!deletedFacility) {
-    throw new NotFoundError('Facility not found');
+    throw new NotFoundError("Facility not found");
   }
   return deletedFacility;
 }
 export async function getFacilityScheduleById(db: DB, facilityId: string) {
   const schedule = findFacilitySchedule(db, facilityId);
   if (!schedule) {
-    throw new NotFoundError('No schedule for this facility');
+    throw new NotFoundError("No schedule for this facility");
   }
   return schedule;
 }
@@ -107,14 +107,14 @@ export async function changeFacilityWeekSchedule(
   console.log(newSchedule);
   await checkFacilityOwnership(db, facilityId, requestedUserId);
   await checkNoOverlapWithinSchedule(newSchedule);
-  console.log('passed checks');
+  console.log("passed checks");
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
     const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
     return inserted;
   });
   if (!transaction) {
-    throw new Error('Something in transaction went wrong');
+    throw new Error("Something in transaction went wrong");
   }
   return transaction;
 }

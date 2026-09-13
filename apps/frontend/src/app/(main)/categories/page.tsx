@@ -1,25 +1,25 @@
-import BreadCrumbs from '@/components/layout/BreadCrumbs';
-import { Badge } from '@/components/ui/badge';
-import { getCategories } from '@/services/categories';
-import { CATEGORY_METADATA } from '@slotbook/shared/facility';
-import * as Icons from 'lucide-react';
-import { FileStack, type LucideIcon } from 'lucide-react';
-import { cookies } from 'next/headers';
-import Link from 'next/link';
+import BreadCrumbs from "@/components/layout/BreadCrumbs";
+import { Badge } from "@/components/ui/badge";
+import { getCategories } from "@/services/categories";
+import { CATEGORY_METADATA } from "@slotbook/shared/facility";
+import * as Icons from "lucide-react";
+import { FileStack, type LucideIcon } from "lucide-react";
+import { cookies } from "next/headers";
+import Link from "next/link";
 
 async function CategoriesPage() {
   const cookieStore = await cookies();
-  const local = cookieStore.get('_sb_country')?.value || 'PL';
+  const local = cookieStore.get("_sb_country")?.value || "PL";
   const categories = await getCategories({ country: local });
 
   return (
     <div>
-      <BreadCrumbs crumbsList={['categories']} />
+      <BreadCrumbs crumbsList={["categories"]} />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-5">
         <Link
-          key={'All'}
+          key={"All"}
           href={`/venues`}
-          style={{ '--category-color': 'blue' } as React.CSSProperties}
+          style={{ "--category-color": "blue" } as React.CSSProperties}
           className="group flex flex-col gap-3 rounded-md border p-5 text-left transition-colors hover:border-[color-mix(in_oklch,var(--category-color)_30%,white)] hover:bg-[color-mix(in_oklch,var(--category-color)_7%,white)]"
         >
           <div className="flex items-center justify-between">
@@ -47,7 +47,7 @@ async function CategoriesPage() {
             <Link
               key={categoryName}
               href={endpoint}
-              style={{ '--category-color': color } as React.CSSProperties}
+              style={{ "--category-color": color } as React.CSSProperties}
               className="group flex flex-col gap-3 rounded-md border p-5 text-left transition-colors hover:border-[color-mix(in_oklch,var(--category-color)_30%,white)] hover:bg-[color-mix(in_oklch,var(--category-color)_7%,white)]"
             >
               <div className="flex items-center justify-between">

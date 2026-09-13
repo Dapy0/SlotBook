@@ -1,4 +1,4 @@
-import { Header } from '@/components/layout/Header';
+import { Header } from "@/components/layout/Header";
 
 export default function RootLayout({
   children,
@@ -8,10 +8,10 @@ export default function RootLayout({
   return (
     <div className="flex h-dvh flex-col">
       <Header
-        navBtns={[{ variant: 'link', linkHref: '/categories', value: 'Categories' }]}
+        navBtns={[{ variant: "link", linkHref: "/categories", value: "Categories" }]}
         rightBtns={[
-          { variant: 'ghost', linkHref: '/login', value: 'Login In' },
-          { variant: 'outline', linkHref: '/register', value: 'Register' },
+          { variant: "ghost", linkHref: "/login", value: "Login In" },
+          { variant: "outline", linkHref: "/register", value: "Register" },
         ]}
       />
       <main className="min-h-0 flex-1 overflow-y-auto">

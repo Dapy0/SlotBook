@@ -1,5 +1,5 @@
-import ScoreBadge from '@/components/layout/ScoreBadge';
-import { Button } from '@/components/ui/button';
+import ScoreBadge from "@/components/layout/ScoreBadge";
+import { Button } from "@/components/ui/button";
 
 type BookingSummaryProps = {
   businessName: string;

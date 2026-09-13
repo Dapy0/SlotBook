@@ -1,5 +1,5 @@
-import {  staffScheduleSchema } from '@slotbook/shared/staffSchedule';
-import z from 'zod';
+import { staffScheduleSchema } from "@slotbook/shared/staffSchedule";
+import z from "zod";
 
 export const scheduleParamsSchema = z.object({
   staffId: z.uuid().nonempty(),
@@ -9,8 +9,8 @@ export type ScheduleParams = z.infer<typeof scheduleParamsSchema>;
 const scheduleObjectWithoutIdSchema = staffScheduleSchema
   .omit({ staffMemberId: true })
   .refine((obj) => obj.startTime < obj.endTime, {
-    message: 'Start Time must be before end time',
-    path: ['endTime'],
+    message: "Start Time must be before end time",
+    path: ["endTime"],
   });
 
 export const scheduleBody = z.array(scheduleObjectWithoutIdSchema).min(1);

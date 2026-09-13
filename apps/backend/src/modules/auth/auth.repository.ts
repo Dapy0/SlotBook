@@ -1,6 +1,6 @@
-import { eq, and, isNull } from 'drizzle-orm';
-import type { DB } from '../../db/drizzlePlugin.ts';
-import { users, type UserEntity } from '../../db/schema/index.ts';
+import { eq, and, isNull } from "drizzle-orm";
+import type { DB } from "../../db/drizzlePlugin.ts";
+import { users, type UserEntity } from "../../db/schema/index.ts";
 
 type RegisterDbParams = {
   name: string;
@@ -18,7 +18,7 @@ export const registerUser = async (db: DB, userData: RegisterDbParams): Promise<
     })
     .returning();
   if (!newUser) {
-    throw new Error('Failed to insert user');
+    throw new Error("Failed to insert user");
   }
   return newUser;
 };
@@ -40,12 +40,12 @@ export async function deleteUserDate(db: DB, userId: string) {
     .update(users)
     .set({
       email: `deleted-${userId}@deleted.local`,
-      name: 'Deleted User',
+      name: "Deleted User",
       deletedAt: new Date(),
       updatedAt: new Date(),
     })
     .returning();
   if (!deletedUser) {
-    throw new Error('Failed to delete user');
+    throw new Error("Failed to delete user");
   }
 }

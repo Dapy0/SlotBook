@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { getFacilityBookings } from '@/services/booking';
-import type { BookingResponse } from '@slotbook/shared/bookings';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { getFacilityBookings } from "@/services/booking";
+import type { BookingResponse } from "@slotbook/shared/bookings";
 
 function formatDateTime(value: unknown): string {
   const date = new Date(value as string);
-  return date.toLocaleString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return date.toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  confirmed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  canceled: 'bg-muted text-muted-foreground',
+  pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  confirmed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  canceled: "bg-muted text-muted-foreground",
 };
 
 export default function FacilityBookingsPage() {
@@ -31,8 +31,8 @@ export default function FacilityBookingsPage() {
     getFacilityBookings(id)
       .then(setBookings)
       .catch((err) => {
-        console.error('Failed to load bookings:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load bookings');
+        console.error("Failed to load bookings:", err);
+        setError(err instanceof Error ? err.message : "Failed to load bookings");
         setBookings([]);
       });
   }, [id]);
@@ -67,7 +67,7 @@ export default function FacilityBookingsPage() {
                 {booking.timeRange.end && ` – ${formatDateTime(booking.timeRange.end)}`}
               </p>
               <p className="font-(family-name:--font-geist-mono) text-xs text-muted-foreground">
-                Staff: {booking.staffMemberId.slice(0, 8)} · Service:{' '}
+                Staff: {booking.staffMemberId.slice(0, 8)} · Service:{" "}
                 {booking.serviceId.slice(0, 8)} · Client: {booking.clientId.slice(0, 8)}
               </p>
             </div>

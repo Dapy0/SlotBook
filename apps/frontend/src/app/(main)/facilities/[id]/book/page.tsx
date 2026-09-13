@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { getStaffMembersByFacilityId } from '@/services/staff';
-import { getServicesByFacilityId } from '@/services/service';
-import { createBooking } from '@/services/booking';
-import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
-import type { ServiceResponseDTO } from '@slotbook/shared/service';
-import type { BookingResponse } from '@slotbook/shared/bookings';
+} from "@/components/ui/select";
+import { getStaffMembersByFacilityId } from "@/services/staff";
+import { getServicesByFacilityId } from "@/services/service";
+import { createBooking } from "@/services/booking";
+import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import type { BookingResponse } from "@slotbook/shared/bookings";
 
 export default function CreateBookingPage() {
   const { id } = useParams<{ id: string }>();
 
   const [staff, setStaff] = useState<StaffMemberResponseDTO[]>([]);
   const [services, setServices] = useState<ServiceResponseDTO[]>([]);
-  const [staffMemberId, setStaffMemberId] = useState('');
-  const [serviceId, setServiceId] = useState('');
-  const [startDatetime, setStartDatetime] = useState('');
+  const [staffMemberId, setStaffMemberId] = useState("");
+  const [serviceId, setServiceId] = useState("");
+  const [startDatetime, setStartDatetime] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export default function CreateBookingPage() {
     setCreated(null);
 
     if (!staffMemberId || !serviceId || !startDatetime) {
-      setError('Fill in all fields');
+      setError("Fill in all fields");
       return;
     }
 
@@ -59,7 +59,7 @@ export default function CreateBookingPage() {
       });
       setCreated(booking);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create booking');
+      setError(err instanceof Error ? err.message : "Failed to create booking");
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +72,7 @@ export default function CreateBookingPage() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         <div className="space-y-1.5">
           <Label>Staff member</Label>
-          <Select value={staffMemberId} onValueChange={(value) => setStaffMemberId(value ?? '')}>
+          <Select value={staffMemberId} onValueChange={(value) => setStaffMemberId(value ?? "")}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select staff member" />
             </SelectTrigger>
@@ -88,7 +88,7 @@ export default function CreateBookingPage() {
 
         <div className="space-y-1.5">
           <Label>Service</Label>
-          <Select value={serviceId} onValueChange={(value) => setServiceId(value ?? '')}>
+          <Select value={serviceId} onValueChange={(value) => setServiceId(value ?? "")}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select service" />
             </SelectTrigger>
@@ -125,7 +125,7 @@ export default function CreateBookingPage() {
         )}
 
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Booking…' : 'Book now'}
+          {isSubmitting ? "Booking…" : "Book now"}
         </Button>
       </form>
     </div>

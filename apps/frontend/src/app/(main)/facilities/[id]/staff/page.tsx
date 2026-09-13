@@ -1,7 +1,7 @@
-import { getFacilityById } from '@/services/facilities';
-import { getStaffMembersByFacilityId } from '@/services/staff';
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { getFacilityById } from "@/services/facilities";
+import { getStaffMembersByFacilityId } from "@/services/staff";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type StaffPageProps = {
   params: Promise<{ id: string }>;
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: StaffPageProps): Promise<Meta
   const facility = await getFacilityById(id);
 
   if (!facility) {
-    return { title: 'Facility Not Found — SlotBook' };
+    return { title: "Facility Not Found — SlotBook" };
   }
 
   return {
@@ -61,11 +61,11 @@ export default async function FacilityStaffPage({ params }: StaffPageProps) {
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
                     staff.isActive
-                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      : 'bg-muted text-muted-foreground'
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {staff.isActive ? 'Active' : 'Inactive'}
+                  {staff.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
 
@@ -76,16 +76,14 @@ export default async function FacilityStaffPage({ params }: StaffPageProps) {
                 User ID: {staff.userId}
               </p>
               <p className="font-(family-name:--font-geist-mono) text-xs text-muted-foreground">
-                Joined{' '}
-                {new Date(staff.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
+                Joined{" "}
+                {new Date(staff.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
                 })}
               </p>
             </div>
-
-            
           </div>
         ))}
 

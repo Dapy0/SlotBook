@@ -1,10 +1,10 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { getFacilities } from '@/services/facilities';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { getFacilities } from "@/services/facilities";
 
 export const metadata: Metadata = {
-  title: 'Facilities Catalog — SlotBook',
-  description: 'Find and book services nearby.',
+  title: "Facilities Catalog — SlotBook",
+  description: "Find and book services nearby.",
 };
 
 export default async function FacilitiesPage() {
@@ -17,7 +17,7 @@ export default async function FacilitiesPage() {
       </p>
       <h1 className="mt-3 font-heading text-4xl font-medium text-foreground">Заведения</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        {facilities.length} {facilities.length === 1 ? 'заведение' : 'заведений'} доступно для
+        {facilities.length} {facilities.length === 1 ? "заведение" : "заведений"} доступно для
         бронирования
       </p>
 

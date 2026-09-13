@@ -1,16 +1,13 @@
-import { api } from '@/lib/api';
-import { CATEGORY_METADATA, type FACILITY_CATEGORIES } from '@slotbook/shared/facility';
+import { api } from "@/lib/api";
+import { CATEGORY_METADATA, type FACILITY_CATEGORIES } from "@slotbook/shared/facility";
 
-export async function getCategories(getParams: {
-  country: string;
-  limit?: number;
-}) {
+export async function getCategories(getParams: { country: string; limit?: number }) {
   const params = new URLSearchParams();
-  params.set('country', String(getParams.country));
-  if (getParams.limit !== undefined) params.set('limit', String(getParams.limit));
+  params.set("country", String(getParams.country));
+  if (getParams.limit !== undefined) params.set("limit", String(getParams.limit));
 
   const query = params.toString();
-  const endpoint = query ? `/facilities/categories?${query}` : '/facilities/categories';
+  const endpoint = query ? `/facilities/categories?${query}` : "/facilities/categories";
 
   const result = await api<
     Array<{
@@ -18,7 +15,7 @@ export async function getCategories(getParams: {
       count: number;
     }>
   >(endpoint, {
-    method: 'GET',
+    method: "GET",
   });
 
   return result;

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { WeeklyScheduleForm, type ScheduleEntry } from '@/components/schedule/WeeklyScheduleForm';
-import { getStaffSchedule, putStaffSchedule } from '@/services/staffSchedule';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { WeeklyScheduleForm, type ScheduleEntry } from "@/components/schedule/WeeklyScheduleForm";
+import { getStaffSchedule, putStaffSchedule } from "@/services/staffSchedule";
 
 export default function StaffSchedulePage() {
   const { id, staffId } = useParams<{ id: string; staffId: string }>();

@@ -1,18 +1,15 @@
-import type { DB } from '../../db/drizzlePlugin.ts';
-import {
-  getFacilityDetails,
-  getFacilityScheduleById,
-} from '../facility/facility.service.ts';
-import { checkIfStaffMemberIsDoingService } from '../staff/staff.service.ts';
-import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';
+import type { DB } from "../../db/drizzlePlugin.ts";
+import { getFacilityDetails, getFacilityScheduleById } from "../facility/facility.service.ts";
+import { checkIfStaffMemberIsDoingService } from "../staff/staff.service.ts";
+import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import {
   addMinutesToTimeString,
   combineDateAndTimeInZone,
   convertShortDayNameToDayNumber,
-} from '../../lib/scheduleHelpers.ts';
-import { receiveStaffSchedule } from '../schedule/schedule.service.ts';
-import { findBookingsByFacilityId } from '../booking/booking.repository.ts';
-import { parseTsRangeLiteral } from '@slotbook/shared/bookings';
+} from "../../lib/scheduleHelpers.ts";
+import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
+import { findBookingsByFacilityId } from "../booking/booking.repository.ts";
+import { parseTsRangeLiteral } from "@slotbook/shared/bookings";
 
 export async function getAvailableTimeByStaffAndServiceId(
   db: DB,
@@ -24,9 +21,9 @@ export async function getAvailableTimeByStaffAndServiceId(
   const facility = await getFacilityDetails(db, facilityId);
   const service = await checkIfStaffMemberIsDoingService(db, staffId, serviceId);
 
-  const dayOfTheWeekConvector = new Intl.DateTimeFormat('en-Us', {
+  const dayOfTheWeekConvector = new Intl.DateTimeFormat("en-Us", {
     timeZone: facility.timezoneIANA,
-    weekday: 'short',
+    weekday: "short",
   });
   const dayOfTheWeek = convertShortDayNameToDayNumber(dayOfTheWeekConvector.format(new Date(date)));
   const facilityDaySchedule = (await findFacilitySchedule(db, facilityId)).filter(
@@ -41,7 +38,7 @@ export async function getAvailableTimeByStaffAndServiceId(
 
   const getFacilityBookingsThisDay = await findBookingsByFacilityId(db, facilityId);
   const nonCanceledAndFilteredByStaffId = getFacilityBookingsThisDay.filter(
-    (b) => b.staffMemberId === staffId && b.status !== 'canceled',
+    (b) => b.staffMemberId === staffId && b.status !== "canceled",
   );
   function hasBounds(r: {
     start: Date | null;

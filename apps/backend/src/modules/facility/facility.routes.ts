@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from "fastify";
 import {
   createFacility,
   getAllFacilities,
@@ -10,35 +10,35 @@ import {
   patchFacilityById,
   putFacilitySchedule,
   removeFacilityById,
-} from './facility.controller.ts';
+} from "./facility.controller.ts";
 import {
   facilityCategoryQuerystringSchema,
   facilityListQuerySchema,
   facilityParamsSchema,
   type FacilityCategoryQuerystring,
   type FacilityParams,
-} from './facility.schema.ts';
+} from "./facility.schema.ts";
 
-import z from 'zod';
+import z from "zod";
 import {
   createFacilityRequestSchema,
   facilityResponseSchema,
   updateFacilityRequestSchema,
   type CreateFacilityRequest,
   type UpdateFacilityRequest,
-} from '@slotbook/shared/facility';
-import { staffRoutes } from '../staff/staff.routes.ts';
-import { bookingRoutes } from '../booking/booking.routes.ts';
+} from "@slotbook/shared/facility";
+import { staffRoutes } from "../staff/staff.routes.ts";
+import { bookingRoutes } from "../booking/booking.routes.ts";
 import {
   createFacilityScheduleSchema,
   responseFacilityScheduleSchema,
   type CreateFacilitySchedule,
-} from '@slotbook/shared/facilitySchedule';
-import { reviewResponseSchema } from '@slotbook/shared/reviews';
+} from "@slotbook/shared/facilitySchedule";
+import { reviewResponseSchema } from "@slotbook/shared/reviews";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
-    '/',
+    "/",
     {
       schema: {
         querystring: facilityListQuerySchema,
@@ -50,7 +50,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     getAllFacilities,
   );
   fastify.get(
-    '/mine',
+    "/mine",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -63,7 +63,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     getOwnFacilities,
   );
   fastify.get(
-    '/:id',
+    "/:id",
     {
       schema: {
         params: facilityParamsSchema,
@@ -77,7 +77,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Body: CreateFacilityRequest;
   }>(
-    '/',
+    "/",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -93,7 +93,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     Body: UpdateFacilityRequest;
     Params: FacilityParams;
   }>(
-    '/:id',
+    "/:id",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -109,7 +109,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get<{
     Params: FacilityParams;
   }>(
-    '/:id/schedule',
+    "/:id/schedule",
     {
       schema: {
         params: facilityParamsSchema,
@@ -124,7 +124,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     Body: CreateFacilitySchedule[];
     Params: FacilityParams;
   }>(
-    '/:id/schedule',
+    "/:id/schedule",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -140,20 +140,20 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.delete<{
     Params: FacilityParams;
   }>(
-    '/:id',
+    "/:id",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
-          204: z.null().describe('No Content'),
+          204: z.null().describe("No Content"),
         },
       },
     },
     removeFacilityById,
   );
   fastify.get<{ Params: FacilityParams }>(
-    '/:id/reviews',
+    "/:id/reviews",
     {
       schema: {
         params: facilityParamsSchema,
@@ -165,7 +165,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     getFacilityReviews,
   );
   fastify.get<{ Querystring: FacilityCategoryQuerystring }>(
-    '/categories',
+    "/categories",
     {
       schema: {
         querystring: facilityCategoryQuerystringSchema,
@@ -173,6 +173,6 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     },
     getAllFacilitiesCategory,
   );
-  fastify.register(staffRoutes, { prefix: '/' });
-  fastify.register(bookingRoutes, { prefix: '/' });
+  fastify.register(staffRoutes, { prefix: "/" });
+  fastify.register(bookingRoutes, { prefix: "/" });
 }

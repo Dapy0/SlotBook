@@ -1,30 +1,30 @@
-import type { DB } from '../../db/drizzlePlugin.ts';
-import type { StaffScheduleEntity } from '../../db/schema/staffSchedule.ts';
-import { ConflictError, ForbiddenError, NotFoundError } from '../../lib/errors.ts';
-import { findFacilitiesByOwnerId } from '../facility/facility.repository.ts';
-import { checkFacilityOwnership, getFacilityDetails } from '../facility/facility.service.ts';
-import { receiveStaffSchedule } from '../schedule/schedule.service.ts';
-import { getFacilityServiceById } from '../service/service.service.ts';
-import { findStaffMemberById } from '../staff/staff.repository.ts';
+import type { DB } from "../../db/drizzlePlugin.ts";
+import type { StaffScheduleEntity } from "../../db/schema/staffSchedule.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
+import { findFacilitiesByOwnerId } from "../facility/facility.repository.ts";
+import { checkFacilityOwnership, getFacilityDetails } from "../facility/facility.service.ts";
+import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
+import { getFacilityServiceById } from "../service/service.service.ts";
+import { findStaffMemberById } from "../staff/staff.repository.ts";
 import {
   checkIfStaffIsFacilityWorker,
   checkIfStaffMemberIsDoingService,
-} from '../staff/staff.service.ts';
+} from "../staff/staff.service.ts";
 import {
   findBookingById,
   findBookingsByFacilityId,
   insertBooking,
   patchStatusByBookingId,
-} from './booking.repository.ts';
-import type { BookingBody } from './booking.schema.ts';
+} from "./booking.repository.ts";
+import type { BookingBody } from "./booking.schema.ts";
 import {
   checkIfBookingFitsAllSchedules,
   checkNoOverlapWithinSchedule,
   checkStaffScheduleFitsFacility,
   toTimeString,
-} from '../../lib/scheduleHelpers.ts';
-import { findFacilitySchedule } from '../facility/facilitySchedule.repository.ts';
-import type { PatchBookingStatus } from '@slotbook/shared/bookings';
+} from "../../lib/scheduleHelpers.ts";
+import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
+import type { PatchBookingStatus } from "@slotbook/shared/bookings";
 export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
 
@@ -46,10 +46,10 @@ export async function createBookingForFacility(
   await checkIfStaffMemberIsDoingService(db, staffMember.id, data.serviceId);
 
   if (userId === facility.ownerId) {
-    throw new ForbiddenError('No self bookings allowed');
+    throw new ForbiddenError("No self bookings allowed");
   }
   if (data.startDatetime <= new Date()) {
-    throw new ConflictError('Start time is in the past');
+    throw new ConflictError("Start time is in the past");
   }
 
   const localDay = ((data.startDatetime.getDay() + 6) % 7) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -75,8 +75,8 @@ export async function createBookingForFacility(
     endDatetime,
   }).catch((e) => {
     const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === '23P01') {
-      throw new ConflictError('This time slot is already booked');
+    if (pgError?.code === "23P01") {
+      throw new ConflictError("This time slot is already booked");
     }
     throw e;
   });
@@ -93,16 +93,16 @@ export async function changeBookingStatus(
 ) {
   const booking = await findBookingById(db, bookingId);
   if (!booking) {
-    throw new NotFoundError('No such booking found');
+    throw new NotFoundError("No such booking found");
   }
   switch (booking.status) {
-    case 'pending':
+    case "pending":
       switch (data.status) {
-        case 'confirmed':
+        case "confirmed":
           // console.log(userId, booking.clientId);
           await checkFacilityOwnership(db, facilityId, userId);
           return await patchStatusByBookingId(db, booking.id, data.status);
-        case 'canceled':
+        case "canceled":
           if (booking.clientId === userId) {
             return await patchStatusByBookingId(db, booking.id, data.status);
           }
@@ -110,11 +110,11 @@ export async function changeBookingStatus(
           return await patchStatusByBookingId(db, booking.id, data.status);
       }
 
-    case 'confirmed':
+    case "confirmed":
       switch (data.status) {
-        case 'confirmed':
-          throw new ConflictError('Not allowed same state');
-        case 'canceled':
+        case "confirmed":
+          throw new ConflictError("Not allowed same state");
+        case "canceled":
           if (booking.clientId === userId) {
             return await patchStatusByBookingId(db, booking.id, data.status);
           }
@@ -123,6 +123,6 @@ export async function changeBookingStatus(
       }
 
     default:
-      throw new ConflictError('Not allowed');
+      throw new ConflictError("Not allowed");
   }
 }

@@ -1,5 +1,5 @@
-'use client';
-import { Input } from '@/components/ui/input';
+"use client";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -7,18 +7,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
-import { ChevronDownIcon } from 'lucide-react';
-import { useState } from 'react';
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 
 const CITIES = [
-  { label: 'All cities', value: 'All cities' },
-  { label: 'Chisinau', value: 'Chisinau' },
-  { label: 'Odessa', value: 'Odessa' },
+  { label: "All cities", value: "All cities" },
+  { label: "Chisinau", value: "Chisinau" },
+  { label: "Odessa", value: "Odessa" },
 ];
 
 function SearchPanel() {
@@ -44,7 +44,7 @@ function SearchPanel() {
 
         <label className="flex  flex-col justify-start gap-0.5">
           <span className="text-xs font-medium uppercase tracking-wide text-neutral-600">City</span>
-          <Select items={CITIES} defaultValue={'All cities'}>
+          <Select items={CITIES} defaultValue={"All cities"}>
             <SelectTrigger className="max-h-fit self-center gap-1 border-0 p-0 text-sm shadow-none focus-visible:ring-0 [&_svg]:text-neutral-400">
               <SelectValue placeholder="City" />
             </SelectTrigger>
@@ -75,7 +75,7 @@ function SearchPanel() {
                   className="flex flex-0 items-center gap-1 self-center text-sm text-black data-[empty=true]:text-neutral-400 border-0 shadow-none hover:bg-transparent  focus-visible:ring-0 focus-visible:bg-transparent active:bg-transparent rounded-none max-h-fit p-0! pr-0 m-0"
                 >
                   {date ? (
-                    format(date, 'PPP')
+                    format(date, "PPP")
                   ) : (
                     <span className="text-black text-sm shadow-none p-0">Pick a date</span>
                   )}
@@ -105,7 +105,7 @@ function SearchPanel() {
           />
         </label>
       </form>
-      <Button className={'p-0 m-0 px-4 h-auto rounded-l-none rounded-r-lg'}>Search</Button>
+      <Button className={"p-0 m-0 px-4 h-auto rounded-l-none rounded-r-lg"}>Search</Button>
     </div>
   );
 }

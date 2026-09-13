@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-type Status = 'pending' | 'confirmed' | 'cancelled';
+type Status = "pending" | "confirmed" | "cancelled";
 
 type Booking = {
   client: string;
@@ -16,56 +16,56 @@ type Booking = {
 
 const bookings: Booking[] = [
   {
-    client: 'Katarzyna N.',
-    service: 'Single Tone Coloring',
-    staff: 'Anna K.',
-    date: '28 Aug',
-    time: '11:00–13:00',
-    status: 'pending',
+    client: "Katarzyna N.",
+    service: "Single Tone Coloring",
+    staff: "Anna K.",
+    date: "28 Aug",
+    time: "11:00–13:00",
+    status: "pending",
   },
   {
-    client: 'Piotr Z.',
+    client: "Piotr Z.",
     service: "Men's Haircut",
-    staff: 'Marek W.',
-    date: '28 Aug',
-    time: '14:00–14:30',
-    status: 'confirmed',
+    staff: "Marek W.",
+    date: "28 Aug",
+    time: "14:00–14:30",
+    status: "confirmed",
   },
   {
-    client: 'Olga R.',
-    service: 'Classic Back Massage',
-    staff: 'Julia S.',
-    date: '29 Aug',
-    time: '10:00–11:00',
-    status: 'confirmed',
+    client: "Olga R.",
+    service: "Classic Back Massage",
+    staff: "Julia S.",
+    date: "29 Aug",
+    time: "10:00–11:00",
+    status: "confirmed",
   },
   {
-    client: 'Adam L.',
+    client: "Adam L.",
     service: "Men's Haircut",
-    staff: 'Marek W.',
-    date: '30 Aug',
-    time: '09:30–10:00',
-    status: 'cancelled',
+    staff: "Marek W.",
+    date: "30 Aug",
+    time: "09:30–10:00",
+    status: "cancelled",
   },
 ];
 
-const filters: { key: 'all' | Status; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'pending', label: 'Pending' },
-  { key: 'confirmed', label: 'Confirmed' },
-  { key: 'cancelled', label: 'Cancelled' },
+const filters: { key: "all" | Status; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "pending", label: "Pending" },
+  { key: "confirmed", label: "Confirmed" },
+  { key: "cancelled", label: "Cancelled" },
 ];
 
 function StatusBadge({ status }: { status: Status }) {
   const styles: Record<Status, string> = {
-    pending: 'bg-amber-50 text-amber-600',
-    confirmed: 'bg-green-50 text-green-600',
-    cancelled: 'bg-red-50 text-red-600',
+    pending: "bg-amber-50 text-amber-600",
+    confirmed: "bg-green-50 text-green-600",
+    cancelled: "bg-red-50 text-red-600",
   };
   const labels: Record<Status, string> = {
-    pending: 'Pending',
-    confirmed: 'Confirmed',
-    cancelled: 'Cancelled',
+    pending: "Pending",
+    confirmed: "Confirmed",
+    cancelled: "Cancelled",
   };
   return (
     <span
@@ -77,9 +77,9 @@ function StatusBadge({ status }: { status: Status }) {
 }
 
 export default function BookingsPage() {
-  const [filter, setFilter] = useState<'all' | Status>('all');
+  const [filter, setFilter] = useState<"all" | Status>("all");
 
-  const filtered = filter === 'all' ? bookings : bookings.filter((b) => b.status === filter);
+  const filtered = filter === "all" ? bookings : bookings.filter((b) => b.status === filter);
 
   return (
     <div>
@@ -94,8 +94,8 @@ export default function BookingsPage() {
             onClick={() => setFilter(f.key)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
               filter === f.key
-                ? 'bg-primary text-white'
-                : 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                ? "bg-primary text-white"
+                : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300"
             }`}
           >
             {f.label}
@@ -118,7 +118,7 @@ export default function BookingsPage() {
               <div className="flex items-center gap-2">
                 <StatusBadge status={booking.status} />
 
-                {booking.status === 'pending' && (
+                {booking.status === "pending" && (
                   <>
                     <Button className="bg-primary text-white hover:bg-primary/90">Confirm</Button>
                     <Button
@@ -130,7 +130,7 @@ export default function BookingsPage() {
                   </>
                 )}
 
-                {booking.status === 'confirmed' && (
+                {booking.status === "confirmed" && (
                   <Button
                     variant="outline"
                     className="border-gray-200 text-gray-900 hover:bg-gray-50"

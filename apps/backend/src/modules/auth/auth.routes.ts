@@ -1,17 +1,17 @@
-import { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import {
   getAuthMe,
   postAuthLogout,
   postAuthRegister,
   postAuthLogin,
   deleteUserAccount,
-} from './auth.controller.ts';
+} from "./auth.controller.ts";
 
-import { authResponseSchema, loginSchema, registerSchema } from '@slotbook/shared/auth';
+import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared/auth";
 
 export async function authRoutes(fastify: FastifyInstance) {
   fastify.post(
-    '/register',
+    "/register",
     {
       schema: {
         body: registerSchema,
@@ -24,7 +24,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   );
 
   fastify.post(
-    '/login',
+    "/login",
     {
       schema: {
         body: loginSchema,
@@ -36,7 +36,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     postAuthLogin,
   );
   fastify.get(
-    '/me',
+    "/me",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -48,7 +48,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     getAuthMe,
   );
   fastify.delete(
-    '/me',
+    "/me",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -57,6 +57,5 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
     deleteUserAccount,
   );
-  fastify.get('/logout', postAuthLogout);
+  fastify.get("/logout", postAuthLogout);
 }
-

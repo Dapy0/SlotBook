@@ -1,7 +1,11 @@
-import type { CreateFacilitySchedule, DayOfTheWeek, ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
-import type { DB } from '../../db/drizzlePlugin.ts';
-import { facilitySchedules } from '../../db/schema/facilitySchedule.ts';
-import { and, eq } from 'drizzle-orm';
+import type {
+  CreateFacilitySchedule,
+  DayOfTheWeek,
+  ResponseFacilityScheduleSchema,
+} from "@slotbook/shared/facilitySchedule";
+import type { DB } from "../../db/drizzlePlugin.ts";
+import { facilitySchedules } from "../../db/schema/facilitySchedule.ts";
+import { and, eq } from "drizzle-orm";
 export async function findFacilitySchedule(
   db: DB,
   facilityId: string,
@@ -40,7 +44,7 @@ export async function insertFacilityScheduleByFacilityId(
     )
     .returning();
   if (!insertedValues) {
-    throw new Error('Failed to insert new schedule');
+    throw new Error("Failed to insert new schedule");
   }
   return insertedValues;
 }

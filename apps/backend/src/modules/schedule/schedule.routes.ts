@@ -1,20 +1,17 @@
-import {
-  responseStaffScheduleSchema,
-} from '@slotbook/shared/staffSchedule';
-import type { FastifyInstance } from 'fastify';
-import z from 'zod';
-import { getStaffSchedule, updateStaffSchedule } from './schedule.controller.ts';
+import { responseStaffScheduleSchema } from "@slotbook/shared/staffSchedule";
+import type { FastifyInstance } from "fastify";
+import z from "zod";
+import { getStaffSchedule, updateStaffSchedule } from "./schedule.controller.ts";
 import {
   scheduleBody,
   scheduleParamsSchema,
   type ScheduleBody,
   type ScheduleParams,
-} from './schedule.schema.ts';
-
+} from "./schedule.schema.ts";
 
 export async function scheduleRoutes(fastify: FastifyInstance) {
   fastify.get(
-    '/schedule',
+    "/schedule",
     {
       schema: {
         params: scheduleParamsSchema,
@@ -26,7 +23,7 @@ export async function scheduleRoutes(fastify: FastifyInstance) {
     getStaffSchedule,
   );
   fastify.put<{ Params: ScheduleParams; Body: ScheduleBody }>(
-    '/schedule',
+    "/schedule",
     {
       onRequest: [fastify.authenticate],
       schema: {

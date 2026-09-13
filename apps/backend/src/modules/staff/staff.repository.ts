@@ -1,12 +1,12 @@
-import { and, avg, count, eq, getColumns, getTableColumns } from 'drizzle-orm';
-import type { DB } from '../../db/drizzlePlugin.ts';
-import { staffMembers, type StaffMemberEntity } from '../../db/schema/staffMember.ts';
-import { staffServices } from '../../db/schema/staffService.ts';
-import { services } from '../../db/schema/service.ts';
-import { users } from '../../db/schema/user.ts';
-import { reviews } from '../../db/schema/reviews.ts';
-import { bookings } from '../../db/schema/booking.ts';
-import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
+import { and, avg, count, eq, getColumns, getTableColumns } from "drizzle-orm";
+import type { DB } from "../../db/drizzlePlugin.ts";
+import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
+import { staffServices } from "../../db/schema/staffService.ts";
+import { services } from "../../db/schema/service.ts";
+import { users } from "../../db/schema/user.ts";
+import { reviews } from "../../db/schema/reviews.ts";
+import { bookings } from "../../db/schema/booking.ts";
+import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
 
 export async function findStaffByFacilityId(
   db: DB,
@@ -35,7 +35,7 @@ export async function findStaffMemberById(db: DB, staffMemberId: string) {
 export async function insertStaffMemberById(db: DB, userId: string, facilityId: string) {
   const [staffMember] = await db.insert(staffMembers).values({ userId, facilityId }).returning();
   if (!staffMember) {
-    throw new Error('Failed to insert staff member');
+    throw new Error("Failed to insert staff member");
   }
   return staffMember;
 }
@@ -46,7 +46,7 @@ export async function assignServiceToStaff(db: DB, staffMemberId: string, servic
     .values({ staffMemberId, serviceId })
     .returning();
   if (!assignedService) {
-    throw new Error('Failed to assign service to staff member');
+    throw new Error("Failed to assign service to staff member");
   }
   return assignedService;
 }

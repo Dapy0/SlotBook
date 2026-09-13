@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 // Request DTOs
 
@@ -8,9 +8,8 @@ export const createStaffServiceSchema = z.object({
 });
 
 export type CreateStaffServiceRequest = z.infer<typeof createStaffServiceSchema>;
-export const updateStaffServiceSchema = createStaffServiceSchema.partial()
+export const updateStaffServiceSchema = createStaffServiceSchema.partial();
 export type UpdateStaffServiceRequest = z.infer<typeof updateStaffServiceSchema>;
-
 
 // Response DTOs
 

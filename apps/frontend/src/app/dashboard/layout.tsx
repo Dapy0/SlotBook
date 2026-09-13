@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: '/dashboard/services', label: 'Services' },
-  { href: '/dashboard/schedule', label: 'Schedule' },
-  { href: '/dashboard/staff', label: 'Staff' },
-  { href: '/dashboard/bookings', label: 'Bookings' },
+  { href: "/dashboard/services", label: "Services" },
+  { href: "/dashboard/schedule", label: "Schedule" },
+  { href: "/dashboard/staff", label: "Staff" },
+  { href: "/dashboard/bookings", label: "Bookings" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -33,8 +33,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={item.href}
                 className={`rounded-md  px-3 py-2 text-lg transition ${
                   isActive
-                    ? 'bg-gray-100 font-medium text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? "bg-gray-100 font-medium text-gray-900"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
                 {item.label}

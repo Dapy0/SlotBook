@@ -1,18 +1,18 @@
-import type { AuthResponseDTO, LoginRequest, RegisterRequest } from '@slotbook/shared/auth';
-import type { DB } from '../../db/drizzlePlugin.ts';
-import bcrypt from 'bcrypt';
-import { deleteUserDate, findUserByEmail, findUserById, registerUser } from './auth.repository.ts';
+import type { AuthResponseDTO, LoginRequest, RegisterRequest } from "@slotbook/shared/auth";
+import type { DB } from "../../db/drizzlePlugin.ts";
+import bcrypt from "bcrypt";
+import { deleteUserDate, findUserByEmail, findUserById, registerUser } from "./auth.repository.ts";
 import {
   BadRequestError,
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-} from '../../lib/errors.ts';
-import type { FastifyInstance, FastifyReply } from 'fastify';
-import { DrizzleQueryError } from 'drizzle-orm';
-import { DatabaseError } from 'pg';
+} from "../../lib/errors.ts";
+import type { FastifyInstance, FastifyReply } from "fastify";
+import { DrizzleQueryError } from "drizzle-orm";
+import { DatabaseError } from "pg";
 
-type JWT = FastifyInstance['jwt'];
+type JWT = FastifyInstance["jwt"];
 export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
   const passwordHash = await bcrypt.hash(data.password, 10);
 
@@ -21,8 +21,8 @@ export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
     passwordHash,
   }).catch((e) => {
     const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === '23505') {
-      throw new ConflictError('Email already exists');
+    if (pgError?.code === "23505") {
+      throw new ConflictError("Email already exists");
     }
 
     throw e;
@@ -41,11 +41,11 @@ export async function signInUser(db: DB, jwt: JWT, data: LoginRequest) {
   const user = await findUserByEmail(db, data.email);
 
   if (!user) {
-    throw new NotFoundError('User with this email not found');
+    throw new NotFoundError("User with this email not found");
   }
   const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
   if (!isPasswordValid) {
-    throw new UnauthorizedError('Password is incorrect');
+    throw new UnauthorizedError("Password is incorrect");
   }
 
   const token = jwt.sign({ id: user.id });
@@ -60,7 +60,7 @@ export async function authorizeUser(db: DB, userId: string) {
   const user = await findUserById(db, userId);
 
   if (!user) {
-    throw new NotFoundError('User Not Found');
+    throw new NotFoundError("User Not Found");
   }
 
   const { passwordHash: _, ...newUser } = user;
@@ -69,6 +69,5 @@ export async function authorizeUser(db: DB, userId: string) {
   };
 }
 export async function deleteUserById(db: DB, userId: string) {
-  await deleteUserDate(db,userId)
-
+  await deleteUserDate(db, userId);
 }

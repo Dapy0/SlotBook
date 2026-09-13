@@ -1,16 +1,16 @@
-import type { FastifyInstance } from 'fastify';
-import { getAvailableTime } from './availability.controller.ts';
+import type { FastifyInstance } from "fastify";
+import { getAvailableTime } from "./availability.controller.ts";
 import {
   availabilityParamSchema,
   availabilityQuerySchema,
   type AvailabilityParamsAndQuery,
-} from './availability.schema.ts';
-import { availabilitySlotSchema } from '@slotbook/shared/availability';
-import z from 'zod';
+} from "./availability.schema.ts";
+import { availabilitySlotSchema } from "@slotbook/shared/availability";
+import z from "zod";
 
 export function availabilityRoutes(fastify: FastifyInstance) {
   fastify.get<AvailabilityParamsAndQuery>(
-    '/availability',
+    "/availability",
     {
       schema: {
         params: availabilityParamSchema,

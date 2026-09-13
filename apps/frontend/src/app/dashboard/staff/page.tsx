@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ChevronDownIcon } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronDownIcon } from "lucide-react";
 
 type Service = {
   id: string;
@@ -32,48 +32,48 @@ type StaffMember = {
 };
 
 const defaultSchedule: DaySchedule[] = [
-  { day: 'Monday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Tuesday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Wednesday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Thursday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Friday', enabled: true, from: '09:00', to: '18:00' },
-  { day: 'Saturday', enabled: false, from: '10:00', to: '16:00' },
-  { day: 'Sunday', enabled: false, from: '10:00', to: '16:00' },
+  { day: "Monday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Tuesday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Wednesday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Thursday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Friday", enabled: true, from: "09:00", to: "18:00" },
+  { day: "Saturday", enabled: false, from: "10:00", to: "16:00" },
+  { day: "Sunday", enabled: false, from: "10:00", to: "16:00" },
 ];
 
 const initialStaff: StaffMember[] = [
   {
-    id: 'anna',
-    name: 'Anna K.',
-    role: 'Stylist',
-    staffId: 'nord-st1',
-    joined: 'Feb 4, 2026',
+    id: "anna",
+    name: "Anna K.",
+    role: "Stylist",
+    staffId: "nord-st1",
+    joined: "Feb 4, 2026",
     active: true,
     services: [
-      { id: 's1', title: 'Single Tone Coloring', duration: '120 min', price: '320,00 zł' },
-      { id: 's2', title: 'Styling', duration: '40 min', price: '90,00 zł' },
-      { id: 's3', title: 'Balayage', duration: '150 min', price: '450,00 zł' },
+      { id: "s1", title: "Single Tone Coloring", duration: "120 min", price: "320,00 zł" },
+      { id: "s2", title: "Styling", duration: "40 min", price: "90,00 zł" },
+      { id: "s3", title: "Balayage", duration: "150 min", price: "450,00 zł" },
     ],
     schedule: defaultSchedule,
   },
   {
-    id: 'marek',
-    name: 'Marek W.',
-    role: 'Barber',
-    staffId: 'nord-st2',
-    joined: 'Mar 18, 2026',
+    id: "marek",
+    name: "Marek W.",
+    role: "Barber",
+    staffId: "nord-st2",
+    joined: "Mar 18, 2026",
     active: true,
-    services: [{ id: 's4', title: "Men's Haircut", duration: '30 min', price: '90,00 zł' }],
+    services: [{ id: "s4", title: "Men's Haircut", duration: "30 min", price: "90,00 zł" }],
     schedule: defaultSchedule,
   },
   {
-    id: 'julia',
-    name: 'Julia S.',
-    role: 'Masseuse',
-    staffId: 'nord-st3',
-    joined: 'Jun 2, 2026',
+    id: "julia",
+    name: "Julia S.",
+    role: "Masseuse",
+    staffId: "nord-st3",
+    joined: "Jun 2, 2026",
     active: false,
-    services: [{ id: 's5', title: 'Classic Back Massage', duration: '60 min', price: '150,00 zł' }],
+    services: [{ id: "s5", title: "Classic Back Massage", duration: "60 min", price: "150,00 zł" }],
     schedule: defaultSchedule.map((d) => ({ ...d, enabled: false })),
   },
 ];
@@ -85,21 +85,21 @@ function ServicesPanel({
   staff: StaffMember;
   onAddService: (staffId: string, service: Service) => void;
 }) {
-  const [name, setName] = useState('');
-  const [duration, setDuration] = useState('');
-  const [price, setPrice] = useState('');
+  const [name, setName] = useState("");
+  const [duration, setDuration] = useState("");
+  const [price, setPrice] = useState("");
 
   const handleAdd = () => {
     if (!name.trim()) return;
     onAddService(staff.id, {
       id: `${staff.id}-${Date.now()}`,
       title: name,
-      duration: duration ? `${duration} min` : '—',
-      price: price ? `${price} zł` : '—',
+      duration: duration ? `${duration} min` : "—",
+      price: price ? `${price} zł` : "—",
     });
-    setName('');
-    setDuration('');
-    setPrice('');
+    setName("");
+    setDuration("");
+    setPrice("");
   };
 
   return (
@@ -162,7 +162,7 @@ function SchedulePanel({
 }: {
   staff: StaffMember;
   onToggleDay: (staffId: string, day: string) => void;
-  onUpdateTime: (staffId: string, day: string, field: 'from' | 'to', value: string) => void;
+  onUpdateTime: (staffId: string, day: string, field: "from" | "to", value: string) => void;
 }) {
   return (
     <div className="divide-y divide-gray-100 rounded-lg border border-gray-100">
@@ -170,7 +170,7 @@ function SchedulePanel({
         <div
           key={d.day}
           className={`flex items-center justify-between px-4 py-2.5 ${
-            !d.enabled ? 'bg-gray-50' : ''
+            !d.enabled ? "bg-gray-50" : ""
           }`}
         >
           <label className="flex items-center gap-2.5">
@@ -180,7 +180,7 @@ function SchedulePanel({
               onChange={() => onToggleDay(staff.id, d.day)}
               className="size-4 accent-primary"
             />
-            <span className={`text-sm ${d.enabled ? 'text-gray-900' : 'text-gray-400'}`}>
+            <span className={`text-sm ${d.enabled ? "text-gray-900" : "text-gray-400"}`}>
               {d.day}
             </span>
           </label>
@@ -190,7 +190,7 @@ function SchedulePanel({
               type="time"
               value={d.from}
               disabled={!d.enabled}
-              onChange={(e) => onUpdateTime(staff.id, d.day, 'from', e.target.value)}
+              onChange={(e) => onUpdateTime(staff.id, d.day, "from", e.target.value)}
               className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
             />
             <span className="text-xs text-gray-400">to</span>
@@ -198,7 +198,7 @@ function SchedulePanel({
               type="time"
               value={d.to}
               disabled={!d.enabled}
-              onChange={(e) => onUpdateTime(staff.id, d.day, 'to', e.target.value)}
+              onChange={(e) => onUpdateTime(staff.id, d.day, "to", e.target.value)}
               className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
             />
           </div>
@@ -211,14 +211,14 @@ function SchedulePanel({
 export default function StaffPage() {
   const [staff, setStaff] = useState(initialStaff);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [subTab, setSubTab] = useState<'services' | 'schedule'>('services');
+  const [subTab, setSubTab] = useState<"services" | "schedule">("services");
 
   const toggleExpanded = (id: string) => {
     if (expandedId === id) {
       setExpandedId(null);
     } else {
       setExpandedId(id);
-      setSubTab('services');
+      setSubTab("services");
     }
   };
 
@@ -245,7 +245,7 @@ export default function StaffPage() {
     );
   };
 
-  const updateTime = (staffId: string, day: string, field: 'from' | 'to', value: string) => {
+  const updateTime = (staffId: string, day: string, field: "from" | "to", value: string) => {
     setStaff((prev) =>
       prev.map((s) =>
         s.id === staffId
@@ -296,10 +296,10 @@ export default function StaffPage() {
                 <div className="flex items-center gap-3">
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      member.active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                      member.active ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {member.active ? 'Active' : 'Inactive'}
+                    {member.active ? "Active" : "Inactive"}
                   </span>
                   <span
                     role="button"
@@ -310,12 +310,12 @@ export default function StaffPage() {
                     }}
                     className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-50"
                   >
-                    {member.active ? 'Disable' : 'Enable'}
+                    {member.active ? "Disable" : "Enable"}
                   </span>
                   <ChevronDownIcon
                     size={18}
                     className={`text-gray-400 transition-transform ${
-                      isExpanded ? 'rotate-180' : ''
+                      isExpanded ? "rotate-180" : ""
                     }`}
                   />
                 </div>
@@ -326,31 +326,31 @@ export default function StaffPage() {
                 <div className="border-t border-gray-100 px-6 py-5">
                   <div className="mb-4 flex gap-2">
                     <button
-                      onClick={() => setSubTab('services')}
+                      onClick={() => setSubTab("services")}
                       className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                        subTab === 'services'
-                          ? 'bg-primary text-white'
-                          : 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        subTab === "services"
+                          ? "bg-primary text-white"
+                          : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                       }`}
                     >
                       Services
                     </button>
                     <button
-                      onClick={() => setSubTab('schedule')}
+                      onClick={() => setSubTab("schedule")}
                       className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                        subTab === 'schedule'
-                          ? 'bg-primary text-white'
-                          : 'border border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        subTab === "schedule"
+                          ? "bg-primary text-white"
+                          : "border border-gray-200 bg-white text-gray-700 hover:border-gray-300"
                       }`}
                     >
                       Schedule
                     </button>
                   </div>
 
-                  {subTab === 'services' && (
+                  {subTab === "services" && (
                     <ServicesPanel staff={member} onAddService={addService} />
                   )}
-                  {subTab === 'schedule' && (
+                  {subTab === "schedule" && (
                     <SchedulePanel
                       staff={member}
                       onToggleDay={toggleDay}

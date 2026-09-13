@@ -1,41 +1,41 @@
-import { customType, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './user.ts';
-import { facilities } from './facility.ts';
-import { staffMembers } from './staffMember.ts';
-import { services } from './service.ts';
+import { customType, index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { users } from "./user.ts";
+import { facilities } from "./facility.ts";
+import { staffMembers } from "./staffMember.ts";
+import { services } from "./service.ts";
 
 export const tstzrange = customType<{
   data: string;
   driverData: string;
 }>({
   dataType() {
-    return 'tstzrange';
+    return "tstzrange";
   },
 });
 
 export const bookings = pgTable(
-  'bookings',
+  "bookings",
   {
     id: uuid().defaultRandom().primaryKey(),
-    clientId: uuid('user_id')
+    clientId: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    facilityId: uuid('facility_id')
+    facilityId: uuid("facility_id")
       .notNull()
-      .references(() => facilities.id, { onDelete: 'cascade' }),
-    staffMemberId: uuid('staff_member_id')
+      .references(() => facilities.id, { onDelete: "cascade" }),
+    staffMemberId: uuid("staff_member_id")
       .notNull()
       .references(() => staffMembers.id),
-    serviceId: uuid('service_id')
+    serviceId: uuid("service_id")
       .notNull()
       .references(() => services.id),
-    timeRange: tstzrange('time_range').notNull(),
-    status: text('status', { enum: ['pending', 'confirmed', 'canceled'] })
+    timeRange: tstzrange("time_range").notNull(),
+    status: text("status", { enum: ["pending", "confirmed", "canceled"] })
       .notNull()
-      .default('pending'),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+      .default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [index('bookings_facilities_idx').on(table.facilityId)],
+  (table) => [index("bookings_facilities_idx").on(table.facilityId)],
 );
 
 export type BookingEntity = typeof bookings.$inferSelect;

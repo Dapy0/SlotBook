@@ -1,5 +1,5 @@
-import { convertRawResponseFacilitySchedule } from '@/lib/utils';
-import type { ResponseFacilityScheduleSchema } from '@slotbook/shared/facilitySchedule';
+import { convertRawResponseFacilitySchedule } from "@/lib/utils";
+import type { ResponseFacilityScheduleSchema } from "@slotbook/shared/facilitySchedule";
 
 function WorkingHours({ hours }: { hours: ResponseFacilityScheduleSchema[] }) {
   // const hours = [
@@ -27,10 +27,10 @@ function WorkingHours({ hours }: { hours: ResponseFacilityScheduleSchema[] }) {
             <span className="text-teal-600 self-start">{row.dayOfTheWeek}</span>
             <span
               className={` flex flex-col gap-0.5
-                ${row.timeIntervals.length === 0 ? 'text-gray-400' : 'font-medium text-gray-900'}`}
+                ${row.timeIntervals.length === 0 ? "text-gray-400" : "font-medium text-gray-900"}`}
             >
               {row.timeIntervals.length === 0
-                ? 'Closed'
+                ? "Closed"
                 : row.timeIntervals.map((interval) => (
                     <span key={hours[0].facilityId + interval}>{interval}</span>
                   ))}

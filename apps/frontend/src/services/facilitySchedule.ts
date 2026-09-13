@@ -1,20 +1,20 @@
-import { api } from '@/lib/api';
+import { api } from "@/lib/api";
 import type {
   CreateFacilitySchedule,
   ResponseFacilityScheduleSchema,
-} from '@slotbook/shared/facilitySchedule';
+} from "@slotbook/shared/facilitySchedule";
 
 export async function getFacilitySchedule(facilityId: string) {
   const result = await api<ResponseFacilityScheduleSchema[]>(`/facilities/${facilityId}/schedule`, {
-    method: 'GET',
+    method: "GET",
   });
 
   return result;
 }
 
-export async function putFacilitySchedule(facilityId: string,data: CreateFacilitySchedule[]) {
+export async function putFacilitySchedule(facilityId: string, data: CreateFacilitySchedule[]) {
   const result = await api<ResponseFacilityScheduleSchema[]>(`/facilities/${facilityId}/schedule`, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(data),
   });
 

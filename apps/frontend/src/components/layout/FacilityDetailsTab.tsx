@@ -1,13 +1,13 @@
-'use client';
-import ReviewsList from '@/components/layout/ReviewsList';
-import ServicesList from '@/components/layout/ServicesList';
-import StaffList from '@/components/layout/StaffList';
-import { TabsTrigger, TabsContent, Tabs, TabsList } from '@/components/ui/tabs';
-import type { ReviewResponse } from '@slotbook/shared/reviews';
-import type { ServiceResponseDTO } from '@slotbook/shared/service';
-import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
-import { SearchIcon } from 'lucide-react';
-import { useState } from 'react';
+"use client";
+import ReviewsList from "@/components/layout/ReviewsList";
+import ServicesList from "@/components/layout/ServicesList";
+import StaffList from "@/components/layout/StaffList";
+import { TabsTrigger, TabsContent, Tabs, TabsList } from "@/components/ui/tabs";
+import type { ReviewResponse } from "@slotbook/shared/reviews";
+import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import { SearchIcon } from "lucide-react";
+import { useState } from "react";
 
 function FacilityDetailsTab({
   services,
@@ -18,11 +18,16 @@ function FacilityDetailsTab({
   staff: StaffMemberResponseDTO[];
   reviews: ReviewResponse[];
 }) {
-  const [activeTab, setActiveTab] = useState('services');
-  const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState("services");
+  const [query, setQuery] = useState("");
 
-  const showSearch = activeTab === 'services' || activeTab === 'staff' || activeTab === 'reviews';
-  const searchPlaceholder = activeTab === 'services' ? 'Search services' : activeTab === 'staff' ? 'Search staff' : "Search reviews";
+  const showSearch = activeTab === "services" || activeTab === "staff" || activeTab === "reviews";
+  const searchPlaceholder =
+    activeTab === "services"
+      ? "Search services"
+      : activeTab === "staff"
+        ? "Search staff"
+        : "Search reviews";
 
   return (
     <div className="w-full max-w-2xl">
@@ -30,14 +35,14 @@ function FacilityDetailsTab({
         <div className="flex w-full items-center gap-4">
           <TabsList variant="line">
             <TabsTrigger value="services">
-              Services{' '}
+              Services{" "}
               <span className="text-gray-400 font-light text-xs">{services.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="staff">
               Staff <span className="text-gray-400 font-light text-xs">{staff.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="reviews">
-              Reviews{' '}
+              Reviews{" "}
               <span className="text-gray-400 font-light text-xs">{reviews.length || 0}</span>
             </TabsTrigger>
           </TabsList>

@@ -1,14 +1,14 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { getServicesByFacilityId, insertService } from './service.repository.ts';
-import { findFacilityById } from '../facility/facility.repository.ts';
-import type { ServiceParams } from './service.schema.ts';
-import type { CreateServiceRequest } from '@slotbook/shared/service';
-import type { NewServiceEntity } from '../../db/schema/service.ts';
+import type { FastifyReply, FastifyRequest } from "fastify";
+import { getServicesByFacilityId, insertService } from "./service.repository.ts";
+import { findFacilityById } from "../facility/facility.repository.ts";
+import type { ServiceParams } from "./service.schema.ts";
+import type { CreateServiceRequest } from "@slotbook/shared/service";
+import type { NewServiceEntity } from "../../db/schema/service.ts";
 import {
   createServiceByFacilityId,
   getFacilityServiceById,
   getFacilityServicesById,
-} from './service.service.ts';
+} from "./service.service.ts";
 
 export async function getFacilityServices(
   request: FastifyRequest<{

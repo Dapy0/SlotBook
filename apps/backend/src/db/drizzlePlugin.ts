@@ -1,8 +1,8 @@
-import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import fp from 'fastify-plugin';
-import type { FastifyInstance } from 'fastify';
-import { relations } from './relations.ts';
+import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import fp from "fastify-plugin";
+import type { FastifyInstance } from "fastify";
+import { relations } from "./relations.ts";
 
 export type DB = NodePgDatabase<typeof relations>;
 
@@ -13,8 +13,8 @@ function drizzlePlugin(fastify: FastifyInstance, options = {}, done: any) {
       ssl: false,
     });
     const db = drizzle({ client: pool, relations });
-    fastify.decorate('drizzle', db);
-    fastify.addHook('onClose', (fastify, done) => {
+    fastify.decorate("drizzle", db);
+    fastify.addHook("onClose", (fastify, done) => {
       pool
         .end()
         .then(() => done())
@@ -24,4 +24,4 @@ function drizzlePlugin(fastify: FastifyInstance, options = {}, done: any) {
   done();
 }
 
-export default fp(drizzlePlugin, { name: 'fastify-drizzle' });
+export default fp(drizzlePlugin, { name: "fastify-drizzle" });

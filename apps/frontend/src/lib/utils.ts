@@ -1,11 +1,11 @@
-import { api } from '@/lib/api';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { api } from "@/lib/api";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 import {
   daysAndThereNames,
   type DayOfTheWeek,
   type ResponseFacilityScheduleSchema,
-} from '@slotbook/shared/facilitySchedule';
+} from "@slotbook/shared/facilitySchedule";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,12 +13,12 @@ export function cn(...inputs: ClassValue[]) {
 export function getCookie(name: string) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()!.split(';').shift() || undefined;
+  if (parts.length === 2) return parts.pop()!.split(";").shift() || undefined;
 }
 
 export async function getLocation(): Promise<{ country: string }> {
   return await api(`/geo`, {
-    method: 'GET',
+    method: "GET",
   });
 }
 
@@ -66,7 +66,7 @@ export function convertRawResponseFacilitySchedule(
   return res;
 }
 export function removeExtraSecondsFromTime(time: string) {
-  const [hours, minutes, seconds] = time.split(':');
+  const [hours, minutes, seconds] = time.split(":");
   return `${hours}:${minutes}`;
 }
 
@@ -75,8 +75,8 @@ export function convertMinutesToTime(durationMinutes: number) {
   const minutes = durationMinutes - hours * 60;
   return [hours, minutes];
 }
-export function formatMoney(cents: number, currency: string, locale: string = 'pl') {
-  const formatter = new Intl.NumberFormat(locale, { style: 'currency', currency });
+export function formatMoney(cents: number, currency: string, locale: string = "pl") {
+  const formatter = new Intl.NumberFormat(locale, { style: "currency", currency });
   const divisor = 10 ** 2;
   return formatter.format(cents / divisor);
 }

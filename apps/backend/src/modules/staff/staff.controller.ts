@@ -1,7 +1,7 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { findStaffByFacilityId } from './staff.repository.ts';
-import type { StaffBody, StaffParams } from './staff.schema.ts';
-import { addNewStaffMembersToFacilityById } from './staff.service.ts';
+import type { FastifyReply, FastifyRequest } from "fastify";
+import { findStaffByFacilityId } from "./staff.repository.ts";
+import type { StaffBody, StaffParams } from "./staff.schema.ts";
+import { addNewStaffMembersToFacilityById } from "./staff.service.ts";
 
 export async function addStaffToFacility(
   request: FastifyRequest<{ Params: StaffParams; Body: StaffBody }>,

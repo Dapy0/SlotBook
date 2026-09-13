@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const restrictedUrls = ['/dashboard'];
+const restrictedUrls = ["/dashboard"];
 export function proxy(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get("token")?.value;
   for (const restricted of restrictedUrls) {
     if (request.nextUrl.pathname.startsWith(restricted) && !token) {
-      return NextResponse.redirect(new URL('/register', request.url));
+      return NextResponse.redirect(new URL("/register", request.url));
     }
   }
   // if (
@@ -20,5 +20,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/register', '/account'],
+  matcher: ["/dashboard/:path*", "/login", "/register", "/account"],
 };

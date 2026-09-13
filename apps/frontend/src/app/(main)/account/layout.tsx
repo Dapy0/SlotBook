@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { CameraIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { CameraIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { href: '/account/appointments', label: 'Bookings' },
-  { href: '/account/gift-cards', label: 'Gift Cards' },
-  { href: '/account/loyalty', label: 'Loyalty Cards' },
-  { href: '/account/favorites', label: 'Favorites' },
-  { href: '/account/settings', label: 'Account Settings' },
-  { href: '/account/reviews', label: 'Reviews' },
-  { href: '/account/payments', label: 'Payments' },
+  { href: "/account/appointments", label: "Bookings" },
+  { href: "/account/gift-cards", label: "Gift Cards" },
+  { href: "/account/loyalty", label: "Loyalty Cards" },
+  { href: "/account/favorites", label: "Favorites" },
+  { href: "/account/settings", label: "Account Settings" },
+  { href: "/account/reviews", label: "Reviews" },
+  { href: "/account/payments", label: "Payments" },
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
@@ -46,8 +46,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                 href={item.href}
                 className={`border-l-2 px-3 py-2.5 text-sm transition ${
                   isActive
-                    ? 'border-primary font-medium text-gray-900'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
+                    ? "border-primary font-medium text-gray-900"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {item.label}
@@ -56,8 +56,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
 
-        <Button className={'w-full py-5'}>
-          <Link href={'/create'}>Create a venue</Link>
+        <Button className={"w-full py-5"}>
+          <Link href={"/create"}>Create a venue</Link>
         </Button>
       </aside>
 

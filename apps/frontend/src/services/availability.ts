@@ -1,5 +1,5 @@
-import { api } from '@/lib/api';
-import type { AvailabilitySlot } from '@slotbook/shared/availability';
+import { api } from "@/lib/api";
+import type { AvailabilitySlot } from "@slotbook/shared/availability";
 
 export async function getAvailability(
   facilityId: string,
@@ -10,6 +10,6 @@ export async function getAvailability(
   const params = new URLSearchParams({ serviceId, date });
   return await api<AvailabilitySlot[]>(
     `/facilities/${facilityId}/staff/${staffId}/availability?${params.toString()}`,
-    { method: 'GET' },
+    { method: "GET" },
   );
 }

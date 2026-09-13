@@ -1,5 +1,5 @@
-'use client';
-import { useSearchParams, useRouter } from 'next/navigation';
+"use client";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export function useFilterHref() {
   const searchParams = useSearchParams();
@@ -10,8 +10,8 @@ export function useFilterHref() {
       if (value === null) params.delete(key);
       else params.set(key, value);
     }
-    params.delete('page');
+    params.delete("page");
     const qs = params.toString();
-    return qs ? `/venues?${qs}` : '/venues';
+    return qs ? `/venues?${qs}` : "/venues";
   };
 }

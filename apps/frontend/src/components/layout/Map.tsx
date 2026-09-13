@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
 
@@ -15,15 +15,15 @@ export function Map({ latitude, longitude }: { longitude: number; latitude: numb
 
     mapRef.current = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/dapy0/cmtl6mkf200lo01sa5udw8nzl',
+      style: "mapbox://styles/dapy0/cmtl6mkf200lo01sa5udw8nzl",
       center: [longitude, latitude],
       zoom: 15,
       bearing: -12.8,
       attributionControl: false,
-      logoPosition: 'bottom-right',
+      logoPosition: "bottom-right",
     });
 
-    new mapboxgl.Marker({ color: 'oklch(0.555 0.163 48.998)' })
+    new mapboxgl.Marker({ color: "oklch(0.555 0.163 48.998)" })
       .setLngLat([longitude, latitude])
       .addTo(mapRef.current);
 
@@ -33,5 +33,5 @@ export function Map({ latitude, longitude }: { longitude: number; latitude: numb
     };
   }, []);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 }

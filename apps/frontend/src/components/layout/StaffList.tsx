@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
-import type { StaffMemberResponseDTO } from '@slotbook/shared/staffMembers';
-import { StarIcon } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import { StarIcon } from "lucide-react";
 
 export default function StaffList({
   staff,
-  query = '',
+  query = "",
 }: {
   staff: StaffMemberResponseDTO[];
   query?: string;
@@ -31,7 +31,7 @@ export default function StaffList({
             </div>
 
             <div className="flex items-center gap-4">
-              <Button variant={'outline'}>Book</Button>
+              <Button variant={"outline"}>Book</Button>
             </div>
           </div>
         ))}

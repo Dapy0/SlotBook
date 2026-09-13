@@ -1,5 +1,5 @@
-import { api } from '@/lib/api';
-import type { BookingResponse } from '@slotbook/shared/bookings';
+import { api } from "@/lib/api";
+import type { BookingResponse } from "@slotbook/shared/bookings";
 
 export type CreateBookingPayload = {
   staffMemberId: string;
@@ -9,7 +9,7 @@ export type CreateBookingPayload = {
 
 export async function createBooking(facilityId: string, data: CreateBookingPayload) {
   const result = await api<BookingResponse>(`/facilities/${facilityId}/bookings`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(data),
   });
 
@@ -17,7 +17,7 @@ export async function createBooking(facilityId: string, data: CreateBookingPaylo
 }
 export async function getFacilityBookings(facilityId: string) {
   const result = await api<BookingResponse>(`/facilities/${facilityId}/bookings`, {
-    method: 'GET',
+    method: "GET",
   });
 
   return result;

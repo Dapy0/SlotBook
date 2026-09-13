@@ -9,14 +9,23 @@
     "backend:generate": "npm run db:generate --workspace=apps/backend",
     "backend:migrate": "npm run db:migrate --workspace=apps/backend",
     "backend:test": "npm run test --workspace=apps/backend",
-    "shared:test": "npm run test --workspace=packages/shared"
+    "shared:test": "npm run test --workspace=packages/shared",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
+  "overrides": {
+    "typescript": "6.0.3"
+  },
   "type": "module",
   "devDependencies": {
-    "concurrently": "^10.0.4"
+    "concurrently": "^10.0.4",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.9.6"
   }
 }

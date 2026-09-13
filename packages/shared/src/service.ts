@@ -1,4 +1,4 @@
-import z from 'zod';
+import z from "zod";
 
 // Request DTOs
 export const createServiceSchema = z.object({
@@ -11,7 +11,7 @@ export const createServiceSchema = z.object({
     .positive()
     .max(24 * 60),
   priceCents: z.number().int().nonnegative(),
-  currency: z.string().length(3).default('PLN'),
+  currency: z.string().length(3).default("PLN"),
   isActive: z.boolean().default(false),
 });
 export type CreateServiceRequest = z.infer<typeof createServiceSchema>;

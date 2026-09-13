@@ -1,5 +1,5 @@
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,13 +7,13 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import type { UserResponse } from '@slotbook/shared/user';
-import { ArrowUp } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import type { UserResponse } from "@slotbook/shared/user";
+import { ArrowUp } from "lucide-react";
 
 function ProfileMenu({
   user,
-  profilePicture = 'https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/',
+  profilePicture = "https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/",
   onLogout,
 }: {
   user: UserResponse;
