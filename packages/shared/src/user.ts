@@ -1,12 +1,12 @@
-import z from "zod";
+import * as z from "zod";
 
-const isoDateSchema = z
-  .union([z.date(), z.string()])
-  .transform((val) => (val instanceof Date ? val.toISOString() : val));
+// const isoDateSchema = z
+//   .union([z.date(), z.string().trim()])
+//   .transform((val) => (val instanceof Date ? val.toISOString() : val));
 
 export const userSchema = z.strictObject({
   id: z.uuid(),
-  name: z.string(),
+  name: z.string().trim(),
   email: z.email(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

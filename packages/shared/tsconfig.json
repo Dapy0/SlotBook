@@ -1,4 +1,18 @@
 {
-  "compilerOptions": { "strict": true },
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "lib": ["esnext"],
+    "types": ["node", "vitest/globals"],
+
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
   "include": ["src/**/*.ts"]
 }

@@ -1,6 +1,6 @@
 {
   "name": "slotbook-monorepo",
-  "private": "true",
+  "private": true,
   "scripts": {
     "dev:backend": "npm run dev --workspace=apps/backend",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
@@ -30,5 +30,14 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "unrs-resolver@1.12.2": true,
+    "ssh2@1.17.0": true,
+    "cpu-features@0.0.10": true,
+    "protobufjs@7.6.6": true
   }
 }

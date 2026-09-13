@@ -1,4 +1,4 @@
-import z from "zod";
+import * as z from "zod";
 const TSRANGE_RE =
   /^([[(])(?:"((?:[^"\\]|\\.)*)"|([^",]*))?,(?:"((?:[^"\\]|\\.)*)"|([^\])"]*))?([)\]])$/;
 
@@ -48,7 +48,7 @@ export const tsRangeSchema = z.codec(
     startInclusive: z.boolean(),
     endInclusive: z.boolean(),
   }),
-  z.string(),
+  z.string().trim(),
   {
     decode: toTsRangeLiteral,
     encode: parseTsRangeLiteral,

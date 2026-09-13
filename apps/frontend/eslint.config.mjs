@@ -7,9 +7,13 @@ import nextTs from "eslint-config-next/typescript";
  */
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
+  {
+    plugins: { "@next/next": next },
+    rules: {
+      ...next.configs.recommended.rules,
+      ...next.configs["core-web-vitals"].rules,
+    },
+  },
 
   globalIgnores([
     // Default ignores of eslint-config-next:

@@ -16,6 +16,7 @@ const eslintConfig = defineConfig(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    
     rules: {
       "@typescript-eslint/naming-convention": [
         "error",

@@ -1,4 +1,4 @@
-import z from "zod";
+import * as z from "zod";
 
 // Request DTOs
 
@@ -16,9 +16,9 @@ export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberSchema>;
 
 export const staffMemberResponseSchema = createStaffMemberSchema.extend({
   id: z.uuid(),
-  score: z.string().nullable(),
+  score: z.string().trim().nullable(),
   reviewsCount: z.number(),
-  name: z.string(),
+  name: z.string().trim(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });

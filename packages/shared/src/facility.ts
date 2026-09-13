@@ -1,4 +1,4 @@
-import z from "zod";
+import * as z from "zod";
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -78,26 +78,26 @@ export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
 const supportedTimezones = Intl.supportedValuesOf("timeZone");
 
 export const timezoneSchema = z
-  .string()
-  .refine((tz) => supportedTimezones.includes(tz), { message: "Incorrect IANA" });
+  .string().trim()
+  .refine((tz) => supportedTimezones.includes(tz), { error: "Incorrect IANA" });
 
 // Request DTOs
 export const facilityFieldsSchema = z.object({
-  name: z.string().min(2).max(255),
+  name: z.string().trim().min(2).max(255),
   slug: z
-    .string()
+    .string().trim()
     .min(2)
     .max(255)
     .regex(/^[a-z0-9-]+$/),
-  city: z.string().min(1),
-  country: z.string().min(1).max(2),
-  address: z.string().min(1),
-  phone: z.string().min(5).max(32),
+  city: z.string().trim().min(1),
+  country: z.string().trim().min(1).max(2),
+  address: z.string().trim().min(1),
+  phone: z.string().trim().min(5).max(32),
   email: z.email(),
   timezoneIANA: timezoneSchema,
   category: facilityCategorySchema,
-  description: z.string(),
-  images: z.array(z.string()).default([]),
+  description: z.string().trim(),
+  images: z.array(z.string().trim()).default([]),
   isPublished: z.boolean().default(false),
   latitude: z.number(),
   longitude: z.number(),
@@ -113,7 +113,7 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   id: z.uuid(),
   ownerId: z.uuid(),
   score: z.number().min(0).max(5).nullable(),
-  reviewsCount: z.number().int().nonnegative(),
+  reviewsCount: z.int().nonnegative(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

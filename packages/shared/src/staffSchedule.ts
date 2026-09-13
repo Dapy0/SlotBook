@@ -1,4 +1,4 @@
-import z from "zod";
+import * as z from "zod";
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);

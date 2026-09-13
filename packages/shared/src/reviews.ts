@@ -1,7 +1,7 @@
-import z from "zod";
+import * as z from "zod";
 export const createReviewRequestSchema = z.object({
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().optional(),
+  rating: z.int().min(1).max(5),
+  comment: z.string().trim().optional(),
 });
 
 export type CreateReviewRequest = z.infer<typeof createReviewRequestSchema>;
@@ -9,11 +9,11 @@ export type CreateReviewRequest = z.infer<typeof createReviewRequestSchema>;
 export const reviewResponseSchema = z.object({
   id: z.uuid(),
   // bookingId: z.uuid(),
-  staffMemberName: z.string(),
+  staffMemberName: z.string().trim(),
   // serviceId: z.uuid(),
-  serviceName: z.string(),
-  rating: z.number().int().min(1).max(5),
-  comment: z.string().nullable(),
+  serviceName: z.string().trim(),
+  rating: z.int().min(1).max(5),
+  comment: z.string().trim().nullable(),
   createdAt: z.coerce.date(),
 });
 export type ReviewResponse = z.infer<typeof reviewResponseSchema>;
