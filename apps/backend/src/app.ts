@@ -25,6 +25,7 @@ import fastifyCaching from "@fastify/caching";
 import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { detectCountry } from "./modules/geoLocation.ts";
+import { ZodError } from "zod";
 
 export async function createServer() {
   const app = Fastify({
@@ -36,12 +37,13 @@ export async function createServer() {
   app.setSerializerCompiler(serializerCompiler);
 
   //Error handler
-  app.setErrorHandler(function (error: any, request, reply) {
+  app.setErrorHandler<Error>(function (error, request, reply) {
     request.log.error(error);
-    if (error.validation) {
+    if (error instanceof ZodError) {
       return reply.status(400).send({
         code: "BAD_REQUEST",
         message: "Data validation Error.",
+        issues: error.issues,
       });
     }
     if (error instanceof AppError) {
