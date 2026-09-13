@@ -46,15 +46,15 @@ export function Header({
   }, [location]);
 
   return (
-    <header className="shrink-0 bg-background border-border border-b">
-      <div className="flex justify-between align-center gap-4 p-4 max-w-7xl my-0 mx-auto">
-        <button className=" bg-none border-0 p-0 cursor-pointer font-sans font-bold text-xl tracking-tight text-">
+    <header className="shrink-0 border-b border-border bg-background">
+      <div className="align-center mx-auto my-0 flex max-w-7xl justify-between gap-4 p-4">
+        <button className="text- cursor-pointer border-0 bg-none p-0 font-sans text-xl font-bold tracking-tight">
           <Link href={"/"}>
             slot
             <span className="text-primary">book</span>
           </Link>
         </button>
-        <nav className="flex gap-4 ml-auto ">
+        <nav className="ml-auto flex gap-4">
           {navBtns?.map((btn) => (
             <Button key={btn.linkHref} variant={btn.variant}>
               {" "}
@@ -62,7 +62,7 @@ export function Header({
             </Button>
           ))}
         </nav>
-        <div className="flex gap-2 ml-auto items-center">
+        <div className="ml-auto flex items-center gap-2">
           <Suspense fallback={<Spinner />}>
             <Select
               items={supportedCounties}

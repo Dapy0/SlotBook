@@ -69,7 +69,7 @@ function StatusBadge({ status }: { status: Status }) {
   };
   return (
     <span
-      className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}
+      className={`rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${styles[status]}`}
     >
       {labels[status]}
     </span>
@@ -83,7 +83,7 @@ export default function BookingsPage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Bookings</p>
+      <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Bookings</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">Incoming Bookings</h1>
 
       {/* Status filters */}

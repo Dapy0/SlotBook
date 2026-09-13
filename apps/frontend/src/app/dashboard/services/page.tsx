@@ -31,7 +31,7 @@ const services = [
 export default function ServicesPage() {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Owner Dashboard</p>
+      <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Owner Dashboard</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">Your Businesses</h1>
 
       {/* Business switcher */}
@@ -59,7 +59,7 @@ export default function ServicesPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-900">{service.title}</span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
                     {service.category}
                   </span>
                 </div>

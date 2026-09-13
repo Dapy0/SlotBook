@@ -191,7 +191,7 @@ function SchedulePanel({
               value={d.from}
               disabled={!d.enabled}
               onChange={(e) => onUpdateTime(staff.id, d.day, "from", e.target.value)}
-              className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
+              className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 focus:border-primary focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
             />
             <span className="text-xs text-gray-400">to</span>
             <input
@@ -199,7 +199,7 @@ function SchedulePanel({
               value={d.to}
               disabled={!d.enabled}
               onChange={(e) => onUpdateTime(staff.id, d.day, "to", e.target.value)}
-              className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
+              className="rounded-lg border border-gray-200 px-2.5 py-1 text-sm text-gray-900 focus:border-primary focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
             />
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function StaffPage() {
     <div>
       <div className="flex items-baseline justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Team</p>
+          <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Team</p>
           <h1 className="mt-1 text-2xl font-bold text-gray-900">Staff</h1>
         </div>
         <span className="text-sm text-gray-400">Total: {staff.length}</span>

@@ -71,7 +71,7 @@ function StatusBadge({ status }: { status: Status }) {
   };
   return (
     <span
-      className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status]}`}
+      className={`rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${styles[status]}`}
     >
       {labels[status]}
     </span>
@@ -125,13 +125,13 @@ function Page() {
           <TabsTrigger value="upcoming">
             <span className="flex items-center gap-1.5">
               Upcoming
-              <span className="text-gray-400 font-light text-xs">{upcoming.length}</span>
+              <span className="text-xs font-light text-gray-400">{upcoming.length}</span>
             </span>
           </TabsTrigger>
           <TabsTrigger value="past">
             <span className="flex items-center gap-1.5">
               Past
-              <span className="text-gray-400 font-light text-xs">{past.length}</span>
+              <span className="text-xs font-light text-gray-400">{past.length}</span>
             </span>
           </TabsTrigger>
         </TabsList>

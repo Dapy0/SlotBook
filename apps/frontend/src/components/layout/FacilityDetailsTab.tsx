@@ -36,14 +36,14 @@ function FacilityDetailsTab({
           <TabsList variant="line">
             <TabsTrigger value="services">
               Services{" "}
-              <span className="text-gray-400 font-light text-xs">{services.length || 0}</span>
+              <span className="text-xs font-light text-gray-400">{services.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="staff">
-              Staff <span className="text-gray-400 font-light text-xs">{staff.length || 0}</span>
+              Staff <span className="text-xs font-light text-gray-400">{staff.length || 0}</span>
             </TabsTrigger>
             <TabsTrigger value="reviews">
               Reviews{" "}
-              <span className="text-gray-400 font-light text-xs">{reviews.length || 0}</span>
+              <span className="text-xs font-light text-gray-400">{reviews.length || 0}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -54,11 +54,11 @@ function FacilityDetailsTab({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-56 rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none"
+                className="w-56 rounded-lg border border-gray-200 py-2 pr-3 pl-9 text-sm text-gray-700 placeholder:text-gray-400 focus:border-teal-500 focus:outline-none"
               />
               <SearchIcon
                 size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
               />
             </div>
           )}

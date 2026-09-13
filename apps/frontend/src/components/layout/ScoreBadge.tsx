@@ -13,7 +13,7 @@ function ScoreBadge({ styles = "", score }: { styles?: string; score: number | n
   if (score == null) {
     return (
       <span
-        className={`px-2 py-1 rounded-sm text-white font-medium text-sm ${styles}`}
+        className={`rounded-sm px-2 py-1 text-sm font-medium text-white ${styles}`}
         style={{ backgroundColor: "purple" }}
       >
         <span className="sb-score__n">{"NEW"}</span>
@@ -24,7 +24,7 @@ function ScoreBadge({ styles = "", score }: { styles?: string; score: number | n
 
   return (
     <span
-      className={`px-2 py-1 rounded-sm text-white font-medium text-sm ${styles}`}
+      className={`rounded-sm px-2 py-1 text-sm font-medium text-white ${styles}`}
       style={{ backgroundColor: color }}
     >
       <span className="sb-score__n" data-tier={tier}>

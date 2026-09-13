@@ -13,13 +13,13 @@ function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) 
   return (
     <Link
       href={`venues/${id}`}
-      className="relative rounded-md p-4 max-w-60 border  overflow-hidden min-w-60"
+      className="relative max-w-60 min-w-60 overflow-hidden rounded-md border p-4"
     >
-      <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>{" "}
+      <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>{" "}
       {/*Gradient*/}
       {/* <img src="" alt="" /> */}
       <div className="relative z-10">
-        <div className="flex justify-between items-center ">
+        <div className="flex items-center justify-between">
           {" "}
           <Badge variant="outline" className={CATEGORY_METADATA[category].badgeClassName}>
             <Icon />
@@ -27,7 +27,7 @@ function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) 
           </Badge>
           <ScoreBadge score={score} />
         </div>
-        <div className="flex flex-col mt-6">
+        <div className="mt-6 flex flex-col">
           <h3 className={"text-lg font-bold"}>{name}</h3>
           <p className={"text-md text-gray-600"}>
             {city}, {address}

@@ -8,7 +8,7 @@ export default function ContactInfo({ phone, email }: { phone: string; email: st
 
   return (
     <div className="w-full max-w-xs rounded-sm border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Contacts</p>
+      <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Contacts</p>
 
       <div className="mt-3 flex flex-col divide-y divide-gray-100">
         {contacts.map((row) => (

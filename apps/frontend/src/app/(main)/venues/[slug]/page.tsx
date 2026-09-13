@@ -45,11 +45,11 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     getFacilityReviews(facilityId),
   ]);
   return (
-    <div className="w-full  mx-auto">
+    <div className="mx-auto w-full">
       <BreadCrumbs crumbsList={["facilities", name]} />
-      <div className="flex gap-10 items-start">
-        <div className="flex flex-col gap-2 flex-1 min-w-0 ">
-          <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-start gap-10">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {}
             <Badge variant="outline" className={CATEGORY_METADATA[category].badgeClassName}>
               <Icon />
@@ -57,10 +57,10 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
             </Badge>
           </div>
           <h1 className="text-3xl font-bold">{name}</h1>
-          <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-3">
             <ScoreBadge styles="text-sm py-0.5! px-0.5" score={score} />
             <span className="text-xs text-gray-600">{reviews.length} reviews</span>
-            <span className="flex text-gray-600 text-sm gap-0.5 items-center">
+            <span className="flex items-center gap-0.5 text-sm text-gray-600">
               <MapPinIcon size={13} />
               {city} · {address}
             </span>
@@ -68,11 +68,11 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
           </div>
           <p className={"text-sm text-gray-700"}>{description}</p>
 
-          <main className="flex flex-col gap-3 mt-6">
+          <main className="mt-6 flex flex-col gap-3">
             <FacilityDetailsTab staff={staff} services={services} reviews={reviews} />
           </main>
         </div>
-        <div className="flex flex-col gap-3 w-80 shrink-0">
+        <div className="flex w-80 shrink-0 flex-col gap-3">
           <CardWithMap address={address} latitude={latitude} longitude={longitude} />
           <WorkingHours hours={facilitySchedule} />
           <ContactInfo phone={phone} email={email} />

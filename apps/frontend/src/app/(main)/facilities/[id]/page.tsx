@@ -32,7 +32,7 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
   console.log(facility.id, services);
   return (
     <div className="mx-auto max-w-3xl px-6 py-14">
-      <span className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">
+      <span className="font-(family-name:--font-geist-mono) text-xs tracking-[0.2em] text-muted-foreground uppercase">
         {facility.category}
       </span>
       <h1 className="mt-3 font-heading text-4xl font-medium text-foreground">{facility.name}</h1>

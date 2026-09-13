@@ -10,29 +10,29 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
   return (
     <Link
       href={`venues/${facility.id}`}
-      className="relative rounded-md grid grid-cols-[1fr_300px]  border  overflow-hidden w-full"
+      className="relative grid w-full grid-cols-[1fr_300px] overflow-hidden rounded-md border"
     >
-      <div className="absolute inset-0  z-5 w-full h-full  bg-linear-to-t from-gray-100 to-gray-50"></div>
+      <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>
       {/* <img src="" alt="" /> */}
-      <div className="relative z-40 p-4 flex flex-col gap-6">
-        <div className="flex items-center  gap-2">
+      <div className="relative z-40 flex flex-col gap-6 p-4">
+        <div className="flex items-center gap-2">
           {" "}
-          <Badge variant={"default"} className="text-cyan-500 rounded-md bg-cyan-100 shadow-s">
+          <Badge variant={"default"} className="shadow-s rounded-md bg-cyan-100 text-cyan-500">
             Sport
           </Badge>
-          <Badge variant={"default"} className="text-gray-500 rounded-md bg-gray-200 shadow-s">
+          <Badge variant={"default"} className="shadow-s rounded-md bg-gray-200 text-gray-500">
             Rent a racket
           </Badge>
-          <Badge variant={"default"} className="text-gray-500 rounded-md bg-gray-200 shadow-s">
+          <Badge variant={"default"} className="shadow-s rounded-md bg-gray-200 text-gray-500">
             Rent a field
           </Badge>
         </div>
-        <div className="flex flex-col  gap-1">
+        <div className="flex flex-col gap-1">
           <h3 className={"text-xl font-bold"}>{name}</h3>
-          <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-3">
             <ScoreBadge styles="text-sm py-0.5! px-0.5" score={score} />
             <span className="text-xs text-gray-600">{reviewsCount} reviews</span>
-            <span className="flex text-gray-600 text-sm gap-0.5 items-center">
+            <span className="flex items-center gap-0.5 text-sm text-gray-600">
               <MapPinIcon size={13} />
               {city} · {address}
             </span>
@@ -49,40 +49,40 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
         <Button
           variant={"ghost"}
           className={
-            "rounded-none flex justify-between items-center px-3 py-1 h-auto border-b-gray-300"
+            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
           }
         >
-          <span className="flex flex-col gap-1 items-start">
+          <span className="flex flex-col items-start gap-1">
             <span className="text-sm">Court rent</span>
             <span className="text-xs font-light text-gray-600">60 min</span>
           </span>
-          <span className="font-bold text-sm">80,00 zl</span>
+          <span className="text-sm font-bold">80,00 zl</span>
         </Button>
         <Button
           variant={"ghost"}
           className={
-            "rounded-none flex justify-between items-center px-3 py-1 h-auto border-b-gray-300"
+            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
           }
         >
-          <span className="flex flex-col gap-1 items-start">
+          <span className="flex flex-col items-start gap-1">
             <span className="text-sm">Court rent</span>
             <span className="text-xs font-light text-gray-600">60 min</span>
           </span>
-          <span className="font-bold text-sm">80,00 zl</span>
+          <span className="text-sm font-bold">80,00 zl</span>
         </Button>
         <Button
           variant={"ghost"}
           className={
-            "rounded-none flex justify-between items-center px-3 py-1 h-auto border-b-gray-300"
+            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
           }
         >
-          <span className="flex flex-col gap-1 items-start">
+          <span className="flex flex-col items-start gap-1">
             <span className="text-sm">Court rent</span>
             <span className="text-xs font-light text-gray-600">60 min</span>
           </span>
-          <span className="font-bold text-sm">80,00 zl</span>
+          <span className="text-sm font-bold">80,00 zl</span>
         </Button>
-        <div className="px-3 py-1 h-full flex flex-col justify-center">
+        <div className="flex h-full flex-col justify-center px-3 py-1">
           <Button variant={"default"} className={"w-full"}>
             Select time
           </Button>

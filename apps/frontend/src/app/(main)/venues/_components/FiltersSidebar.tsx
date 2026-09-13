@@ -28,14 +28,14 @@ function FiltersSidebar({
   const activePrice = searchParams.get("priceMax");
 
   return (
-    <aside className="w-65 shrink-0 flex flex-col gap-6 border rounded-md p-4 h-fit">
+    <aside className="flex h-fit w-65 shrink-0 flex-col gap-6 rounded-md border p-4">
       <div>
-        <p className="text-xs font-medium text-gray-500 mb-3">CATEGORY</p>
+        <p className="mb-3 text-xs font-medium text-gray-500">CATEGORY</p>
         <div className="flex flex-col gap-1">
           <Link href={buildHref({ category: null })}>
             <Button
               variant={"ghost"}
-              className={`flex items-center justify-between text-sm rounded-md px-2 py-1 -mx-2 transition-colors hover:bg-gray-100 w-full ${
+              className={`-mx-2 flex w-full items-center justify-between rounded-md px-2 py-1 text-sm transition-colors hover:bg-gray-100 ${
                 !activeCategory ? "bg-gray-100 font-medium" : "text-gray-700"
               }`}
             >
@@ -55,7 +55,7 @@ function FiltersSidebar({
                 <Button
                   variant={"ghost"}
                   key={category}
-                  className={`flex items-center justify-between text-sm rounded-md px-2 py-1 -mx-2 transition-colors hover:bg-gray-100 w-full ${
+                  className={`-mx-2 flex w-full items-center justify-between rounded-md px-2 py-1 text-sm transition-colors hover:bg-gray-100 ${
                     isSelected ? "bg-gray-100 font-medium" : "text-gray-700"
                   }`}
                 >
@@ -77,7 +77,7 @@ function FiltersSidebar({
       </div>
 
       <div>
-        <p className="text-xs font-medium text-gray-500 mb-3">CITY</p>
+        <p className="mb-3 text-xs font-medium text-gray-500">CITY</p>
         <Select
           value={activeCity ?? "all"}
           onValueChange={(v) => router.replace(buildHref({ city: v === "all" ? null : v }))}
@@ -94,7 +94,7 @@ function FiltersSidebar({
       </div>
 
       <div>
-        <p className="text-xs font-medium text-gray-500 mb-3">RATING</p>
+        <p className="mb-3 text-xs font-medium text-gray-500">RATING</p>
         <div className="flex gap-2">
           {RATINGS.map((value) => (
             <Link href={buildHref({ rating: value })}>
@@ -111,7 +111,7 @@ function FiltersSidebar({
       </div>
 
       <div>
-        <p className="text-xs font-medium text-gray-500 mb-3">PRICE FROM</p>
+        <p className="mb-3 text-xs font-medium text-gray-500">PRICE FROM</p>
         <Select
           value={activePrice ?? "any"}
           onValueChange={(v) => router.replace(buildHref({ priceMax: v === "any" ? null : v }))}

@@ -44,7 +44,7 @@ export default function RootLayout({
         publicSans.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <AuthProvider>{children}</AuthProvider>
         <Toaster />
       </body>

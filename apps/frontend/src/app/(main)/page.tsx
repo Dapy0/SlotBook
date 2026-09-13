@@ -31,17 +31,17 @@ async function Page() {
   ]).catch();
   return (
     <div>
-      <section className="text-center flex flex-col gap-3 justify-center">
-        <h1 className="flex items-center justify-center gap-2 text-6xl mt-10">
+      <section className="flex flex-col justify-center gap-3 text-center">
+        <h1 className="mt-10 flex items-center justify-center gap-2 text-6xl">
           Book
           <RotatingCategory CATEGORY_WORDS={CATEGORY_WORDS} />
         </h1>
         <p className="text-l text-gray-400">Books without waiting and "I will recall u later".</p>
-        <div className="mx-20 mb-0 mt-10">
+        <div className="mx-20 mt-10 mb-0">
           <SearchPanel />
         </div>
         <div className="mt-5">
-          <div className="flex gap-2 flex-wrap justify-center">
+          <div className="flex flex-wrap justify-center gap-2">
             <Suspense
               fallback={Array.from({ length: 5 }).map((index) => (
                 <Skeleton key={`skel-cat-${index}`} className="w-20" />
@@ -57,12 +57,12 @@ async function Page() {
                     } as React.CSSProperties
                   }
                   className={
-                    "text-center text-medium hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)] hover:border-(--icon-color-temp)"
+                    "text-medium text-center hover:border-(--icon-color-temp) hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)]"
                   }
                 >
-                  <Dot className={` size-7 [&>circle]:text-(--icon-color-temp)`} />
+                  <Dot className={`size-7 [&>circle]:text-(--icon-color-temp)`} />
                   {CATEGORY_METADATA[category.categoryName].label}
-                  <span className="text-gray-400 text-xs">{category.count}</span>
+                  <span className="text-xs text-gray-400">{category.count}</span>
                 </Button>
               ))}
             </Suspense>
@@ -72,7 +72,7 @@ async function Page() {
       <main className="mt-20 flex flex-col gap-5">
         <div>
           <h1 className="text-3xl font-semibold">Close to you</h1>
-          <div className="flex flex-wrap gap-8 mt-5">
+          <div className="mt-5 flex flex-wrap gap-8">
             {facilities.map((facility) => (
               <SmallFacilityPreviewCard key={facility.id} facility={facility} />
             ))}
@@ -80,27 +80,27 @@ async function Page() {
         </div>
         <div>
           <h1 className="text-3xl font-semibold">Promoted</h1>
-          <div className=" flex flex-col gap-3 mt-5">
+          <div className="mt-5 flex flex-col gap-3">
             {facilities.slice(1, 6).map((facility) => (
               <BigFacilityPreviewCard facility={facility} />
             ))}
           </div>
         </div>
       </main>
-      <footer className="w-full  mt-20">
-        <div className="max-w-3xl my-0 mx-auto text-center  ">
+      <footer className="mt-20 w-full">
+        <div className="mx-auto my-0 max-w-3xl text-center">
           <p className="m-0 text-xl font-semibold">How it works</p>
-          <p className="mt-2  text-gray-600">
+          <p className="mt-2 text-gray-600">
             Slots come directly from the venue's schedule, so you see actual availability — not
             "we'll call you back to confirm." Bookings are open 30 days ahead, confirmation comes
             via Telegram, and you can cancel up to 2 hours before the start.
           </p>
         </div>
-        <div className="border rounded-md overflow-hidden  mt-20">
-          <div className="flex items-center justify-between gpa-4 p-4 bg-muted flex-wrap">
+        <div className="mt-20 overflow-hidden rounded-md border">
+          <div className="gpa-4 flex flex-wrap items-center justify-between bg-muted p-4">
             <div>
               <p className="m-0 text-xl font-semibold">Have your own venue?</p>
-              <p className="mt-2  text-gray-600">
+              <p className="mt-2 text-gray-600">
                 Set up your services, staff, and working hours — the schedule builds itself.
               </p>
             </div>

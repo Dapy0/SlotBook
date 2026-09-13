@@ -46,7 +46,7 @@ export default function ServicesList({
       {filteredGroups.map((group, i) => {
         return (
           <div key={group.section} className={i > 0 ? "border-t border-gray-200" : ""}>
-            <p className="px-6 pt-4 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <p className="px-6 pt-4 pb-1 text-xs font-semibold tracking-wide text-gray-400 uppercase">
               {group.section}
             </p>
             <div className="divide-y divide-gray-100">

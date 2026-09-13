@@ -27,7 +27,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               <circle cx="12" cy="8" r="4" strokeWidth={1.5} />
               <path d="M4 20c0-4 4-6 8-6s8 2 8 6" strokeWidth={1.5} />
             </svg>
-            <span className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full bg-white text-gray-500 shadow ring-1 ring-gray-200">
+            <span className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-white text-gray-500 shadow ring-1 ring-gray-200">
               <CameraIcon size={12} />
             </span>
           </div>
@@ -37,7 +37,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <nav className="flex flex-col mb-8">
+        <nav className="mb-8 flex flex-col">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (

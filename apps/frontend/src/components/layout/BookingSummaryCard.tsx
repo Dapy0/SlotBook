@@ -29,11 +29,11 @@ export default function BookingSummaryCard({
   onConfirm,
 }: BookingSummaryProps) {
   return (
-    <div className="w-full max-w-xs ">
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="w-full max-w-xs">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         {/* Business */}
         <div className="px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Business</p>
+          <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Business</p>
           <p className="mt-1 text-base font-semibold text-gray-900">{businessName}</p>
           <p className="text-sm text-gray-500">
             {city} · {address}
@@ -48,7 +48,7 @@ export default function BookingSummaryCard({
 
         {/* Booking details */}
         <div className="px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
             Booking details
           </p>
           <div className="mt-2 divide-y divide-gray-100">

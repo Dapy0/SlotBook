@@ -12,7 +12,7 @@ export default async function FacilitiesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-14">
-      <p className="font-(family-name:--font-geist-mono) text-xs uppercase tracking-[0.2em] text-muted-foreground">
+      <p className="font-(family-name:--font-geist-mono) text-xs tracking-[0.2em] text-muted-foreground uppercase">
         Каталог
       </p>
       <h1 className="mt-3 font-heading text-4xl font-medium text-foreground">Заведения</h1>
@@ -28,7 +28,7 @@ export default async function FacilitiesPage() {
             href={`/facilities/${facility.id}`}
             className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/40"
           >
-            <span className="font-(family-name:--font-geist-mono) text-[11px] uppercase tracking-wider text-muted-foreground">
+            <span className="font-(family-name:--font-geist-mono) text-[11px] tracking-wider text-muted-foreground uppercase">
               {facility.category}
             </span>
             <h2 className="mt-2 font-heading text-xl font-medium text-card-foreground group-hover:text-primary">

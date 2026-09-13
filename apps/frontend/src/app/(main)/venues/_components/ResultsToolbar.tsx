@@ -26,7 +26,7 @@ function ResultsToolbar() {
           router.replace(buildHref({ q: value || null }));
         }}
       >
-        <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+        <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
         <Input
           name="q"
           defaultValue={searchParams.get("q") ?? ""}

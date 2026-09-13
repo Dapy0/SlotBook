@@ -15,7 +15,7 @@ async function CategoriesPage() {
   return (
     <div>
       <BreadCrumbs crumbsList={["categories"]} />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-5">
+      <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         <Link
           key={"All"}
           href={`/venues`}
@@ -28,7 +28,7 @@ async function CategoriesPage() {
             </span>
             <Badge
               variant="default"
-              className="rounded-md bg-gray-200 text-gray-500 shadow-s transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
+              className="shadow-s rounded-md bg-gray-200 text-gray-500 transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
             >
               {categories.reduce((prev, next) => {
                 return prev + next.count;
@@ -56,7 +56,7 @@ async function CategoriesPage() {
                 </span>
                 <Badge
                   variant="default"
-                  className="rounded-md bg-gray-200 text-gray-500 shadow-s transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
+                  className="shadow-s rounded-md bg-gray-200 text-gray-500 transition-colors group-hover:bg-[color-mix(in_oklch,var(--category-color)_15%,white)] group-hover:text-(--category-color)"
                 >
                   {count}
                 </Badge>

@@ -136,10 +136,10 @@ function BookForm({
 
           {/* Date picker */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
               Date · Booking open for the next 30 days
             </p>
-            <div className="flex gap-2 overflow-x-scroll max-w-2xl pb-1">
+            <div className="flex max-w-2xl gap-2 overflow-x-scroll pb-1">
               {days.map((d) => {
                 const isSelected = d.key === selectedDay;
                 return (
@@ -172,7 +172,7 @@ function BookForm({
           ) : slots.length > 0 ? (
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
                   Available time
                 </p>
                 <p className="text-xs text-gray-400">

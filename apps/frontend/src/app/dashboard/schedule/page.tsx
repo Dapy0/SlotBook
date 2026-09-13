@@ -40,7 +40,7 @@ export default function SchedulePage() {
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Schedule</p>
+      <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">Schedule</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">Working Hours</h1>
 
       {/* Entity switcher */}
@@ -92,7 +92,7 @@ export default function SchedulePage() {
                     value={d.from}
                     disabled={!d.enabled}
                     onChange={(e) => updateTime(d.day, "from", e.target.value)}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 focus:border-primary focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export default function SchedulePage() {
                     value={d.to}
                     disabled={!d.enabled}
                     onChange={(e) => updateTime(d.day, "to", e.target.value)}
-                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 disabled:bg-gray-100 disabled:text-gray-400 focus:border-primary focus:outline-none"
+                    className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-900 focus:border-primary focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
                   />
                 </div>
               </div>

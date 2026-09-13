@@ -58,20 +58,20 @@ async function Page({
           ...(categoryName ? [CATEGORY_METADATA[categoryName].label] : []),
         ]}
       />
-      <div className="flex items-baseline gap-2 mb-6">
+      <div className="mb-6 flex items-baseline gap-2">
         <h1 className="text-3xl font-bold">{title} Venues</h1>
-        <span className="text-gray-400 text-lg">
+        <span className="text-lg text-gray-400">
           {shown} of {countAll}
         </span>
       </div>
 
-      <div className="flex gap-8 items-start">
-        <Suspense fallback={<Skeleton className="w-65 h-160" />}>
+      <div className="flex items-start gap-8">
+        <Suspense fallback={<Skeleton className="h-160 w-65" />}>
           <FiltersSidebar counts={categories} />
         </Suspense>
 
-        <div className="flex-1 flex flex-col gap-4">
-          <Suspense fallback={<Skeleton className="w-full h-10" />}>
+        <div className="flex flex-1 flex-col gap-4">
+          <Suspense fallback={<Skeleton className="h-10 w-full" />}>
             <ResultsToolbar />
           </Suspense>
 
@@ -82,7 +82,7 @@ async function Page({
                 <BigFacilityPreviewCard facility={facility} key={facility.id} />
               ))
             ) : (
-              <div className="flex items-center self-center text-3xl pt-10 text-gray-400">
+              <div className="flex items-center self-center pt-10 text-3xl text-gray-400">
                 No facilities in this category
               </div>
             )}
