@@ -17,7 +17,7 @@ export const bookings = pgTable(
   "bookings",
   {
     id: uuid().defaultRandom().primaryKey(),
-    clientId: uuid("user_id")
+    clientId: uuid("client_id")
       .notNull()
       .references(() => users.id),
     facilityId: uuid("facility_id")
@@ -33,7 +33,7 @@ export const bookings = pgTable(
     status: text("status", { enum: ["pending", "confirmed", "canceled"] })
       .notNull()
       .default("pending"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => [index("bookings_facilities_idx").on(table.facilityId)],
 );

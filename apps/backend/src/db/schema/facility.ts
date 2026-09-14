@@ -29,6 +29,7 @@ export const facilities = pgTable(
     category: facilityCategoryEnum("category").notNull(),
     city: varchar({ length: 120 }).notNull(),
     country: varchar({ length: 2 }).notNull(),
+    currency: varchar({ length: 3 }).notNull().default("EUR"),
     address: varchar({ length: 255 }).notNull(),
     latitude: numeric({ precision: 9, scale: 6, mode: "number" }).notNull(),
     longitude: numeric({ precision: 9, scale: 6, mode: "number" }).notNull(),
@@ -36,11 +37,11 @@ export const facilities = pgTable(
     email: varchar({ length: 255 }).notNull(),
     images: jsonb().$type<string[]>().notNull(),
     score: numeric({ precision: 3, scale: 1, mode: "number" }),
-    reviewsCount: integer().notNull().default(0),
+    reviewsCount: integer("reviews_count").notNull().default(0),
     isPublished: boolean("is_published").notNull().default(false),
     timezoneIANA: text("timezone_IANA").notNull().default("Europe/Warsaw"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     // telegram_chat_id
   },
   (table) => [

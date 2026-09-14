@@ -9,8 +9,6 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { facilities } from "./facility.ts";
-import { createInsertSchema, createSelectSchema } from "drizzle-orm/zod";
-import z from "zod";
 
 export const services = pgTable(
   "services",
@@ -25,12 +23,11 @@ export const services = pgTable(
 
     durationMinutes: integer("duration_minutes").notNull(),
     priceCents: integer("price_cents").notNull(),
-    currency: varchar({ length: 3 }).notNull().default("PLN"),
 
     isActive: boolean("is_active").notNull().default(true),
 
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => [index("services_facility_idx").on(table.facilityId)],
 );

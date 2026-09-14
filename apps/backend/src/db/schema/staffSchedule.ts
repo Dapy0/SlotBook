@@ -7,10 +7,10 @@ export const staffSchedules = pgTable("staff_schedule", {
   staffMemberId: uuid("staff_member_id")
     .notNull()
     .references(() => staffMembers.id, { onDelete: "cascade" }),
-  dayOfTheWeek: smallint().$type<DayOfTheWeek>().notNull(),
-  startTime: time({ precision: 0 }).notNull(),
-  endTime: time({ precision: 0 }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  dayOfTheWeek: smallint("day_of_the_week").$type<DayOfTheWeek>().notNull(),
+  startTime: time("start_time", { precision: 0 }).notNull(),
+  endTime: time("end_time", { precision: 0 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
 });
 export type StaffScheduleEntity = typeof staffSchedules.$inferSelect;
 export type NewStaffScheduleEntity = typeof staffSchedules.$inferInsert;

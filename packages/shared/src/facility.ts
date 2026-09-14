@@ -78,19 +78,31 @@ export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
 const supportedTimezones = Intl.supportedValuesOf("timeZone");
 
 export const timezoneSchema = z
-  .string().trim()
+  .string()
+  .trim()
   .refine((tz) => supportedTimezones.includes(tz), { error: "Incorrect IANA" });
 
 // Request DTOs
 export const facilityFieldsSchema = z.object({
   name: z.string().trim().min(2).max(255),
   slug: z
-    .string().trim()
+    .string()
+    .trim()
     .min(2)
     .max(255)
     .regex(/^[a-z0-9-]+$/),
   city: z.string().trim().min(1),
-  country: z.string().trim().min(1).max(2),
+  country: z
+    .string()
+    .trim()
+    .length(2)
+    .transform((val) => val.toUpperCase()),
+  currency: z
+    .string()
+    .trim()
+    .length(3)
+    .default("PLN")
+    .transform((val) => val.toUpperCase()),
   address: z.string().trim().min(1),
   phone: z.string().trim().min(5).max(32),
   email: z.email(),

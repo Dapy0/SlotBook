@@ -1,17 +1,18 @@
 import * as z from "zod";
 
 // Request DTOs
-export const createServiceSchema = z.object({
+export const serviceFieldsSchema = z.object({
   name: z.string().trim().min(2).max(255),
   description: z.string().trim(),
   category: z.string().trim(),
-  durationMinutes: z.int()
+  durationMinutes: z
+    .int()
     .positive()
     .max(24 * 60),
   priceCents: z.int().nonnegative(),
-  currency: z.string().trim().length(3).default("PLN"),
   isActive: z.boolean().default(false),
 });
+export const createServiceSchema = serviceFieldsSchema;
 export type CreateServiceRequest = z.infer<typeof createServiceSchema>;
 export const updateServiceSchema = createServiceSchema.partial();
 export type UpdateServiceRequest = z.infer<typeof updateServiceSchema>;

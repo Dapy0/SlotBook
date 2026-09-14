@@ -5,9 +5,9 @@ export const users = pgTable("users", {
   name: varchar({ length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
   // telegram_chat_id
 });
 export type SelectUserEntity = typeof users.$inferSelect;

@@ -1,4 +1,4 @@
-import { boolean, pgTable, timestamp, uuid, primaryKey, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, primaryKey, index } from "drizzle-orm/pg-core";
 import { staffMembers } from "./staffMember.ts";
 import { services } from "./service.ts";
 

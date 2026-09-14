@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createStaffServiceSchema } from "./staffServices";
+import { requestStaffServiceSchema } from "./staffServices";
 
 describe("StaffServiceResponse DTO", () => {
   test("accepts staff service", () => {
@@ -8,6 +8,6 @@ describe("StaffServiceResponse DTO", () => {
       serviceId: "cc752901-46a1-4727-b0d1-1952550ef1f1",
     };
 
-    expect(createStaffServiceSchema.safeParse(fixture).success).toBe(true);
+    expect(requestStaffServiceSchema.safeParse(fixture).success).toBe(true);
   });
 });

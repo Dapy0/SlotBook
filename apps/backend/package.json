@@ -12,7 +12,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:reset": "drizzle-kit drop && drizzle-kit migrate && npm run db:seed"
   },
   "dependencies": {
     "@fastify/caching": "^9.0.4",
