@@ -19,18 +19,22 @@ import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, use, useEffect, useState, useTransition } from "react";
-import { setCountry } from '@/app/actions/setCountry';
+import { setCountry } from "@/app/actions/setCountry";
+import type { Route } from "next";
 
-type NavButton = VariantProps<typeof buttonVariants> & { linkHref: string; value: string };
+type NavButton<M extends string> = VariantProps<typeof buttonVariants> & {
+  linkHref: Route<M> | URL;
+  value: string;
+};
 
-export function Header({
+export function Header<T extends string>({
   navBtns,
   rightBtns,
   countries,
   country,
 }: {
-  navBtns?: NavButton[];
-  rightBtns?: NavButton[];
+  navBtns?: NavButton<T>[];
+  rightBtns?: NavButton<T>[];
   countries: CountryOption[];
   country: string;
 }) {
@@ -52,9 +56,9 @@ export function Header({
         </button>
         <nav className="ml-auto flex gap-4">
           {navBtns?.map((btn) => (
-            <Button key={btn.linkHref} variant={btn.variant}>
+            <Button key={btn.linkHref as Route<T>} variant={btn.variant}>
               {" "}
-              <Link href={btn.linkHref}>{btn.value}</Link>
+              <Link href={btn.linkHref as Route<T>}>{btn.value}</Link>
             </Button>
           ))}
         </nav>
@@ -85,9 +89,9 @@ export function Header({
             <ProfileMenu user={user} profilePicture={""} onLogout={logout} />
           ) : (
             rightBtns?.map((btn) => (
-              <Button key={btn.linkHref} variant={btn.variant}>
+              <Button key={btn.linkHref as Route<T>} variant={btn.variant}>
                 {" "}
-                <Link href={btn.linkHref ?? ""}>{btn.value}</Link>
+                <Link href={btn.linkHref as Route<T>}>{btn.value}</Link>
               </Button>
             ))
           )}
