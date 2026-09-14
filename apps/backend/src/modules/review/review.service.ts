@@ -4,7 +4,7 @@ import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import { parseTsRangeLiteral } from "@slotbook/shared/bookings";
 import { findReviewsByFacilityId, insertReview } from "./review.repository.ts";
-import { recalculateFacilityScore } from "../facility/facility.repository.ts";
+import { updateFacilityScore } from "../facility/facility.repository.ts";
 
 export async function createReviewForBooking(
   db: DB,
@@ -26,18 +26,17 @@ export async function createReviewForBooking(
   if (booking.status !== "confirmed") {
     throw new ConflictError("Booking is not confirmed");
   }
-  if (parseTsRangeLiteral(booking.timeRange).end! > new Date()) {
+  if (new Date(parseTsRangeLiteral(booking.timeRange).end!) > new Date()) {
     throw new ConflictError("Service has not happened yet");
   }
   await insertReview(db, bookingId, reviewData).catch((e) => {
-    const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === "23505") {
+    if (e.code === "23505") {
       throw new ConflictError("You already reviewed this booking");
     }
 
     throw e;
   });
-  await recalculateFacilityScore(db, facilityId);
+  await updateFacilityScore(db, facilityId);
   return;
 }
 export async function getAllFacilityReviews(db: DB, facilityId: string) {
