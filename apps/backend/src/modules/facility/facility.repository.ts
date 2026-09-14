@@ -5,8 +5,7 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
-import type { UpdateFacilityRequest } from "@slotbook/shared/facility";
-import { FACILITY_CATEGORIES } from "@slotbook/shared/facility";
+import type { FacilityCategoryResponse, UpdateFacilityRequest } from "@slotbook/shared/facility";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
 import type { FacilityListQuery } from "./facility.schema.ts";
@@ -99,12 +98,7 @@ export async function getAllCategories(
   db: DB,
   country: string,
   limit?: number,
-): Promise<
-  Array<{
-    categoryName: (typeof FACILITY_CATEGORIES)[number];
-    count: number;
-  }>
-> {
+): Promise<FacilityCategoryResponse[]> {
   const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
 
   const query = db
@@ -148,5 +142,13 @@ export async function findCountriesWithFacilities(db: DB) {
     .from(facilities)
     .where(eq(facilities.isPublished, true))
     .groupBy(facilities.country)
+    .orderBy(desc(count()));
+}
+export async function findCitiesByCountry(db: DB, country: string) {
+  return db
+    .select({ city: facilities.city, facilitiesCount: count() })
+    .from(facilities)
+    .where(and(eq(facilities.isPublished, true), eq(facilities.country, country)))
+    .groupBy(facilities.city)
     .orderBy(desc(count()));
 }

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isoDateSchema } from './codecs';
+import { isoDateSchema } from "./codecs";
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -75,7 +75,16 @@ export const CATEGORY_BY_SLUG = Object.fromEntries(
 
 export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
+export const facilityCategoryResponseSchema = z.object({
+  categoryName: facilityCategorySchema,
+  count: z.number(),
+});
+export type FacilityCategoryResponse = z.infer<typeof facilityCategoryResponseSchema>;
 
+export const facilityCityResponseSchema = z.object({
+  city: z.string().trim(),
+});
+export type FacilityCityResponse = z.infer<typeof facilityCityResponseSchema>;
 
 function isValidTimeZone(timeZone: string): boolean {
   try {

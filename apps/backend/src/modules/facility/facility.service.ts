@@ -1,8 +1,4 @@
-import type {
-  CreateFacilityRequest,
-  FacilityCategory,
-  UpdateFacilityRequest,
-} from "@slotbook/shared/facility";
+import type { CreateFacilityRequest, UpdateFacilityRequest } from "@slotbook/shared/facility";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   findAllFacilitiesByParams,
@@ -16,13 +12,10 @@ import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.t
 import {
   deleteFacilityScheduleByFacilityId,
   findFacilitySchedule,
-  findFacilityScheduleByDay,
   insertFacilityScheduleByFacilityId,
 } from "./facilitySchedule.repository.ts";
-import type { CreateFacilitySchedule, DayOfTheWeek } from "@slotbook/shared/facilitySchedule";
-import { deleteScheduleByStaffId } from "../schedule/schedule.repository.ts";
+import type { CreateFacilitySchedule } from "@slotbook/shared/facilitySchedule";
 import { checkNoOverlapWithinSchedule } from "../../lib/scheduleHelpers.ts";
-import { string } from "zod";
 import type { FacilityListQuery } from "./facility.schema.ts";
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
@@ -57,8 +50,7 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
       ownerId: userId,
     });
   } catch (e) {
-    const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === "23505") {
+    if (e.code === "23505") {
       throw new ConflictError("Slug already exists");
     }
 

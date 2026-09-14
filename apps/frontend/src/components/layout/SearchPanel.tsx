@@ -14,15 +14,22 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
+import type { FacilityCityResponse } from "@slotbook/shared";
 
-const CITIES = [
-  { label: "All cities", value: "All cities" },
-  { label: "Chisinau", value: "Chisinau" },
-  { label: "Odessa", value: "Odessa" },
-];
-
-function SearchPanel() {
+function convertToSelectFormat(arrObj: FacilityCityResponse[]): Array<{
+  value: string;
+  label: string;
+}> {
+  const res = [];
+  for (const [name, val] of arrObj.entries()) {
+    console.log(name, val);
+    res.push({ value: val.city, label: val.city });
+  }
+  return res;
+}
+function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
   const [date, setDate] = useState<Date>();
+  const formattedCities = convertToSelectFormat(cities);
   return (
     <div className="flex flex-nowrap justify-center">
       <form
@@ -44,15 +51,15 @@ function SearchPanel() {
 
         <label className="flex flex-col justify-start gap-0.5">
           <span className="text-xs font-medium tracking-wide text-neutral-600 uppercase">City</span>
-          <Select items={CITIES} defaultValue={"All cities"}>
+          <Select items={formattedCities} defaultValue={"All cities"}>
             <SelectTrigger className="max-h-fit gap-1 self-center border-0 p-0 text-sm shadow-none focus-visible:ring-0 [&_svg]:text-neutral-400">
               <SelectValue placeholder="City" />
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
               <SelectGroup>
-                {CITIES.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
+                {formattedCities.map((city) => (
+                  <SelectItem key={city.value} value={city.value}>
+                    {city.label.toWellFormed()}
                   </SelectItem>
                 ))}
               </SelectGroup>

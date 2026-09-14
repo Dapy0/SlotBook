@@ -1,11 +1,11 @@
 import SearchPanel from "@/components/layout/SearchPanel";
 import { Button } from "@/components/ui/button";
 import { Circle, Dot } from "lucide-react";
-import s from "./main.module.css";
+import type { Route } from "next";
 import { RotatingCategory } from "@/components/layout/RotatingCategory";
 import SmallFacilityPreviewCard from "@/components/layout/SmallFacilityPreviewCard";
 import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
-import { getFacilities } from "@/services/facilities";
+import { getCitiesList, getFacilities } from "@/services/facilities";
 import { getCategories } from "@/services/categories";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +13,7 @@ import { getCookie } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { CATEGORY_METADATA } from "@slotbook/shared/facility";
 import Link from "next/link";
+import { createParams } from "@/lib/queryStrings";
 const CATEGORY_WORDS = [
   "manicure",
   "for a haircut",
@@ -25,10 +26,12 @@ const CATEGORY_WORDS = [
 async function Page() {
   const cookieStore = await cookies();
   const local = cookieStore.get("_sb_country")?.value || "PL";
-  const [facilities, categories] = await Promise.all([
+  const [facilities, categories, citiesList] = await Promise.all([
     getFacilities({ country: local, limit: 8 }),
     getCategories({ country: local, limit: 4 }),
+    getCitiesList({ country: local }),
   ]).catch();
+
   return (
     <div>
       <section className="flex flex-col justify-center gap-3 text-center">
@@ -38,7 +41,7 @@ async function Page() {
         </h1>
         <p className="text-l text-gray-400">Books without waiting and "I will recall u later".</p>
         <div className="mx-20 mt-10 mb-0">
-          <SearchPanel />
+          <SearchPanel cities={citiesList} />
         </div>
         <div className="mt-5">
           <div className="flex flex-wrap justify-center gap-2">
@@ -48,22 +51,26 @@ async function Page() {
               ))}
             >
               {categories.map((category) => (
-                <Button
-                  key={CATEGORY_METADATA[category.categoryName].label}
-                  variant={"outline"}
-                  style={
-                    {
-                      "--icon-color-temp": CATEGORY_METADATA[category.categoryName].color,
-                    } as React.CSSProperties
-                  }
-                  className={
-                    "text-medium text-center hover:border-(--icon-color-temp) hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)]"
-                  }
+                <Link
+                  href={`/venues?${createParams({ category: CATEGORY_METADATA[category.categoryName].slug })}`}
                 >
-                  <Dot className={`size-7 [&>circle]:text-(--icon-color-temp)`} />
-                  {CATEGORY_METADATA[category.categoryName].label}
-                  <span className="text-xs text-gray-400">{category.count}</span>
-                </Button>
+                  <Button
+                    key={CATEGORY_METADATA[category.categoryName].label}
+                    variant={"outline"}
+                    style={
+                      {
+                        "--icon-color-temp": CATEGORY_METADATA[category.categoryName].color,
+                      } as React.CSSProperties
+                    }
+                    className={
+                      "text-medium text-center hover:border-(--icon-color-temp) hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)]"
+                    }
+                  >
+                    <Dot className={`size-7 [&>circle]:text-(--icon-color-temp)`} />
+                    {CATEGORY_METADATA[category.categoryName].label}
+                    <span className="text-xs text-gray-400">{category.count}</span>
+                  </Button>
+                </Link>
               ))}
             </Suspense>
           </div>

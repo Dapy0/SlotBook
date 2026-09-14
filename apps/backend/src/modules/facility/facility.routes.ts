@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   createFacility,
   getAllFacilities,
@@ -22,6 +22,8 @@ import {
 import z from "zod";
 import {
   createFacilityRequestSchema,
+  facilityCategoryResponseSchema,
+  facilityCityResponseSchema,
   facilityResponseSchema,
   updateFacilityRequestSchema,
   type CreateFacilityRequest,
@@ -35,6 +37,7 @@ import {
   type CreateFacilitySchedule,
 } from "@slotbook/shared/facilitySchedule";
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
+import { findCitiesByCountry } from "./facility.repository.ts";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -169,9 +172,29 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     {
       schema: {
         querystring: facilityCategoryQuerystringSchema,
+        response: {
+          200: z.array(facilityCategoryResponseSchema),
+        },
       },
     },
     getAllFacilitiesCategory,
+  );
+  fastify.get<{ Querystring: FacilityCategoryQuerystring }>(
+    "/cities",
+    {
+      schema: {
+        querystring: facilityCategoryQuerystringSchema,
+        response: {
+          200: z.array(facilityCityResponseSchema),
+        },
+      },
+    },
+    async (
+      request: FastifyRequest<{ Querystring: FacilityCategoryQuerystring }>,
+      response: FastifyReply,
+    ) => {
+      response.send(await findCitiesByCountry(request.server.drizzle, request.query.country));
+    },
   );
   fastify.register(staffRoutes, { prefix: "/" });
   fastify.register(bookingRoutes, { prefix: "/" });
