@@ -2,14 +2,13 @@ import { startTestDatabase, stopTestDatabase } from "../../test/setup.ts";
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { createServer } from "../../app.ts";
-import { afterEach } from "node:test";
+import { afterEach } from "vitest";
 import { users } from "../../db/schema/user.ts";
 
 let app: FastifyInstance;
 
 beforeAll(async () => {
   await startTestDatabase();
-  console.log("TEST DB:", process.env.DATABASE_URL);
   app = await createServer();
 });
 afterEach(async () => {
@@ -21,10 +20,6 @@ afterAll(async () => {
   await stopTestDatabase();
 });
 
-function extractCookie(response: { headers: Record<string, unknown> }) {
-  const raw = response.headers["set-cookie"];
-  return Array.isArray(raw) ? raw.join("; ") : ((raw as string) ?? "");
-}
 
 describe("POST auth/register", () => {
   test("create users and returns status code 201 and set httOnly cookie with token", async () => {

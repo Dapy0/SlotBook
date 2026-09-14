@@ -1,4 +1,4 @@
-import { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
+import { type FastifyInstance } from "fastify";
 import {
   getAuthMe,
   postAuthLogout,

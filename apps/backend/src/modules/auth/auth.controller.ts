@@ -1,6 +1,6 @@
 import { type FastifyReply, type FastifyRequest } from "fastify";
 import { type LoginRequest, type RegisterRequest } from "@slotbook/shared/auth";
-import { authorizeUser, deleteUserById, signInUser, signUpUser } from "./auth.service.ts";
+import { authorizeUser, deleteUser, signInUser, signUpUser } from "./auth.service.ts";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -50,6 +50,6 @@ export const postAuthLogout = async (request: FastifyRequest, response: FastifyR
 };
 
 export async function deleteUserAccount(request: FastifyRequest, response: FastifyReply) {
-  await deleteUserById(request.server.drizzle, request.user.id);
+  await deleteUser(request.server.drizzle, request.user.id);
   return response.send(204);
 }

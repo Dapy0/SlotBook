@@ -1,27 +1,25 @@
-import type { AuthResponseDTO, LoginRequest, RegisterRequest } from "@slotbook/shared/auth";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { LoginRequest, RegisterRequest } from "@slotbook/shared/auth";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import bcrypt from "bcrypt";
-import { deleteUserDate, findUserByEmail, findUserById, registerUser } from "./auth.repository.ts";
 import {
-  BadRequestError,
-  ConflictError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../../lib/errors.ts";
-import type { FastifyInstance, FastifyReply } from "fastify";
-import { DrizzleQueryError } from "drizzle-orm";
-import { DatabaseError } from "pg";
+  deleteUserById,
+  findUserByEmail,
+  findUserById,
+  insertUserByUserData,
+} from "./auth.repository.ts";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../lib/errors.ts";
+import type { FastifyInstance } from "fastify";
 
 type JWT = FastifyInstance["jwt"];
 export async function signUpUser(db: DB, jwt: JWT, data: RegisterRequest) {
   const passwordHash = await bcrypt.hash(data.password, 10);
 
-  const user = await registerUser(db, {
+  const user = await insertUserByUserData(db, {
     ...data,
     passwordHash,
   }).catch((e) => {
-    const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === "23505") {
+    if (e.code === "23505") {
       throw new ConflictError("Email already exists");
     }
 
@@ -68,6 +66,6 @@ export async function authorizeUser(db: DB, userId: string) {
     user: newUser,
   };
 }
-export async function deleteUserById(db: DB, userId: string) {
-  await deleteUserDate(db, userId);
+export async function deleteUser(db: DB, userId: string) {
+  await deleteUserById(db, userId);
 }

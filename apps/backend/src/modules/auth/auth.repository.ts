@@ -1,13 +1,16 @@
 import { eq, and, isNull } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { users, type UserEntity } from "../../db/schema/index.ts";
+import { users, type SelectUserEntity } from "../../db/schema/index.ts";
 
 type RegisterDbParams = {
   name: string;
   email: string;
   passwordHash: string;
 };
-export const registerUser = async (db: DB, userData: RegisterDbParams): Promise<UserEntity> => {
+export const insertUserByUserData = async (
+  db: DB,
+  userData: RegisterDbParams,
+): Promise<SelectUserEntity> => {
   const { email, name, passwordHash } = userData;
   const [newUser] = await db
     .insert(users)
@@ -23,19 +26,19 @@ export const registerUser = async (db: DB, userData: RegisterDbParams): Promise<
   return newUser;
 };
 
-export const findUserByEmail = async (db: DB, email: string): Promise<UserEntity | null> => {
+export const findUserByEmail = async (db: DB, email: string): Promise<SelectUserEntity | null> => {
   const [newUser] = await db
     .select()
     .from(users)
     .where(and(eq(users.email, email), isNull(users.deletedAt)));
   return newUser ?? null;
 };
-export const findUserById = async (db: DB, id: string): Promise<UserEntity | null> => {
-  const [newUser] = await db.select().from(users).where(eq(users.id, id));
+export const findUserById = async (db: DB, userId: string): Promise<SelectUserEntity | null> => {
+  const [newUser] = await db.select().from(users).where(eq(users.id, userId));
   return newUser ?? null;
 };
 
-export async function deleteUserDate(db: DB, userId: string) {
+export async function deleteUserById(db: DB, userId: string) {
   const [deletedUser] = await db
     .update(users)
     .set({
@@ -44,6 +47,7 @@ export async function deleteUserDate(db: DB, userId: string) {
       deletedAt: new Date(),
       updatedAt: new Date(),
     })
+    .where(eq(users.id, userId))
     .returning();
   if (!deletedUser) {
     throw new Error("Failed to delete user");

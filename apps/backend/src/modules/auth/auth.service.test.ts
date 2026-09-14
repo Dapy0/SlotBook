@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { findUserByEmail, registerUser } from "./auth.repository.ts";
+import { findUserByEmail, insertUserByUserData } from "./auth.repository.ts";
 import bcrypt from "bcrypt";
 import { signInUser, signUpUser } from "./auth.service.ts";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../lib/errors.ts";
@@ -14,10 +14,10 @@ beforeEach(() => {
 });
 
 describe("signUpUser Tests", async () => {
-  test("create user and returns when data is valid ", async () => {
+  test("create user and returns when data is valid", async () => {
     const now = new Date();
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
-    vi.mocked(registerUser).mockResolvedValue({
+    vi.mocked(insertUserByUserData).mockResolvedValue({
       id: "test-id",
       name: "test",
       email: "test@test.com",
@@ -41,9 +41,9 @@ describe("signUpUser Tests", async () => {
 
     expect(token).toBe("fake-jwt-token");
   });
-  test("passes hashed password not raw password ", async () => {
+  test("passes hashed password not raw password", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
-    vi.mocked(registerUser).mockResolvedValue({
+    vi.mocked(insertUserByUserData).mockResolvedValue({
       id: "test-id",
       name: "test",
       email: "test@test.com",
@@ -57,7 +57,7 @@ describe("signUpUser Tests", async () => {
       password: "test",
     });
     expect(bcrypt.hash).toHaveBeenCalledWith("test", 10);
-    expect(registerUser).toHaveBeenCalledWith(
+    expect(insertUserByUserData).toHaveBeenCalledWith(
       fakeDb,
       expect.objectContaining({
         passwordHash: "hashedPassword",
@@ -67,7 +67,7 @@ describe("signUpUser Tests", async () => {
 
   test("does not include passwordHash in returned user object", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
-    vi.mocked(registerUser).mockResolvedValue({
+    vi.mocked(insertUserByUserData).mockResolvedValue({
       id: "test-id",
       name: "test",
       email: "test@test.com",
@@ -85,7 +85,7 @@ describe("signUpUser Tests", async () => {
   });
   test("throws ConflictError when email already exists", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
-    vi.mocked(registerUser).mockRejectedValue({ cause: { code: "23505" } });
+    vi.mocked(insertUserByUserData).mockRejectedValue({ cause: { code: "23505" } });
     await expect(
       signUpUser(fakeDb, fakeJwt as any, {
         name: "test",
@@ -97,7 +97,7 @@ describe("signUpUser Tests", async () => {
   test("rethrows original error when database fails for unknown reason", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
     const newError = new Error("Failed to insert user");
-    vi.mocked(registerUser).mockRejectedValue(newError);
+    vi.mocked(insertUserByUserData).mockRejectedValue(newError);
     await expect(
       signUpUser(fakeDb, fakeJwt as any, {
         name: "test",
@@ -109,7 +109,7 @@ describe("signUpUser Tests", async () => {
   test("signs token with the newly created user id", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
 
-    vi.mocked(registerUser).mockResolvedValue({
+    vi.mocked(insertUserByUserData).mockResolvedValue({
       id: "test-id",
       name: "test",
       email: "test@test.com",

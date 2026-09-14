@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid().defaultRandom().primaryKey(),
@@ -10,4 +10,5 @@ export const users = pgTable("users", {
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   // telegram_chat_id
 });
-export type UserEntity = typeof users.$inferSelect;
+export type SelectUserEntity = typeof users.$inferSelect;
+export type InsertUserEntity = typeof users.$inferInsert;
