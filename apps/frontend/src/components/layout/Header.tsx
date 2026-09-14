@@ -14,37 +14,33 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/authContext";
-import { getCookie, getLocation } from "@/lib/utils";
+import { countryFlag, countryName, type CountryOption } from "@slotbook/shared";
 import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useEffect, useState } from "react";
+import { Suspense, use, useEffect, useState, useTransition } from "react";
+import { setCountry } from '@/app/actions/setCountry';
 
-const supportedCounties = [
-  { label: "🌍", value: null },
-  { label: "Poland", value: "PL" },
-  { label: "Germany", value: "DE" },
-  { label: "Moldova", value: "MD" },
-  { label: "Romania", value: "RO" },
-];
+type NavButton = VariantProps<typeof buttonVariants> & { linkHref: string; value: string };
 
 export function Header({
   navBtns,
   rightBtns,
+  countries,
+  country,
 }: {
-  navBtns?: (VariantProps<typeof buttonVariants> & { linkHref: string | null; value: string })[];
-  rightBtns?: (VariantProps<typeof buttonVariants> & { linkHref: string | null; value: string })[];
+  navBtns?: NavButton[];
+  rightBtns?: NavButton[];
+  countries: CountryOption[];
+  country: string;
 }) {
   const { user, isLoading, logout } = useAuth();
-  const [location, setLocation] = useState<string | null>(null);
-  const router = useRouter();
-  useEffect(() => {
-    getLocation().then((vale) => {
-      setLocation(vale.country);
-      router.refresh();
-    });
-  }, [location]);
+  const [isPending, startTransition] = useTransition();
 
+  const items = countries.map((option) => ({
+    value: option.country,
+    label: `${countryFlag(option.country)} ${countryName(option.country)}`,
+  }));
   return (
     <header className="shrink-0 border-b border-border bg-background">
       <div className="align-center mx-auto my-0 flex max-w-7xl justify-between gap-4 p-4">
@@ -58,35 +54,33 @@ export function Header({
           {navBtns?.map((btn) => (
             <Button key={btn.linkHref} variant={btn.variant}>
               {" "}
-              <Link href={btn.linkHref ?? ""}>{btn.value}</Link>
+              <Link href={btn.linkHref}>{btn.value}</Link>
             </Button>
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Suspense fallback={<Spinner />}>
-            <Select
-              items={supportedCounties}
-              onValueChange={(val) => {
-                if (!val) return;
-                document.cookie = `_sb_country=${val}`;
-                setLocation(val);
-              }}
-              value={location ?? null}
-            >
-              <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent alignItemWithTrigger={false}>
-                <SelectGroup>
-                  {supportedCounties.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </Suspense>
+          <Select
+            items={items}
+            value={country}
+            disabled={isPending}
+            onValueChange={(value) => {
+              if (!value || value === country) return;
+              startTransition(() => setCountry(value));
+            }}
+          >
+            <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent alignItemWithTrigger={false}>
+              <SelectGroup>
+                {items.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           {!isLoading && user ? (
             <ProfileMenu user={user} profilePicture={""} onLogout={logout} />
           ) : (

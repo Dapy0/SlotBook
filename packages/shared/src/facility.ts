@@ -76,12 +76,19 @@ export const CATEGORY_BY_SLUG = Object.fromEntries(
 export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
 
-const supportedTimezones = Intl.supportedValuesOf("timeZone");
 
+function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
 export const timezoneSchema = z
   .string()
   .trim()
-  .refine((tz) => supportedTimezones.includes(tz), { error: "Incorrect IANA" });
+  .refine(isValidTimeZone, { error: "Incorrect IANA" });
 
 // Request DTOs
 export const facilityFieldsSchema = z.object({

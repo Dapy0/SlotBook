@@ -1,26 +1,18 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import geoip from "geoip-lite";
+import { findCountriesWithFacilities } from "./facility/facility.repository.ts";
+import type { FastifyInstance } from "fastify";
+import { geoResponseSchema, countriesResponseSchema } from "@slotbook/shared/geo";
 
-const COOKIE_NAME = "_sb_country";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
-
-export async function detectCountry(request: FastifyRequest, response: FastifyReply) {
-  if (request.cookies[COOKIE_NAME]) {
-    return response.code(200).send({ country: request.cookies[COOKIE_NAME] });
-  }
-
-  const ip = request.ip.replace("::ffff:", "");
-  const geo = geoip.lookup(ip);
-  const country = geo?.country ?? "PL";
-
-  response.setCookie(COOKIE_NAME, country, {
-    httpOnly: false,
-    secure: false,
-    sameSite: "lax",
-    path: "/",
-    maxAge: COOKIE_MAX_AGE,
-    signed: false,
+export async function geoRoutes(fastify: FastifyInstance) {
+  fastify.get("/geo", { schema: { response: { 200: geoResponseSchema } } }, async (request) => {
+    const forwarded = request.headers["x-forwarded-for"]?.toString().split(",")[0];
+    const ip = (forwarded ?? request.ip).trim().replace("::ffff:", "");
+    return { country: geoip.lookup(ip)?.country ?? null };
   });
 
-  return response.code(200).send({ country: country });
+  fastify.get(
+    "/geo/countries",
+    { schema: { response: { 200: countriesResponseSchema } } },
+    async () => findCountriesWithFacilities(fastify.drizzle),
+  );
 }

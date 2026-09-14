@@ -37,7 +37,8 @@
     "./bookings": "./src/bookings.ts",
     "./availability": "./src/availability.ts",
     "./reviews": "./src/reviews.ts",
-    "./errors": "./src/errors.ts"
+    "./errors": "./src/errors.ts",
+    "./geo": "./src/geo.ts"
   },
   "devDependencies": {
     "zod": "^4.4.3",

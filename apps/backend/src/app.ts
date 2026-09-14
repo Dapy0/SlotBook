@@ -24,7 +24,7 @@ import fastifyEtag from "@fastify/etag";
 import fastifyCaching from "@fastify/caching";
 import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
-import { detectCountry } from "./modules/geoLocation.ts";
+import { geoRoutes } from "./modules/geoLocation.ts";
 import { ZodError } from "zod";
 
 export async function createServer() {
@@ -69,10 +69,7 @@ export async function createServer() {
   await app.register(facilityRoutes, { prefix: "/facilities" });
   await app.register(serviceRoutes, { prefix: "/facilities" });
   await app.register(mineBookingsRoutes, { prefix: "/bookings" });
-
-  app.get("/geo", async (req, res) => {
-    return detectCountry(req, res);
-  });
+  await app.register(geoRoutes);
 
   return app;
 }

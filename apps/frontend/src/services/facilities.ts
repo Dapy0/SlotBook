@@ -20,8 +20,8 @@ export async function getFacilities(getParams: {
   const query = params.toString();
   const endpoint = query ? `/facilities/?${query}` : "/facilities/";
 
-  const result = facilityResponseSchema.parse(
-    await api<FacilityResponse[]>(endpoint, {
+  const result = facilityResponseSchema.array().parse(
+    await api(endpoint, {
       method: "GET",
     }),
   );

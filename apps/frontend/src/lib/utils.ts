@@ -16,11 +16,7 @@ export function getCookie(name: string) {
   if (parts.length === 2) return parts.pop()!.split(";").shift() || undefined;
 }
 
-export async function getLocation(): Promise<{ country: string }> {
-  return await api(`/geo`, {
-    method: "GET",
-  });
-}
+
 
 export function getMapLink(address: string, lat: number, lng: number) {
   if (lat && lng) {

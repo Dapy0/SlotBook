@@ -142,3 +142,11 @@ export async function updateFacilityScore(db: DB, facilityId: string) {
     .returning();
   return updatedFacility;
 }
+export async function findCountriesWithFacilities(db: DB) {
+  return db
+    .select({ country: facilities.country, facilitiesCount: count() })
+    .from(facilities)
+    .where(eq(facilities.isPublished, true))
+    .groupBy(facilities.country)
+    .orderBy(desc(count()));
+}

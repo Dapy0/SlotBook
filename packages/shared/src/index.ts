@@ -12,3 +12,4 @@ export * from "./bookings";
 export * from "./availability";
 export * from "./reviews";
 export * from "./errors";
+export * from "./geo";
