@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { isoDateSchema } from './codecs';
 
 // Request DTOs
 
@@ -19,7 +20,7 @@ export const staffMemberResponseSchema = createStaffMemberSchema.extend({
   score: z.string().trim().nullable(),
   reviewsCount: z.number(),
   name: z.string().trim(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: isoDateSchema,
+  updatedAt: isoDateSchema,
 });
 export type StaffMemberResponseDTO = z.infer<typeof staffMemberResponseSchema>;

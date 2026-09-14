@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { isoDateSchema } from './codecs';
 export const createReviewRequestSchema = z.object({
   rating: z.int().min(1).max(5),
   comment: z.string().trim().optional(),
@@ -14,6 +15,6 @@ export const reviewResponseSchema = z.object({
   serviceName: z.string().trim(),
   rating: z.int().min(1).max(5),
   comment: z.string().trim().nullable(),
-  createdAt: z.coerce.date(),
+  createdAt: isoDateSchema,
 });
 export type ReviewResponse = z.infer<typeof reviewResponseSchema>;

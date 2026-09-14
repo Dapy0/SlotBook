@@ -13,6 +13,23 @@ const eslintConfig = defineConfig([
     rules: {
       ...next.configs.recommended.rules,
       ...next.configs["core-web-vitals"].rules,
+      "no-restricted-properties": [
+        "error",
+        ...[
+          "getHours",
+          "getMinutes",
+          "getDate",
+          "getDay",
+          "getMonth",
+          "getFullYear",
+          "toLocaleString",
+          "toLocaleDateString",
+          "toLocaleTimeString",
+        ].map((property) => ({
+          property,
+          message: "Works in pc timeZone. Use Intl.DateTimeFormat with timeZone.",
+        })),
+      ],
     },
   },
 

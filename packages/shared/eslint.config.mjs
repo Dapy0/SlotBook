@@ -8,6 +8,7 @@ const eslintConfig = defineConfig(
   tseslint.configs.stylisticTypeChecked,
   eslintPluginZod.configs.recommended,
   baseConfig,
+  globalIgnores(["src/codecs.ts"]),
   {
     ignores: ["node_modules"],
     languageOptions: {
@@ -16,10 +17,11 @@ const eslintConfig = defineConfig(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    
+
     rules: {
       "@typescript-eslint/naming-convention": [
         "error",
+
         { selector: "variable", filter: { regex: "Schema$", match: true }, format: ["camelCase"] },
         { selector: "typeAlias", format: ["PascalCase"] },
       ],

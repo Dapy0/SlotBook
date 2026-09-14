@@ -3,6 +3,19 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "noEmit": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -11,6 +24,8 @@
     "lint:fix": "eslint . --fix"
   },
   "exports": {
+    ".": "./src/index.ts",
+    "./codecs": "./src/codecs.ts",
     "./auth": "./src/auth.ts",
     "./user": "./src/user.ts",
     "./facility": "./src/facility.ts",
@@ -25,6 +40,7 @@
     "./errors": "./src/errors.ts"
   },
   "devDependencies": {
+    "zod": "^4.4.3",
     "eslint": "^9.39.5",
     "eslint-plugin-zod": "^4.12.1",
     "typescript-eslint": "^8.70.0",

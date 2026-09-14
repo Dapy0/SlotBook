@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { isoDateSchema } from './codecs';
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -92,17 +93,8 @@ export const facilityFieldsSchema = z.object({
     .max(255)
     .regex(/^[a-z0-9-]+$/),
   city: z.string().trim().min(1),
-  country: z
-    .string()
-    .trim()
-    .length(2)
-    .transform((val) => val.toUpperCase()),
-  currency: z
-    .string()
-    .trim()
-    .length(3)
-    .default("PLN")
-    .transform((val) => val.toUpperCase()),
+  country: z.string().trim().length(2),
+  currency: z.string().trim().length(3).default("EUR"),
   address: z.string().trim().min(1),
   phone: z.string().trim().min(5).max(32),
   email: z.email(),
@@ -114,7 +106,11 @@ export const facilityFieldsSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
 });
-export const createFacilityRequestSchema = facilityFieldsSchema;
+
+export const createFacilityRequestSchema = facilityFieldsSchema.extend({
+  country: z.string().trim().toUpperCase().pipe(z.string().trim().length(2)),
+  currency: z.string().trim().toUpperCase().pipe(z.string().trim().length(3)).default("PLN"),
+});
 export type CreateFacilityRequest = z.infer<typeof createFacilityRequestSchema>;
 // update
 export const updateFacilityRequestSchema = facilityFieldsSchema.partial();
@@ -126,7 +122,7 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   ownerId: z.uuid(),
   score: z.number().min(0).max(5).nullable(),
   reviewsCount: z.int().nonnegative(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: isoDateSchema,
+  updatedAt: isoDateSchema,
 });
 export type FacilityResponse = z.infer<typeof facilityResponseSchema>;

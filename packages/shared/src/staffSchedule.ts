@@ -1,12 +1,13 @@
 import * as z from "zod";
+import { isoDateSchema, wallTimeSchema } from './codecs';
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
 export const staffScheduleSchema = z.object({
   staffMemberId: z.uuid(),
   dayOfTheWeek: dayOfTheWeekSchema,
-  startTime: z.iso.time({ precision: 0 }),
-  endTime: z.iso.time({ precision: 0 }),
+  startTime: wallTimeSchema,
+  endTime: wallTimeSchema,
 });
 export const staffScheduleSchemaWithoutStaffId = staffScheduleSchema.omit({
   staffMemberId: true,
@@ -41,7 +42,7 @@ export type UpdateStaffSchedule = z.infer<typeof updateStaffSchedule>;
 
 export const responseStaffScheduleSchema = createStaffScheduleSchema.extend({
   id: z.uuid(),
-  createdAt: z.coerce.date(),
+  createdAt: isoDateSchema,
 });
 
 export type ResponseStaffScheduleSchema = z.infer<typeof responseStaffScheduleSchema>;

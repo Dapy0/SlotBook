@@ -1,6 +1,7 @@
 import * as z from "zod";
+import { wallTimeSchema } from './codecs';
 export const availabilitySlotSchema = z.object({
-  start: z.iso.datetime(),
-  end: z.iso.datetime(),
+  start: wallTimeSchema,
+  end: wallTimeSchema,
 });
 export type AvailabilitySlot = z.infer<typeof availabilitySlotSchema>;
