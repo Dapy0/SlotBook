@@ -1,15 +1,14 @@
-import type {
-  CreateFacilitySchedule,
-  DayOfTheWeek,
-  ResponseFacilityScheduleSchema,
-} from "@slotbook/shared/facilitySchedule";
+import type { CreateFacilitySchedule, DayOfTheWeek } from "@slotbook/shared/facilitySchedule";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { facilitySchedules } from "../../db/schema/facilitySchedule.ts";
+import {
+  facilitySchedules,
+  type FacilityScheduleEntity,
+} from "../../db/schema/facilitySchedule.ts";
 import { and, eq } from "drizzle-orm";
 export async function findFacilitySchedule(
   db: DB,
   facilityId: string,
-): Promise<ResponseFacilityScheduleSchema[]> {
+): Promise<FacilityScheduleEntity[] | null> {
   const schedule = await db
     .select()
     .from(facilitySchedules)
@@ -17,7 +16,11 @@ export async function findFacilitySchedule(
   return schedule ?? null;
 }
 
-export async function findFacilityScheduleByDay(db: DB, facilityId: string, day: DayOfTheWeek) {
+export async function findFacilityScheduleByDay(
+  db: DB,
+  facilityId: string,
+  day: DayOfTheWeek,
+): Promise<FacilityScheduleEntity[] | null> {
   const schedule = await db
     .select()
     .from(facilitySchedules)
@@ -31,8 +34,8 @@ export async function insertFacilityScheduleByFacilityId(
   db: DB,
   facilityId: string,
   newFacilitySchedule: CreateFacilitySchedule[],
-) {
-  const insertedValues = db
+): Promise<FacilityScheduleEntity[] | null> {
+  const insertedValues = await db
     .insert(facilitySchedules)
     .values(
       newFacilitySchedule.map((val) => ({

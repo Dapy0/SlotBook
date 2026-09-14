@@ -5,7 +5,7 @@ import type {
 } from "@slotbook/shared/facility";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
-  findAllFacilities,
+  findAllFacilitiesByParams,
   findFacilitiesByOwnerId,
   findFacilityById,
   insertFacility,
@@ -38,7 +38,7 @@ export async function checkFacilityOwnership(db: DB, facilityId: string, userId:
   return facility;
 }
 export async function getAllPublicFacilities(db: DB, query: FacilityListQuery) {
-  return findAllFacilities(db, query);
+  return findAllFacilitiesByParams(db, query);
 }
 export async function getFacilityDetails(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);

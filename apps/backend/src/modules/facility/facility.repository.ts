@@ -5,14 +5,14 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
-import type { FacilityCategory, UpdateFacilityRequest } from "@slotbook/shared/facility";
+import type { UpdateFacilityRequest } from "@slotbook/shared/facility";
 import { FACILITY_CATEGORIES } from "@slotbook/shared/facility";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
 import type { FacilityListQuery } from "./facility.schema.ts";
 import { services } from "../../db/schema/service.ts";
 
-export async function findAllFacilities(
+export async function findAllFacilitiesByParams(
   db: DB,
   params: FacilityListQuery,
 ): Promise<Array<FacilityEntity>> {
@@ -122,7 +122,7 @@ export async function getAllCategories(
   return await query;
 }
 
-export async function recalculateFacilityScore(db: DB, facilityId: string) {
+export async function updateFacilityScore(db: DB, facilityId: string) {
   const [result] = await db
     .select({
       avgRating: avg(reviews.rating),
@@ -138,6 +138,7 @@ export async function recalculateFacilityScore(db: DB, facilityId: string) {
       reviewsCount: result?.count ?? 0,
       score: result?.avgRating ? Number(result.avgRating) : null,
     })
+    .where(eq(facilities.id, facilityId))
     .returning();
   return updatedFacility;
 }
