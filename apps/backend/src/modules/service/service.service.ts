@@ -1,6 +1,6 @@
 import type { CreateServiceRequest } from "@slotbook/shared/service";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { NotFoundError } from "../../lib/errors.ts";
 import { findFacilityById } from "../facility/facility.repository.ts";
 import { checkFacilityOwnership } from "../facility/facility.service.ts";
 import {
@@ -8,6 +8,7 @@ import {
   getServicesByFacilityId,
   insertService,
 } from "./service.repository.ts";
+import type { ServiceEntity } from "../../db/schema/service.ts";
 
 async function checkIfFacilityWithIdExists(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);

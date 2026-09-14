@@ -1,5 +1,4 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { getServicesByFacilityId, insertService } from "./service.repository.ts";
 import { findFacilityById } from "../facility/facility.repository.ts";
 import type { ServiceParams } from "./service.schema.ts";
 import type { CreateServiceRequest } from "@slotbook/shared/service";

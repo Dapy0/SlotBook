@@ -11,7 +11,6 @@ import {
   serviceResponseSchema,
   type ServiceResponseDTO,
 } from "@slotbook/shared/service";
-import { getFacilityServiceById } from "./service.service.ts";
 
 export async function serviceRoutes(fastify: FastifyInstance) {
   fastify.get(
