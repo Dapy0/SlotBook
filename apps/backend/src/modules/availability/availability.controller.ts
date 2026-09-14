@@ -13,7 +13,5 @@ export async function getAvailableTime(
     request.query.serviceId,
     request.query.date,
   );
-  return response.send(
-    availableTime.map((s) => ({ start: s.start.toISOString(), end: s.end.toISOString() })),
-  );
+  return response.send(availableTime.map((s) => ({ start: s.start, end: s.end })));
 }

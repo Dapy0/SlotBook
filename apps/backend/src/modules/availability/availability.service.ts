@@ -1,15 +1,15 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { getFacilityDetails, getFacilityScheduleById } from "../facility/facility.service.ts";
+import { getFacilityDetails } from "../facility/facility.service.ts";
 import { checkIfStaffMemberIsDoingService } from "../staff/staff.service.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import {
-  addMinutesToTimeString,
   combineDateAndTimeInZone,
   convertShortDayNameToDayNumber,
 } from "../../lib/scheduleHelpers.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { findBookingsByFacilityId } from "../booking/booking.repository.ts";
 import { parseTsRangeLiteral } from "@slotbook/shared/bookings";
+import type { AvailabilitySlot } from "@slotbook/shared/availability";
 
 export async function getAvailableTimeByStaffAndServiceId(
   db: DB,
@@ -17,7 +17,7 @@ export async function getAvailableTimeByStaffAndServiceId(
   staffId: string,
   serviceId: string,
   date: string,
-) {
+): Promise<AvailabilitySlot[]> {
   const facility = await getFacilityDetails(db, facilityId);
   const service = await checkIfStaffMemberIsDoingService(db, staffId, serviceId);
 
@@ -41,11 +41,11 @@ export async function getAvailableTimeByStaffAndServiceId(
     (b) => b.staffMemberId === staffId && b.status !== "canceled",
   );
   function hasBounds(r: {
-    start: Date | null;
-    end: Date | null;
+    start: string | null;
+    end: string | null;
     startInclusive: boolean;
     endInclusive: boolean;
-  }): r is { start: Date; end: Date; startInclusive: boolean; endInclusive: boolean } {
+  }): r is { start: string; end: string; startInclusive: boolean; endInclusive: boolean } {
     return r.start !== null && r.end !== null;
   }
 
@@ -53,27 +53,25 @@ export async function getAvailableTimeByStaffAndServiceId(
     .map((b) => parseTsRangeLiteral(b.timeRange))
     .filter(hasBounds);
 
-  const slots: Array<{ start: Date; end: Date }> = [];
+  const slots: AvailabilitySlot[] = [];
   const now = new Date();
   for (const schedule of staffDaySchedule) {
     const windowStart = combineDateAndTimeInZone(date, schedule.startTime, facility.timezoneIANA);
     const windowEnd = combineDateAndTimeInZone(date, schedule.endTime, facility.timezoneIANA);
 
-    slots.push(
-      ...computeSlotsForWindow(windowStart, windowEnd, service.durationMinutes, busyIntervals, now),
-    );
+    slots.push(...createSlots(windowStart, windowEnd, service.durationMinutes, busyIntervals, now));
   }
   return slots;
 }
 
-function computeSlotsForWindow(
+function createSlots(
   windowStart: Date,
   windowEnd: Date,
   durationMinutes: number,
-  busyIntervals: Array<{ start: Date; end: Date }>,
+  busyIntervals: AvailabilitySlot[],
   now: Date,
-): Array<{ start: Date; end: Date }> {
-  const slots: Array<{ start: Date; end: Date }> = [];
+): AvailabilitySlot[] {
+  const slots: AvailabilitySlot[] = [];
   const durationMs = durationMinutes * 60_000;
 
   let candidateStart = windowStart;
@@ -82,15 +80,15 @@ function computeSlotsForWindow(
     const candidateEnd = new Date(candidateStart.getTime() + durationMs);
 
     const overlapsBusy = busyIntervals.some(
-      (b) => candidateStart < b.end && candidateEnd > b.start,
+      (b) => candidateStart < new Date(b.end) && candidateEnd > new Date(b.start),
     );
     const isInPast = candidateStart <= now;
 
     if (!overlapsBusy && !isInPast) {
-      slots.push({ start: candidateStart, end: candidateEnd });
+      slots.push({ start: candidateStart.toISOString(), end: candidateEnd.toISOString() });
     }
 
-    candidateStart = candidateEnd; // фиксированный шаг = длительность услуги
+    candidateStart = candidateEnd;
   }
 
   return slots;
