@@ -14,27 +14,33 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
-import type { FacilityCityResponse } from "@slotbook/shared";
-
+import { toast } from "@/components/ui/toast";
+import type { FacilityCityResponse, WallTime } from "@slotbook/shared";
 function convertToSelectFormat(arrObj: FacilityCityResponse[]): Array<{
   value: string;
   label: string;
 }> {
   const res = [];
   for (const [name, val] of arrObj.entries()) {
-    console.log(name, val);
     res.push({ value: val.city, label: val.city });
   }
   return res;
 }
+const formater = Intl.DateTimeFormat();
 function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
   const [date, setDate] = useState<Date>();
+  const [inputVal, setInputVal] = useState<string>();
+  const [time, setTime] = useState<WallTime>("10:30");
+
   const formattedCities = convertToSelectFormat(cities);
   return (
     <div className="flex flex-nowrap justify-center">
       <form
         id="search-panel-form"
         className="inline-flex items-stretch gap-6 rounded-l-lg border border-r-0 border-neutral-200 bg-white px-2 py-1 text-center whitespace-nowrap shadow-sm"
+        onSubmit={() => {
+          console.log(`Looking for - ${inputVal}`);
+        }}
       >
         <label className="flex flex-col justify-start gap-0.5">
           <span className="text-xs font-medium tracking-wide text-neutral-600 uppercase">
@@ -44,6 +50,8 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
             type="text"
             placeholder="haircut, lesson"
             className="h-auto rounded-none border-0 px-0 py-0 pl-1 text-center text-sm text-black shadow-none focus-visible:ring-0"
+            value={inputVal}
+            onChange={(e) => setInputVal(e.target.value)}
           />
         </label>
 
@@ -94,7 +102,13 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
               }
             />
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={date} onSelect={setDate} defaultMonth={date} />
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                defaultMonth={date}
+                weekStartsOn={1}
+              />
             </PopoverContent>
           </Popover>
         </label>
@@ -106,13 +120,21 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
           <Input
             type="time"
             id="time-picker-optional"
+            lang="en-GB"
             step="0"
-            defaultValue="10:30"
+            value={time}
+            onChange={(e) => setTime(e.target.value as WallTime)}
             className="flex-0 appearance-none self-center rounded-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
         </label>
       </form>
-      <Button className={"m-0 h-auto rounded-l-none rounded-r-lg p-0 px-4"}>Search</Button>
+      <Button
+        type="submit"
+        form="search-panel-form"
+        className={"m-0 h-auto rounded-l-none rounded-r-lg p-0 px-4"}
+      >
+        Search
+      </Button>
     </div>
   );
 }

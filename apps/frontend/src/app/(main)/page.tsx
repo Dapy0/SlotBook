@@ -1,4 +1,4 @@
-import SearchPanel from "@/components/layout/SearchPanel";
+import SearchPanel from "@/app/(main)/venues/_components/SearchPanel";
 import { Button } from "@/components/ui/button";
 import { Circle, Dot } from "lucide-react";
 import type { Route } from "next";
@@ -52,10 +52,10 @@ async function Page() {
             >
               {categories.map((category) => (
                 <Link
+                  key={CATEGORY_METADATA[category.categoryName].label}
                   href={`/venues?${createParams({ category: CATEGORY_METADATA[category.categoryName].slug })}`}
                 >
                   <Button
-                    key={CATEGORY_METADATA[category.categoryName].label}
                     variant={"outline"}
                     style={
                       {
