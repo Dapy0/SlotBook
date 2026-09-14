@@ -23,8 +23,8 @@ export function parseTsRangeLiteral(raw: string) {
   const startRaw = sQ !== undefined ? unescapeBound(sQ) : sU;
   const endRaw = eQ !== undefined ? unescapeBound(eQ) : eU;
   return {
-    start: startRaw ? new Date(normalizeTimestamp(startRaw)) : null,
-    end: endRaw ? new Date(normalizeTimestamp(endRaw)) : null,
+    start: startRaw ? new Date(normalizeTimestamp(startRaw)).toISOString() : null,
+    end: endRaw ? new Date(normalizeTimestamp(endRaw)).toISOString() : null,
     startInclusive: open === "[",
     endInclusive: close === "]",
   };

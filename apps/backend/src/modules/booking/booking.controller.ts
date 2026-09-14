@@ -3,7 +3,7 @@ import type { BookingBody, BookingParams, BookingPatchParams } from "./booking.s
 import {
   changeBookingStatus,
   createBookingForFacility,
-  getAllFacilityBookings,
+  getFacilityBookingsForOwner,
 } from "./booking.service.ts";
 import type { PatchBookingStatus } from "@slotbook/shared/bookings";
 import type { CreateReviewRequest } from "@slotbook/shared/reviews";
@@ -13,7 +13,7 @@ export async function getBookings(
   request: FastifyRequest<{ Params: BookingParams }>,
   response: FastifyReply,
 ) {
-  const bookings = await getAllFacilityBookings(
+  const bookings = await getFacilityBookingsForOwner(
     request.server.drizzle,
     request.user.id,
     request.params.id,

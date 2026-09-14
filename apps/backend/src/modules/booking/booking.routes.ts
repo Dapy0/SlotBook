@@ -6,7 +6,6 @@ import {
   type BookingBody,
   type BookingParams,
   type BookingPatchParams,
-  type UpdateBookingBody,
 } from "./booking.schema.ts";
 import {
   getBookings,
@@ -22,10 +21,8 @@ import {
 } from "@slotbook/shared/bookings";
 import {
   createReviewRequestSchema,
-  reviewResponseSchema,
   type CreateReviewRequest,
 } from "@slotbook/shared/reviews";
-import { createReviewForBooking } from "../review/review.service.ts";
 
 export async function bookingRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: BookingParams }>(
@@ -78,7 +75,7 @@ export async function bookingRoutes(fastify: FastifyInstance) {
   );
 }
 
-export async function mineBookingsRoutes(fastify: FastifyInstance) {
+export async function mineBookingsRoutes() {
   // fastify.get(
   //   '/mine',
   //   {

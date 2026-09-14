@@ -1,11 +1,8 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import type { StaffScheduleEntity } from "../../db/schema/staffSchedule.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
-import { findFacilitiesByOwnerId } from "../facility/facility.repository.ts";
 import { checkFacilityOwnership, getFacilityDetails } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
-import { findStaffMemberById } from "../staff/staff.repository.ts";
 import {
   checkIfStaffIsFacilityWorker,
   checkIfStaffMemberIsDoingService,
@@ -17,15 +14,10 @@ import {
   patchStatusByBookingId,
 } from "./booking.repository.ts";
 import type { BookingBody } from "./booking.schema.ts";
-import {
-  checkIfBookingFitsAllSchedules,
-  checkNoOverlapWithinSchedule,
-  checkStaffScheduleFitsFacility,
-  toTimeString,
-} from "../../lib/scheduleHelpers.ts";
+import { checkIfBookingFitsAllSchedules, toTimeString } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import type { PatchBookingStatus } from "@slotbook/shared/bookings";
-export async function getAllFacilityBookings(db: DB, userId: string, facilityId: string) {
+export async function getFacilityBookingsForOwner(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
 
   const facilityBookings = await findBookingsByFacilityId(db, facilityId);
@@ -74,8 +66,7 @@ export async function createBookingForFacility(
     startDatetime: data.startDatetime,
     endDatetime,
   }).catch((e) => {
-    const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === "23P01") {
+    if (e.code === "23P01") {
       throw new ConflictError("This time slot is already booked");
     }
     throw e;
@@ -108,12 +99,15 @@ export async function changeBookingStatus(
           }
           await checkFacilityOwnership(db, facilityId, userId);
           return await patchStatusByBookingId(db, booking.id, data.status);
+          break;
       }
+      break;
 
     case "confirmed":
       switch (data.status) {
         case "confirmed":
           throw new ConflictError("Not allowed same state");
+          break;
         case "canceled":
           if (booking.clientId === userId) {
             return await patchStatusByBookingId(db, booking.id, data.status);
@@ -121,6 +115,7 @@ export async function changeBookingStatus(
           await checkFacilityOwnership(db, facilityId, userId);
           return await patchStatusByBookingId(db, booking.id, data.status);
       }
+      break;
 
     default:
       throw new ConflictError("Not allowed");

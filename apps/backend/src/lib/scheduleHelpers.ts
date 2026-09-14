@@ -46,7 +46,7 @@ export function checkStaffScheduleFitsFacility(
     }
   }
 }
-export function checkIfBookingFitsAllSchedules(
+export async function checkIfBookingFitsAllSchedules(
   startTime: string,
   endTime: string,
   dayOfTheWeek: DayOfTheWeek,
