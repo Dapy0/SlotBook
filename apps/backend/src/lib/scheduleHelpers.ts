@@ -1,14 +1,15 @@
 import {
   daysAndThereNames,
-  type CreateFacilitySchedule,
   type DayOfTheWeek,
   type ResponseFacilityScheduleSchema,
 } from "@slotbook/shared/facilitySchedule";
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type {
-  CreateStaffSchedule,
   ResponseStaffScheduleSchema,
 } from "@slotbook/shared/staffSchedule";
+import type { FacilityScheduleEntity } from '../db/schema/facilitySchedule.ts';
+import type { StaffScheduleEntity } from '../db/schema/staffSchedule.ts';
+import type { ScheduleBody } from '../modules/schedule/schedule.schema.ts';
 
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
@@ -31,8 +32,8 @@ export function checkNoOverlapWithinSchedule(
 }
 
 export function checkStaffScheduleFitsFacility(
-  staffSchedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
-  facilitySchedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
+  staffSchedule: ScheduleBody,
+  facilitySchedule: ScheduleBody,
 ) {
   for (const current of staffSchedule) {
     const facilityDay = facilitySchedule.find((f) => f.dayOfTheWeek === current.dayOfTheWeek);

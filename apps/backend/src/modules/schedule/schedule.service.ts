@@ -1,5 +1,5 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { BadRequestError, ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { NotFoundError } from "../../lib/errors.ts";
 import { findFacilityById } from "../facility/facility.repository.ts";
 
 import {
@@ -45,7 +45,7 @@ export async function changeWeekSchedule(
   if (!facility) {
     throw new NotFoundError("No such facility found");
   }
-  const facilitySchedule = await findFacilitySchedule(db, facility.id);
+  const facilitySchedule = (await findFacilitySchedule(db, facility.id)) as ScheduleBody;
   const staffMemberFacility = await findStaffMemberById(db, staffId);
   if (!staffMemberFacility) {
     throw new NotFoundError("No such worker found in facilities");
