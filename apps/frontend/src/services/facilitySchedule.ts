@@ -1,11 +1,11 @@
 import { api } from "@/lib/api";
 import type {
   CreateFacilitySchedule,
-  ResponseFacilityScheduleSchema,
+  FacilityScheduleResponse,
 } from "@slotbook/shared/facilitySchedule";
 
 export async function getFacilitySchedule(facilityId: string) {
-  const result = await api<ResponseFacilityScheduleSchema[]>(`/facilities/${facilityId}/schedule`, {
+  const result = await api<FacilityScheduleResponse[]>(`/facilities/${facilityId}/schedule`, {
     method: "GET",
   });
 
@@ -13,7 +13,7 @@ export async function getFacilitySchedule(facilityId: string) {
 }
 
 export async function putFacilitySchedule(facilityId: string, data: CreateFacilitySchedule[]) {
-  const result = await api<ResponseFacilityScheduleSchema[]>(`/facilities/${facilityId}/schedule`, {
+  const result = await api<FacilityScheduleResponse[]>(`/facilities/${facilityId}/schedule`, {
     method: "PUT",
     body: JSON.stringify(data),
   });

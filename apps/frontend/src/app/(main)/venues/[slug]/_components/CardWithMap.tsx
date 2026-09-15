@@ -1,6 +1,7 @@
-import { Map } from "@/components/layout/Map";
+import { Map } from "@/app/(main)/venues/[slug]/_components/Map";
 import { Button } from "@/components/ui/button";
 import { getMapLink } from "@/lib/utils";
+import type { Route } from "next";
 import Link from "next/link";
 
 interface ICardWithMap {
@@ -18,7 +19,7 @@ function CardWithMap({ address, latitude, longitude }: ICardWithMap) {
       <div className="flex items-center justify-between bg-card px-4 py-3 text-sm">
         <span className="text-sm text-gray-600">{address}</span>
         <Button variant={"ghost"}>
-          <Link className="" href={getMapLink(address, latitude, longitude)}>
+          <Link className="" href={getMapLink(address, latitude, longitude) as Route<string>}>
             Open in maps
           </Link>
         </Button>

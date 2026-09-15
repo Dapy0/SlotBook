@@ -1,0 +1,1 @@
+ALTER TABLE "facility_schedule" ADD CONSTRAINT "facility_schedules_unique_slot" UNIQUE("facility_id","day_of_the_week","start_time","end_time");

@@ -6,8 +6,12 @@ import {
   type FacilityCityResponse,
   type FacilityResponse,
 } from "@slotbook/shared/facility";
-import type { ResponseFacilityScheduleSchema } from "@slotbook/shared/facilitySchedule";
+import {
+  facilityScheduleResponseSchema,
+  type FacilityScheduleResponse,
+} from "@slotbook/shared/facilitySchedule";
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import { facilities } from "../../../backend/src/db/schema/facility";
 
 export async function getFacilities(getParams: {
   country: string;
@@ -43,24 +47,14 @@ export async function getCitiesList(getParams: {
 
   return result;
 }
-export async function getFacilityById(id: string): Promise<
-  FacilityResponse & {
-    facilitySchedule: ResponseFacilityScheduleSchema[];
-  }
-> {
-  const facilityInfo = await api<FacilityResponse>(`/facilities/${id}`, {
-    method: "GET",
-  });
-  const facilitySchedule = await api<ResponseFacilityScheduleSchema[]>(
-    `/facilities/${id}/schedule`,
-    {
-      method: "GET",
-    },
-  );
-  return {
-    ...facilityInfo,
-    facilitySchedule: facilitySchedule,
-  };
+export async function getFacilityById(id: string): Promise<FacilityResponse> {
+  return facilityResponseSchema.parse(await api(`/facilities/${id}`, { method: "GET" }));
+}
+
+export async function getFacilityScheduleById(id: string): Promise<FacilityScheduleResponse[]> {
+  return facilityScheduleResponseSchema
+    .array()
+    .parse(await api(`/facilities/${id}/schedule`, { method: "GET" }));
 }
 
 export async function getMyFacilities(): Promise<FacilityResponse[]> {

@@ -5,9 +5,9 @@ import bcrypt from "bcrypt";
 
 import { users } from "./schema/user.ts";
 import { facilities } from "./schema/facility.ts";
-import { facilitySchedules, type NewFacilityScheduleEntity } from "./schema/facilitySchedule.ts";
-import { services, type NewServiceEntity } from "./schema/service.ts";
-import { staffMembers, type StaffMemberEntity } from "./schema/staffMember.ts";
+import { facilitySchedules } from "./schema/facilitySchedule.ts";
+import { services } from "./schema/service.ts";
+import { staffMembers } from "./schema/staffMember.ts";
 import { staffServices } from "./schema/staffService.ts";
 import type { CreateFacilityRequest, FacilityCategory } from "@slotbook/shared/facility";
 import type { CreateServiceRequest } from "@slotbook/shared/service";

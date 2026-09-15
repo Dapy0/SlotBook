@@ -33,7 +33,7 @@ import { staffRoutes } from "../staff/staff.routes.ts";
 import { bookingRoutes } from "../booking/booking.routes.ts";
 import {
   createFacilityScheduleSchema,
-  responseFacilityScheduleSchema,
+  facilityScheduleResponseSchema,
   type CreateFacilitySchedule,
 } from "@slotbook/shared/facilitySchedule";
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
@@ -117,7 +117,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       schema: {
         params: facilityParamsSchema,
         response: {
-          200: z.array(responseFacilityScheduleSchema),
+          200: z.array(facilityScheduleResponseSchema),
         },
       },
     },
@@ -134,7 +134,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         params: facilityParamsSchema,
         body: z.array(createFacilityScheduleSchema),
         response: {
-          200: z.array(responseFacilityScheduleSchema),
+          200: z.array(facilityScheduleResponseSchema),
         },
       },
     },

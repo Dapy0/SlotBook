@@ -8,7 +8,6 @@ import {
   getServicesByFacilityId,
   insertService,
 } from "./service.repository.ts";
-import type { ServiceEntity } from "../../db/schema/service.ts";
 
 async function checkIfFacilityWithIdExists(db: DB, facilityId: string) {
   const facility = await findFacilityById(db, facilityId);

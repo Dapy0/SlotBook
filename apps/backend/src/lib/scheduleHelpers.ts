@@ -1,15 +1,13 @@
 import {
   daysAndThereNames,
   type DayOfTheWeek,
-  type ResponseFacilityScheduleSchema,
+  type FacilityScheduleResponse,
 } from "@slotbook/shared/facilitySchedule";
 import { BadRequestError, ConflictError } from "./errors.ts";
-import type {
-  ResponseStaffScheduleSchema,
-} from "@slotbook/shared/staffSchedule";
-import type { FacilityScheduleEntity } from '../db/schema/facilitySchedule.ts';
-import type { StaffScheduleEntity } from '../db/schema/staffSchedule.ts';
-import type { ScheduleBody } from '../modules/schedule/schedule.schema.ts';
+import type { ResponseStaffScheduleSchema } from "@slotbook/shared/staffSchedule";
+import type { FacilityScheduleEntity } from "../db/schema/facilitySchedule.ts";
+import type { StaffScheduleEntity } from "../db/schema/staffSchedule.ts";
+import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
 
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
@@ -52,7 +50,7 @@ export async function checkIfBookingFitsAllSchedules(
   endTime: string,
   dayOfTheWeek: DayOfTheWeek,
   staffSchedule: ResponseStaffScheduleSchema[],
-  facilitySchedule: ResponseFacilityScheduleSchema[],
+  facilitySchedule: FacilityScheduleResponse[],
 ) {
   const facilityDaySchedules = facilitySchedule.filter((f) => f.dayOfTheWeek === dayOfTheWeek);
   const staffDaySchedules = staffSchedule.filter((s) => s.dayOfTheWeek === dayOfTheWeek);

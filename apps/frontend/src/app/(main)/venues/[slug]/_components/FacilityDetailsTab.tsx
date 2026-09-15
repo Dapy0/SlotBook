@@ -1,6 +1,6 @@
 "use client";
-import ReviewsList from "@/components/layout/ReviewsList";
-import ServicesList from "@/components/layout/ServicesList";
+import ReviewsList from "@/app/(main)/venues/[slug]/_components/ReviewsList";
+import ServicesList from "@/app/(main)/venues/[slug]/_components/ServicesList";
 import StaffList from "@/components/layout/StaffList";
 import { TabsTrigger, TabsContent, Tabs, TabsList } from "@/components/ui/tabs";
 import type { ReviewResponse } from "@slotbook/shared/reviews";
@@ -65,7 +65,7 @@ function FacilityDetailsTab({
         </div>
 
         <TabsContent value="services" className="mt-3">
-          <ServicesList services={services} query={query} />
+          <ServicesList  services={services} query={query} />
         </TabsContent>
         <TabsContent value="staff" className="mt-3">
           <StaffList staff={staff} query={query} />

@@ -14,7 +14,7 @@ import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
 import type { AvailabilitySlot } from "@slotbook/shared/availability";
 import type { FacilityResponse } from "@slotbook/shared/facility";
-import type { ResponseFacilityScheduleSchema } from "@slotbook/shared/facilitySchedule";
+import type { FacilityScheduleResponse } from "@slotbook/shared/facilitySchedule";
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
 import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
 import { useCallback, useEffect, useState } from "react";
@@ -45,7 +45,7 @@ function BookForm({
   initialTime,
 }: {
   facility: FacilityResponse & {
-    facilitySchedule: ResponseFacilityScheduleSchema[];
+    facilitySchedule: FacilityScheduleResponse[];
   };
   staffMembers: StaffMemberResponseDTO[];
   service: ServiceResponseDTO;

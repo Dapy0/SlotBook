@@ -1,7 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { convertMinutesToTime, formatMoney } from "@/lib/utils";
+import { durationFormatter, moneyFormatter } from "@/lib/format";
+import { convertMinutesToTime } from '@/lib/utils';
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,7 +26,6 @@ export default function ServicesList({
   const pathname = usePathname();
   const prettifyItems = groupByCategory(services);
   const q = query.trim().toLowerCase();
-  const formatter = new Intl.DurationFormat("en", { style: "narrow" });
 
   const filteredGroups = prettifyItems
     .map((group) => ({
@@ -65,7 +66,7 @@ export default function ServicesList({
                     )} */}
                       </div>
                       <p className="mt-0.5 text-xs text-gray-400">
-                        {formatter.format({
+                        {durationFormatter.format({
                           hours: convertMinutesToTime(service.durationMinutes)[0],
                           minutes: convertMinutesToTime(service.durationMinutes)[1],
                         })}
@@ -74,9 +75,9 @@ export default function ServicesList({
 
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-semibold text-gray-900">
-                        {formatMoney(service.priceCents, service.currency)}
+                        {moneyFormatter(service.priceCents, service.currency)}
                       </span>
-                      <Link href={`${pathname}/book?${query}`}>
+                      <Link href={`${pathname}/book?${query}` as Route}>
                         <Button>Book</Button>
                       </Link>
                     </div>

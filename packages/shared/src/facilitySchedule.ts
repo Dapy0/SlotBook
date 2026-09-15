@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isoDateSchema, wallTimeSchema } from './codecs';
+import { isoDateSchema, wallTimeSchema } from "./codecs";
 
 // Request DTOs
 const dayOfTheWeekSchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
@@ -50,9 +50,9 @@ export type UpdateFacilitySchedule = z.infer<typeof updateFacilitySchedule>;
 
 // Response DTOs
 
-export const responseFacilityScheduleSchema = facilityScheduleSchema.extend({
+export const facilityScheduleResponseSchema = facilityScheduleSchema.extend({
   id: z.uuid(),
   createdAt: isoDateSchema,
 });
 
-export type ResponseFacilityScheduleSchema = z.infer<typeof responseFacilityScheduleSchema>;
+export type FacilityScheduleResponse = z.infer<typeof facilityScheduleResponseSchema>;

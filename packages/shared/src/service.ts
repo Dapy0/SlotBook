@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isoDateSchema } from './codecs';
+import { isoDateSchema } from "./codecs";
 
 // Request DTOs
 export const serviceFieldsSchema = z.object({
@@ -24,6 +24,7 @@ export const serviceResponseSchema = createServiceSchema.extend({
   facilityId: z.uuid(),
   createdAt: isoDateSchema,
   updatedAt: isoDateSchema,
+  currency: z.string().trim().length(3),
 });
 
 export type ServiceResponseDTO = z.infer<typeof serviceResponseSchema>;
