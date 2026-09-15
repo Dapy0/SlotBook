@@ -3,6 +3,9 @@ import z from "zod";
 
 export const facilityListQuerySchema = z.object({
   country: z.string(),
+  city: z.string().optional(),
+  time: z.string().optional(),
+  date: z.string().optional(),
   category: facilityCategorySchema.optional(),
   limit: z.coerce.number().nonnegative().optional(),
   rating: z.coerce.number().optional(),

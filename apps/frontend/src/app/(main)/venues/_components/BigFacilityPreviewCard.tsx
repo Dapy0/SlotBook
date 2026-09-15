@@ -9,7 +9,7 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
   const { name, address, city, category, score, reviewsCount, description } = facility;
   return (
     <Link
-      href={`venues/${facility.id}`}
+      href={`/venues/${facility.id}`}
       className="relative grid w-full grid-cols-[1fr_300px] overflow-hidden rounded-md border"
     >
       <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>
