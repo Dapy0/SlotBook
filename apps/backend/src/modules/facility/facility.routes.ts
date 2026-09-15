@@ -13,7 +13,6 @@ import {
 } from "./facility.controller.ts";
 import {
   facilityCategoryQuerystringSchema,
-  facilityListQuerySchema,
   facilityParamsSchema,
   type FacilityCategoryQuerystring,
   type FacilityParams,
@@ -24,9 +23,12 @@ import {
   createFacilityRequestSchema,
   facilityCategoryResponseSchema,
   facilityCityResponseSchema,
+  facilityListQuerySchema,
   facilityResponseSchema,
+  facilityWithServicesResponseSchema,
   updateFacilityRequestSchema,
   type CreateFacilityRequest,
+  type FacilityListQuery,
   type UpdateFacilityRequest,
 } from "@slotbook/shared/facility";
 import { staffRoutes } from "../staff/staff.routes.ts";
@@ -37,7 +39,8 @@ import {
   type CreateFacilitySchedule,
 } from "@slotbook/shared/facilitySchedule";
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
-import { findCitiesByCountry } from "./facility.repository.ts";
+import { findAllFacilitiesByParams, findCitiesByCountry } from "./facility.repository.ts";
+import { getServicesByFacilityIds } from "../service/service.repository.ts";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -51,6 +54,31 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       },
     },
     getAllFacilities,
+  );
+  fastify.get(
+    "/search",
+    {
+      schema: {
+        querystring: facilityListQuerySchema,
+        response: { 200: facilityWithServicesResponseSchema.array() },
+      },
+    },
+    async (request: FastifyRequest<{ Querystring: FacilityListQuery }>) => {
+      const facilities = await findAllFacilitiesByParams(request.server.drizzle, request.query);
+      const servicesByFacilityIds = await getServicesByFacilityIds(
+        request.server.drizzle,
+        facilities.map((f) => f.id),
+      );
+      const groupedServicesWithFacilities = Object.groupBy(
+        servicesByFacilityIds,
+        (obj) => obj.facilityId,
+      );
+
+      return facilities.map((facility) => ({
+        ...facility,
+        services: groupedServicesWithFacilities[facility.id] ?? [],
+      }));
+    },
   );
   fastify.get(
     "/mine",

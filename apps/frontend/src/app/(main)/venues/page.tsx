@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCategories } from "@/services/categories";
-import { getFacilities } from "@/services/facilities";
+import { getFacilities, searchFacilities } from "@/services/facilities";
 import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@slotbook/shared/facility";
 import { SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
@@ -39,8 +39,8 @@ async function Page({
   console.log(categoryName);
   if (category && !categoryName) notFound();
 
-  const [facilities, categories] = await Promise.all([
-    getFacilities({ country, category: categoryName, rating, priceMax, q, sort }),
+  const [facilitiesWithServices, categories] = await Promise.all([
+    searchFacilities({ country, category: categoryName, q, sort }),
     getCategories({ country }),
   ]);
 
@@ -77,9 +77,12 @@ async function Page({
 
           <div className="flex flex-col gap-4">
             {}
-            {facilities.length > 0 ? (
-              facilities.map((facility) => (
-                <BigFacilityPreviewCard facility={facility} key={facility.id} />
+            {facilitiesWithServices.length > 0 ? (
+              facilitiesWithServices.map((facilityWithServices) => (
+                <BigFacilityPreviewCard
+                  facilityWithServices={facilityWithServices}
+                  key={facilityWithServices.id}
+                />
               ))
             ) : (
               <div className="flex items-center self-center pt-10 text-3xl text-gray-400">

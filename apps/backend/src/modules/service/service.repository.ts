@@ -1,5 +1,5 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { eq, and, getColumns } from "drizzle-orm";
+import { eq, and, getColumns, inArray } from "drizzle-orm";
 import { services, type NewServiceEntity, type ServiceEntity } from "../../db/schema/service.ts";
 import { facilities } from "../../db/schema/facility.ts";
 export type ServiceWithCurrency = ServiceEntity & { currency: string };
@@ -10,6 +10,16 @@ export async function getServicesByFacilityId(db: DB, id: string): Promise<Servi
     .from(services)
     .innerJoin(facilities, eq(facilities.id, services.facilityId))
     .where(eq(services.facilityId, id));
+}
+export async function getServicesByFacilityIds(
+  db: DB,
+  facilityIds: string[],
+): Promise<ServiceWithCurrency[]> {
+  return db
+    .select({ ...getColumns(services), currency: facilities.currency })
+    .from(services)
+    .innerJoin(facilities, eq(facilities.id, services.facilityId))
+    .where(and(inArray(services.facilityId, facilityIds), eq(services.isActive, true)));
 }
 export async function getServiceByFacilityIdAndServiceId(
   db: DB,

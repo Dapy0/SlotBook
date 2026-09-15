@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { isoDateSchema } from "./codecs";
+import { serviceResponseSchema } from "./service";
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -142,3 +143,21 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   updatedAt: isoDateSchema,
 });
 export type FacilityResponse = z.infer<typeof facilityResponseSchema>;
+
+export const facilityWithServicesResponseSchema = facilityResponseSchema.extend({
+  services: serviceResponseSchema.array(),
+});
+export type FacilityWithServicesResponse = z.infer<typeof facilityWithServicesResponseSchema>;
+export const facilityListQuerySchema = z.object({
+  country: z.string().trim(),
+  city: z.string().trim().optional(),
+  time: z.string().trim().optional(),
+  date: z.string().trim().optional(),
+  category: facilityCategorySchema.optional(),
+  limit: z.coerce.number().nonnegative().optional(),
+  rating: z.coerce.number().optional(),
+  priceMax: z.coerce.number().optional(),
+  q: z.string().trim().optional(),
+  sort: z.string().trim().optional(),
+});
+export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;

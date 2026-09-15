@@ -1,4 +1,8 @@
-import type { CreateFacilityRequest, UpdateFacilityRequest } from "@slotbook/shared/facility";
+import type {
+  CreateFacilityRequest,
+  FacilityListQuery,
+  UpdateFacilityRequest,
+} from "@slotbook/shared/facility";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   findAllFacilitiesByParams,
@@ -16,7 +20,6 @@ import {
 } from "./facilitySchedule.repository.ts";
 import type { CreateFacilitySchedule } from "@slotbook/shared/facilitySchedule";
 import { checkNoOverlapWithinSchedule } from "../../lib/scheduleHelpers.ts";
-import type { FacilityListQuery } from "./facility.schema.ts";
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);

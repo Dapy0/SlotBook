@@ -5,10 +5,9 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
-import type { FacilityCategoryResponse, UpdateFacilityRequest } from "@slotbook/shared/facility";
+import type { FacilityCategoryResponse, FacilityListQuery, UpdateFacilityRequest } from "@slotbook/shared/facility";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import type { FacilityListQuery } from "./facility.schema.ts";
 import { services } from "../../db/schema/service.ts";
 
 export async function findAllFacilitiesByParams(
@@ -16,7 +15,6 @@ export async function findAllFacilitiesByParams(
   params: FacilityListQuery,
 ): Promise<Array<FacilityEntity>> {
   const { country, category, rating, priceMax, q, sort, limit } = params;
-
   const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
 
   if (category !== undefined) filters.push(eq(facilities.category, category));

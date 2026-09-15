@@ -1,19 +1,6 @@
-import { facilityCategorySchema } from "@slotbook/shared/facility";
 import z from "zod";
 
-export const facilityListQuerySchema = z.object({
-  country: z.string(),
-  city: z.string().optional(),
-  time: z.string().optional(),
-  date: z.string().optional(),
-  category: facilityCategorySchema.optional(),
-  limit: z.coerce.number().nonnegative().optional(),
-  rating: z.coerce.number().optional(),
-  priceMax: z.coerce.number().optional(),
-  q: z.string().optional(),
-  sort: z.string().optional(),
-});
-export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
+
 export const facilityParamsSchema = z.object({
   id: z.uuid(),
 });

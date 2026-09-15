@@ -3,7 +3,9 @@ import { createParams } from "@/lib/queryStrings";
 import {
   facilityCityResponseSchema,
   facilityResponseSchema,
+  facilityWithServicesResponseSchema,
   type FacilityCityResponse,
+  type FacilityListQuery,
   type FacilityResponse,
 } from "@slotbook/shared/facility";
 import {
@@ -13,16 +15,8 @@ import {
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
 import { facilities } from "../../../backend/src/db/schema/facility";
 
-export async function getFacilities(getParams: {
-  country: string;
-  category?: string;
-  rating?: string;
-  priceMax?: string;
-  q?: string;
-  sort?: string;
-  limit?: number;
-}): Promise<FacilityResponse[]> {
-  const query = createParams(getParams);
+export async function getFacilities(params: FacilityListQuery): Promise<FacilityResponse[]> {
+  const query = createParams(params);
   const endpoint = query ? `/facilities/?${query}` : "/facilities/";
 
   const result = facilityResponseSchema.array().parse(
@@ -32,6 +26,12 @@ export async function getFacilities(getParams: {
   );
 
   return result;
+}
+export async function searchFacilities(params: FacilityListQuery) {
+  console.log(params)
+  const query = createParams(params);
+  const endpoint = query ? `/facilities/search?${query}` : "/facilities/search";
+  return facilityWithServicesResponseSchema.array().parse(await api(endpoint));
 }
 export async function getCitiesList(getParams: {
   country: string;

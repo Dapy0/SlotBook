@@ -1,17 +1,25 @@
 import ScoreBadge from "@/components/layout/ScoreBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { FacilityResponse } from "@slotbook/shared/facility";
+import { durationFormatter, moneyFormatter } from "@/lib/format";
+import { createParams } from "@/lib/queryStrings";
+import { convertMinutesToTime } from "@/lib/utils";
+import type { FacilityResponse, FacilityWithServicesResponse } from "@slotbook/shared/facility";
 import { MapPinIcon } from "lucide-react";
 import Link from "next/link";
 
-function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
-  const { name, address, city, category, score, reviewsCount, description } = facility;
+function BigFacilityPreviewCard({
+  facilityWithServices,
+}: {
+  facilityWithServices: FacilityWithServicesResponse;
+}) {
+  const { id, name, address, city, category, score, reviewsCount, description, services } =
+    facilityWithServices;
   return (
-    <Link
-      href={`/venues/${facility.id}`}
-      className="relative grid w-full grid-cols-[1fr_300px] overflow-hidden rounded-md border"
-    >
+    <div className="relative grid w-full overflow-hidden rounded-md border lg:grid-cols-[1fr_300px]">
+      <div className="absolute inset-0 z-0 bg-linear-to-t from-gray-100 to-gray-50" />
+
+      <Link href={`/venues/${id}`} className="absolute inset-0 z-10" aria-label={name} />
       <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>
       {/* <img src="" alt="" /> */}
       <div className="relative z-40 flex flex-col gap-6 p-4">
@@ -29,7 +37,7 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
         </div>
         <div className="flex flex-col gap-1">
           <h3 className={"text-xl font-bold"}>{name}</h3>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 whitespace-nowrap">
             <ScoreBadge styles="text-sm py-0.5! px-0.5" score={score} />
             <span className="text-xs text-gray-600">{reviewsCount} reviews</span>
             <span className="flex items-center gap-0.5 text-sm text-gray-600">
@@ -42,53 +50,48 @@ function BigFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
         </div>
         <div className="flex items-center gap-3">
           <Button variant={"outline"}>All services and time</Button>
-          <span className="text-xs text-gray-600">3 services in price list</span>
+          <span className="text-xs text-gray-600">{services.length} services in price list</span>
         </div>
       </div>
-      <div className="relative z-40 flex flex-col justify-start rounded-none border-l">
-        <Button
-          variant={"ghost"}
-          className={
-            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
-          }
-        >
-          <span className="flex flex-col items-start gap-1">
-            <span className="text-sm">Court rent</span>
-            <span className="text-xs font-light text-gray-600">60 min</span>
-          </span>
-          <span className="text-sm font-bold">80,00 zl</span>
-        </Button>
-        <Button
-          variant={"ghost"}
-          className={
-            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
-          }
-        >
-          <span className="flex flex-col items-start gap-1">
-            <span className="text-sm">Court rent</span>
-            <span className="text-xs font-light text-gray-600">60 min</span>
-          </span>
-          <span className="text-sm font-bold">80,00 zl</span>
-        </Button>
-        <Button
-          variant={"ghost"}
-          className={
-            "flex h-auto items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
-          }
-        >
-          <span className="flex flex-col items-start gap-1">
-            <span className="text-sm">Court rent</span>
-            <span className="text-xs font-light text-gray-600">60 min</span>
-          </span>
-          <span className="text-sm font-bold">80,00 zl</span>
-        </Button>
+      <div className="relative z-40 flex flex-col justify-start rounded-none border-t lg:border-l">
+        {services.slice(0, 3).map((service) => (
+          <Link
+            key={service.id}
+            href={`/venues/${id}/book?${createParams({ service: service.id })}`}
+          >
+            <Button
+              key={service.id}
+              variant={"ghost"}
+
+              className={
+                "flex h-auto w-full items-center justify-between rounded-none border-b-gray-300 px-3 py-1"
+              }
+            >
+              <span className="flex flex-col items-start gap-1">
+                <span className="text-sm">{service.name}</span>
+                <span className="text-xs font-light text-gray-600">
+                  {durationFormatter.format({
+                    hours: convertMinutesToTime(service.durationMinutes)[0],
+                    minutes: convertMinutesToTime(service.durationMinutes)[1],
+                  })}
+                </span>
+              </span>
+              <span className="text-sm font-bold">
+                {moneyFormatter(service.priceCents, service.currency)}
+              </span>
+            </Button>
+          </Link>
+        ))}
+
         <div className="flex h-full flex-col justify-center px-3 py-1">
-          <Button variant={"default"} className={"w-full"}>
-            Select time
-          </Button>
+          <Link href={`/venues/${id}/book`}>
+            <Button variant={"default"} className={"w-full"}>
+              Select time
+            </Button>
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 

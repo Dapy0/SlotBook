@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { convertMinutesToTime, formatMoney } from "@/lib/utils";
+import { moneyFormatter } from "@/lib/format";
+import { convertMinutesToTime } from "@/lib/utils";
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
 import type { AvailabilitySlot } from "@slotbook/shared/availability";
@@ -108,7 +109,7 @@ function BookForm({
                 hours: convertMinutesToTime(service.durationMinutes)[0],
                 minutes: convertMinutesToTime(service.durationMinutes)[1],
               })}{" "}
-              · {formatMoney(service.priceCents, service.currency)}
+              · {moneyFormatter(service.priceCents, service.currency)}
             </p>
           </header>
 
@@ -222,7 +223,7 @@ function BookForm({
               "Select something"
             }
             time={(selectedTime && formatTime(selectedTime)) || "Select something"}
-            price={formatMoney(service.priceCents, service.currency)}
+            price={moneyFormatter(service.priceCents, service.currency)}
             onConfirm={() => {
               if (selectedTime && selectedStaff) {
                 handleBookSlot(selectedTime, selectedStaff, service.id);
