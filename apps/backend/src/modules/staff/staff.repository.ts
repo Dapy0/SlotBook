@@ -1,6 +1,6 @@
-import { and, avg, count, eq, getColumns, getTableColumns } from "drizzle-orm";
+import { and, avg, count, eq, getColumns } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
+import { staffMembers } from "../../db/schema/staffMember.ts";
 import { staffServices } from "../../db/schema/staffService.ts";
 import { services } from "../../db/schema/service.ts";
 import { users } from "../../db/schema/user.ts";
@@ -68,6 +68,7 @@ export async function findServicesByStaffMemberId(db: DB, staffMemberId: string)
 
   return result;
 }
+
 export async function findServiceByServiceIdAndMemberId(
   db: DB,
   staffMemberId: string,

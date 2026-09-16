@@ -13,27 +13,21 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ChevronDownIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FacilityCityResponse, WallTime } from "@slotbook/shared";
 import { createParams } from "@/lib/queryStrings";
 import router from "next/router";
 import { redirect } from "next/navigation";
-function convertToSelectFormat(arrObj: FacilityCityResponse[]): Array<{
-  value: string;
-  label: string;
-}> {
-  const res = [];
-  for (const [name, val] of arrObj.entries()) {
-    res.push({ value: val.city, label: val.city });
-  }
-  return res;
-}
+import { convertToSelectFormat } from "@/lib/utils";
+import { useFilterHref } from "@/components/hooks/useFilterHref";
+
 function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
   const [date, setDate] = useState<Date>();
   const [inputVal, setInputVal] = useState<string>();
-  const [activeCity, setActiveCity] = useState<string>();
+  const [activeCity, setActiveCity] = useState<string | null>(null);
   const [time, setTime] = useState<WallTime>("10:30");
-  const formattedCities = convertToSelectFormat(cities);
+  const formattedCities = convertToSelectFormat(cities, 'city', 'city');
+
   return (
     <div className="flex flex-nowrap justify-center">
       <form
@@ -41,7 +35,6 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
         className="inline-flex items-stretch gap-6 rounded-l-lg border border-r-0 border-neutral-200 bg-white px-2 py-1 text-center whitespace-nowrap shadow-sm"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log(time);
           const query = createParams({
             q: inputVal,
             date: date?.toISOString().split("T")[0],
@@ -79,6 +72,7 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
             </SelectTrigger>
             <SelectContent alignItemWithTrigger={false}>
               <SelectGroup>
+                <SelectItem value={null}>All cities</SelectItem>
                 {formattedCities.map((city) => (
                   <SelectItem key={city.value} value={city.value}>
                     {city.label.toWellFormed()}

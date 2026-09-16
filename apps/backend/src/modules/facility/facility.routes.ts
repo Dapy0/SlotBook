@@ -21,13 +21,16 @@ import {
 import z from "zod";
 import {
   createFacilityRequestSchema,
+  facilityBookingQuerySchema,
   facilityCategoryResponseSchema,
   facilityCityResponseSchema,
+  facilityDataForBookingSchema,
   facilityListQuerySchema,
   facilityResponseSchema,
   facilityWithServicesResponseSchema,
   updateFacilityRequestSchema,
   type CreateFacilityRequest,
+  type FacilityBookingQuery,
   type FacilityListQuery,
   type UpdateFacilityRequest,
 } from "@slotbook/shared/facility";
@@ -40,7 +43,13 @@ import {
 } from "@slotbook/shared/facilitySchedule";
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
 import { findAllFacilitiesByParams, findCitiesByCountry } from "./facility.repository.ts";
-import { getServicesByFacilityIds } from "../service/service.repository.ts";
+import {
+  getServicesByFacilityId,
+  getServicesByFacilityIds,
+  getServicesWithStaffIds,
+} from "../service/service.repository.ts";
+import { getFacilityDetails } from "./facility.service.ts";
+import { findStaffByFacilityId } from "../staff/staff.repository.ts";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -105,6 +114,32 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     },
     getFacilityById,
   );
+  fastify.get(
+    "/:id/bookingData",
+    {
+      schema: {
+        params: facilityParamsSchema,
+        querystring: facilityBookingQuerySchema,
+        response: { 200: facilityDataForBookingSchema },
+      },
+    },
+    async (
+      request: FastifyRequest<{ Params: FacilityParams; Querystring: FacilityBookingQuery }>,
+    ) => {
+      const facility = await getFacilityDetails(request.server.drizzle, request.params.id);
+      const servicesByFacilityId = await getServicesWithStaffIds(
+        request.server.drizzle,
+        facility.id,
+      );
+      const staff = await findStaffByFacilityId(request.server.drizzle, facility.id);
+
+      return {
+        ...facility,
+        staff: staff,
+        services: servicesByFacilityId,
+      };
+    },
+  );
   fastify.post<{
     Body: CreateFacilityRequest;
   }>(
@@ -137,6 +172,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     },
     patchFacilityById,
   );
+
   fastify.get<{
     Params: FacilityParams;
   }>(

@@ -2,9 +2,11 @@ import { api } from "@/lib/api";
 import { createParams } from "@/lib/queryStrings";
 import {
   facilityCityResponseSchema,
+  facilityDataForBookingSchema,
   facilityResponseSchema,
   facilityWithServicesResponseSchema,
   type FacilityCityResponse,
+  type FacilityDataForBookingResponse,
   type FacilityListQuery,
   type FacilityResponse,
 } from "@slotbook/shared/facility";
@@ -28,7 +30,6 @@ export async function getFacilities(params: FacilityListQuery): Promise<Facility
   return result;
 }
 export async function searchFacilities(params: FacilityListQuery) {
-  console.log(params)
   const query = createParams(params);
   const endpoint = query ? `/facilities/search?${query}` : "/facilities/search";
   return facilityWithServicesResponseSchema.array().parse(await api(endpoint));
@@ -49,6 +50,13 @@ export async function getCitiesList(getParams: {
 }
 export async function getFacilityById(id: string): Promise<FacilityResponse> {
   return facilityResponseSchema.parse(await api(`/facilities/${id}`, { method: "GET" }));
+}
+export async function getDataForBooking(
+  facilityId: string,
+): Promise<FacilityDataForBookingResponse> {
+  return facilityDataForBookingSchema.parse(
+    await api(`/facilities/${facilityId}/bookingData`, { method: "GET" }),
+  );
 }
 
 export async function getFacilityScheduleById(id: string): Promise<FacilityScheduleResponse[]> {

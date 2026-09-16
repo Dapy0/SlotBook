@@ -5,7 +5,7 @@ import type { Route } from "next";
 import { RotatingCategory } from "@/components/layout/RotatingCategory";
 import SmallFacilityPreviewCard from "@/components/layout/SmallFacilityPreviewCard";
 import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
-import { getCitiesList, getFacilities } from "@/services/facilities";
+import { getCitiesList, getFacilities, searchFacilities } from "@/services/facilities";
 import { getCategories } from "@/services/categories";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,7 +27,7 @@ async function Page() {
   const cookieStore = await cookies();
   const local = cookieStore.get("_sb_country")?.value || "PL";
   const [facilities, categories, citiesList] = await Promise.all([
-    getFacilities({ country: local, limit: 8 }),
+    searchFacilities({ country: local, limit: 8 }),
     getCategories({ country: local, limit: 4 }),
     getCitiesList({ country: local }),
   ]).catch();
@@ -89,7 +89,7 @@ async function Page() {
           <h1 className="text-3xl font-semibold">Promoted</h1>
           <div className="mt-5 flex flex-col gap-3">
             {facilities.slice(1, 6).map((facility) => (
-              <BigFacilityPreviewCard facility={facility} />
+              <BigFacilityPreviewCard key={facility.id + "Big"} facilityWithServices={facility} />
             ))}
           </div>
         </div>

@@ -5,7 +5,11 @@ import {
   type FacilityEntity,
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
-import type { FacilityCategoryResponse, FacilityListQuery, UpdateFacilityRequest } from "@slotbook/shared/facility";
+import type {
+  FacilityCategoryResponse,
+  FacilityListQuery,
+  UpdateFacilityRequest,
+} from "@slotbook/shared/facility";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
 import { services } from "../../db/schema/service.ts";
@@ -14,11 +18,12 @@ export async function findAllFacilitiesByParams(
   db: DB,
   params: FacilityListQuery,
 ): Promise<Array<FacilityEntity>> {
-  const { country, category, rating, priceMax, q, sort, limit } = params;
+  const { country, category, rating, priceMax, q, sort, limit, city } = params;
   const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
 
   if (category !== undefined) filters.push(eq(facilities.category, category));
   if (rating !== undefined) filters.push(gte(facilities.score, rating));
+  if (city !== undefined) filters.push(eq(facilities.city, city));
   if (q !== undefined && q !== "") {
     filters.push(or(ilike(facilities.name, `%${q}%`), ilike(facilities.description, `%${q}%`))!);
   }

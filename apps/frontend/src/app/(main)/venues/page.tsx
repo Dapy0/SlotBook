@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCategories } from "@/services/categories";
-import { getFacilities, searchFacilities } from "@/services/facilities";
+import { getCitiesList, getFacilities, searchFacilities } from "@/services/facilities";
 import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@slotbook/shared/facility";
 import { SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
@@ -32,16 +32,17 @@ async function Page({
     sort?: string;
   }>;
 }) {
-  const { category, rating, priceMax, q, sort } = await searchParams;
+  const { category, rating, priceMax, q, sort, city } = await searchParams;
   const country = (await cookies()).get("_sb_country")?.value || "PL";
 
   const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
   console.log(categoryName);
   if (category && !categoryName) notFound();
 
-  const [facilitiesWithServices, categories] = await Promise.all([
-    searchFacilities({ country, category: categoryName, q, sort }),
+  const [facilitiesWithServices, categories, cities] = await Promise.all([
+    searchFacilities({ country, category: categoryName, q, sort, city }),
     getCategories({ country }),
+    getCitiesList({ country }),
   ]);
 
   const countAll = categories.reduce((sum, c) => sum + c.count, 0);
@@ -67,7 +68,7 @@ async function Page({
 
       <div className="flex items-start gap-8">
         <Suspense fallback={<Skeleton className="h-160 w-65" />}>
-          <FiltersSidebar counts={categories} />
+          <FiltersSidebar cities={cities} counts={categories} />
         </Suspense>
 
         <div className="flex flex-1 flex-col gap-4">

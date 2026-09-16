@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SearchIcon } from "lucide-react";
+import type { Route } from 'next';
 import { useRouter, useSearchParams } from "next/navigation";
 
 function ResultsToolbar() {
@@ -23,7 +24,7 @@ function ResultsToolbar() {
         onSubmit={(e) => {
           e.preventDefault();
           const value = new FormData(e.currentTarget).get("q")?.toString().trim();
-          router.replace(buildHref({ q: value || null }));
+          router.replace(buildHref({ q: value || null }) as Route);
         }}
       >
         <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
@@ -39,7 +40,9 @@ function ResultsToolbar() {
         <span className="text-xs text-gray-500">SORT BY</span>
         <Select
           value={searchParams.get("sort") ?? "rating"}
-          onValueChange={(v) => router.replace(buildHref({ sort: v === "rating" ? null : v }))}
+          onValueChange={(v) =>
+            router.replace(buildHref({ sort: v === "rating" ? null : v }) as Route)
+          }
         >
           <SelectTrigger className="w-40">
             <SelectValue />

@@ -6,6 +6,7 @@ import {
   type DayOfTheWeek,
   type FacilityScheduleResponse,
 } from "@slotbook/shared/facilitySchedule";
+import type { FacilityCityResponse } from "@slotbook/shared";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -40,4 +41,24 @@ export function convertMinutesToTime(durationMinutes: number) {
   const hours = Math.trunc(durationMinutes / 60);
   const minutes = durationMinutes - hours * 60;
   return [hours, minutes];
+}
+export function convertToSelectFormat<T extends Record<string, unknown>>(
+  arrObj: T[],
+  labelField: keyof T,
+  valueField: keyof T,
+): Array<{
+  value: string ;
+  label: string;
+}> {
+  const res: Array<{
+    value: string ;
+    label: string;
+  }> = [];
+  for (const val of arrObj) {
+    res.push({
+      value: String(val[valueField]),
+      label: String(val[labelField]),
+    });
+  }
+  return res;
 }

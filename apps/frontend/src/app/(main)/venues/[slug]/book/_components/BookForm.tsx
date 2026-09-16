@@ -9,16 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { moneyFormatter } from "@/lib/format";
-import { convertMinutesToTime } from "@/lib/utils";
+import { durationFormatter, moneyFormatter } from "@/lib/format";
+import { convertMinutesToTime, convertToSelectFormat } from "@/lib/utils";
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
 import type { AvailabilitySlot } from "@slotbook/shared/availability";
-import type { FacilityResponse } from "@slotbook/shared/facility";
+import type { FacilityDataForBookingResponse, FacilityResponse } from "@slotbook/shared/facility";
 import type { FacilityScheduleResponse } from "@slotbook/shared/facilitySchedule";
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
 import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
-import { useCallback, useEffect, useState } from "react";
+import { MapPinIcon } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 const weekdayShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function buildDaysFromWithSchedule(count: number) {
@@ -38,108 +39,158 @@ function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 function BookForm({
-  facility,
-  service,
-  staffMembers,
+  bookingData,
+  initialService,
   initialStaff,
   initialDate,
   initialTime,
 }: {
-  facility: FacilityResponse & {
-    facilitySchedule: FacilityScheduleResponse[];
-  };
-  staffMembers: StaffMemberResponseDTO[];
-  service: ServiceResponseDTO;
+  bookingData: FacilityDataForBookingResponse;
+  initialService: string | null;
   initialStaff: string | null;
   initialDate: string | null;
   initialTime: string | null;
 }) {
   const [selectedStaff, setSelectedStaff] = useState<string | null>(initialStaff);
+  const [selectedService, setSelectedService] = useState<string | null>(initialService);
   const [selectedDay, setSelectedDay] = useState<string | null>(initialDate);
   const [selectedTime, setSelectedTime] = useState<string | null>(initialTime);
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const fetchSlots = useCallback(() => {
-    if (!selectedStaff || !selectedDay) {
-      setSlots([]);
-      return;
+  // const fetchSlots = useCallback(() => {
+  //   if (!selectedStaff || !selectedDay) {
+  //     setSlots([]);
+  //     return;
+  //   }
+  //   setIsLoadingSlots(true);
+
+  //   getAvailability(facility.id, selectedStaff, service.id, selectedDay)
+  //     .then(setSlots)
+  //     .catch((err) => {
+  //       setSlots([]);
+  //       setIsLoadingSlots(false);
+  //     })
+  //     .finally(() => setIsLoadingSlots(false));
+  // }, [selectedStaff, selectedDay, facility, service]);
+
+  // useEffect(() => {
+  //   fetchSlots();
+  // }, [fetchSlots]);
+
+  // async function handleBookSlot(startTime: string, staffMemberId: string, serviceId: string) {
+  //   try {
+  //     await createBooking(facility.id, {
+  //       staffMemberId,
+  //       serviceId,
+  //       startDatetime: startTime,
+  //     });
+
+  //     fetchSlots();
+  //   } catch (err) {
+  //     console.log(err instanceof Error ? err.message : "Failed to create booking");
+  //   } finally {
+  //     setSelectedTime(null);
+  //   }
+  // }
+  const { name, services, staff, reviewsCount, city, address, score } = bookingData;
+  const allowedServiceIds = useMemo(() => {
+    if (!selectedStaff) {
+      return null;
     }
-    setIsLoadingSlots(true);
+    return new Set(
+      services.filter((service) => service.staffMemberIds.includes(selectedStaff)).map((s) => s.id),
+    );
+  }, [selectedStaff, services]);
+  const allowedStaffIds = useMemo(() => {
+    if (!selectedService) return null;
+    const service = services.find((s) => s.id === selectedService);
+    return service ? new Set(service.staffMemberIds) : null;
+  }, [selectedService, services]);
 
-    getAvailability(facility.id, selectedStaff, service.id, selectedDay)
-      .then(setSlots)
-      .catch((err) => {
-        setSlots([]);
-        setIsLoadingSlots(false);
-      })
-      .finally(() => setIsLoadingSlots(false));
-  }, [selectedStaff, selectedDay, facility, service]);
+  const staffOptions = useMemo(
+    () => [
+      { label: "Any staff member", value: null },
+      ...convertToSelectFormat(staff, "name", "id"),
+    ],
+    [staff],
+  );
+  const serviceOptions = useMemo(
+    () => [{ label: "Any service", value: null }, ...convertToSelectFormat(services, "name", "id")],
+    [services],
+  );
 
-  useEffect(() => {
-    fetchSlots();
-  }, [fetchSlots]);
-
-  async function handleBookSlot(startTime: string, staffMemberId: string, serviceId: string) {
-    try {
-      await createBooking(facility.id, {
-        staffMemberId,
-        serviceId,
-        startDatetime: startTime,
-      });
-
-      fetchSlots();
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : "Failed to create booking");
-    } finally {
-      setSelectedTime(null);
-    }
-  }
-  // const availableCount = timeSlots.filter((s) => s.available).length;
-  const formatter = new Intl.DurationFormat("en", { style: "narrow" });
   return (
     <div>
       <BreadCrumbs crumbsList={["categories", "hair", "Padel Club", "Booking"]} />
       <div className="flex gap-10">
         <div className="flex flex-col gap-6">
           <header>
-            <h1 className="text-3xl font-bold text-gray-900">{service.name}</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              {facility.name} ·{" "}
-              {formatter.format({
-                hours: convertMinutesToTime(service.durationMinutes)[0],
-                minutes: convertMinutesToTime(service.durationMinutes)[1],
-              })}{" "}
-              · {moneyFormatter(service.priceCents, service.currency)}
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-0.5 text-sm text-gray-600">
+                <MapPinIcon size={13} />
+                {city} · {address}
+              </span>
+              {/* <span className="text-sm text-gray-600">4.7 km</span> */}
+            </div>
           </header>
-
           {/* Staff select */}
           <div>
-            <p className="mb-2 text-sm font-medium text-gray-900">Staff member</p>
-            <Select value={selectedStaff} onValueChange={setSelectedStaff}>
+            <p className="mb-2 text-sm font-medium text-gray-900">Select Staff</p>
+            <Select items={staffOptions} value={selectedStaff} onValueChange={setSelectedStaff}>
               <SelectTrigger className="w-full max-w-72">
-                <SelectValue placeholder="Select a staff member">
-                  {staffMembers.find((staffMember) => staffMember.id === selectedStaff)?.name ||
-                    "Select a staff member"}
-                </SelectValue>
+                <SelectValue></SelectValue>
               </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {staffMembers.map((staffMember) => (
-                    <SelectItem key={staffMember.name} value={staffMember.id}>
-                      {staffMember.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
+              <SelectContent alignItemWithTrigger={false}>
+                {staffOptions.map((staffMember) => (
+                  <SelectItem
+                    key={staffMember.label}
+                    value={staffMember.value}
+                    disabled={
+                      staffMember.value !== null &&
+                      allowedStaffIds !== null &&
+                      !allowedStaffIds.has(staffMember.value)
+                    }
+                  >
+                    {staffMember.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-
+          {/* Service Select */}
+          <div>
+            <p className="mb-2 text-sm font-medium text-gray-900">Select Service</p>
+            <Select
+              items={serviceOptions}
+              value={selectedService}
+              defaultValue={null}
+              onValueChange={setSelectedService}
+            >
+              <SelectTrigger className="w-full max-w-72">
+                <SelectValue></SelectValue>
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                {serviceOptions.map((service) => (
+                  <SelectItem
+                    key={service.label}
+                    value={service.value}
+                    disabled={
+                      service.value !== null &&
+                      allowedServiceIds !== null &&
+                      !allowedServiceIds.has(service.value)
+                    }
+                  >
+                    {service.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {/* Date picker */}
           <div>
-            <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-              Date · Booking open for the next 30 days
-            </p>
+            <p className="mb-2 text-sm font-medium text-gray-900">Select Date</p>
+
             <div className="flex max-w-2xl gap-2 overflow-x-scroll pb-1">
               {days.map((d) => {
                 const isSelected = d.key === selectedDay;
@@ -165,8 +216,10 @@ function BookForm({
                 );
               })}
             </div>
+            <p className="mt-2 text-xs font-light tracking-wide text-gray-400 uppercase">
+              Booking open for the next 30 days
+            </p>
           </div>
-
           {/* Time slots */}
           {isLoadingSlots ? (
             <h1>Select staff and day first</h1>
@@ -207,14 +260,14 @@ function BookForm({
           )}
         </div>
         <div className="w-72 shrink-0">
-          <BookingSummaryCard
-            businessName={facility.name}
-            city={facility.city}
-            address={facility.address}
-            score={facility.score}
-            reviewsCount={facility.reviewsCount}
-            service={service.name}
-            duration={formatter.format({
+          {/* <BookingSummaryCard
+            businessName={name}
+            city={city}
+            address={address}
+            score={score}
+            reviewsCount={reviewsCount}
+            service={selectedService ?? ''}
+            duration={durationFormatter.format({
               hours: convertMinutesToTime(service.durationMinutes)[0],
               minutes: convertMinutesToTime(service.durationMinutes)[1],
             })}
@@ -229,7 +282,7 @@ function BookForm({
                 handleBookSlot(selectedTime, selectedStaff, service.id);
               }
             }}
-          />
+          /> */}
         </div>
       </div>
     </div>

@@ -28,3 +28,11 @@ export const serviceResponseSchema = createServiceSchema.extend({
 });
 
 export type ServiceResponseDTO = z.infer<typeof serviceResponseSchema>;
+
+export const servicesWithStaffMemberIdResponseSchema = serviceResponseSchema.extend({
+  staffMemberIds: z.array(z.string().trim()),
+});
+
+export type ServicesWithStaffMemberIdResponse = z.infer<
+  typeof servicesWithStaffMemberIdResponseSchema
+>;

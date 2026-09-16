@@ -26,10 +26,24 @@ import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
 import { ZodError } from "zod";
-
+const isDev = process.env.NODE_ENV !== "production";
 export async function createServer() {
   const app = Fastify({
-    logger: true,
+    logger: isDev
+      ? {
+          level: "debug",
+          transport: {
+            target: "pino-pretty",
+            options: {
+              colorize: true,
+              translateTime: "HH:MM:ss Z",
+              ignore: "pid,hostname",
+            },
+          },
+        }
+      : {
+          level: "info",
+        },
   }).withTypeProvider<ZodTypeProvider>();
 
   // validator and serializer

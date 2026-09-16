@@ -9,14 +9,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CATEGORY_METADATA, FACILITY_CATEGORIES } from "@slotbook/shared/facility";
+import { convertToSelectFormat } from "@/lib/utils";
+import {
+  CATEGORY_METADATA,
+  FACILITY_CATEGORIES,
+  type FacilityCityResponse,
+} from "@slotbook/shared/facility";
+import type { Route } from "next";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 const RATINGS = [null, "4.0", "4.5", "4.8"];
 function FiltersSidebar({
   counts,
+  cities,
 }: {
   counts: Array<{ categoryName: (typeof FACILITY_CATEGORIES)[number]; count: number }>;
+  cities: FacilityCityResponse[];
 }) {
   const buildHref = useFilterHref();
   const router = useRouter();
@@ -26,13 +34,14 @@ function FiltersSidebar({
   const activeRating = searchParams.get("rating");
   const activeCity = searchParams.get("city");
   const activePrice = searchParams.get("priceMax");
+  const formattedCities = convertToSelectFormat(cities, "city", "city");
 
   return (
     <aside className="flex h-fit w-65 shrink-0 flex-col gap-6 rounded-md border p-4">
       <div>
         <p className="mb-3 text-xs font-medium text-gray-500">CATEGORY</p>
         <div className="flex flex-col gap-1">
-          <Link href={buildHref({ category: null })}>
+          <Link href={buildHref({ category: null }) as Route}>
             <Button
               variant={"ghost"}
               className={`-mx-2 flex w-full items-center justify-between rounded-md px-2 py-1 text-sm transition-colors hover:bg-gray-100 ${
@@ -51,7 +60,7 @@ function FiltersSidebar({
             const isSelected = activeCategory === slug;
 
             return (
-              <Link href={buildHref({ category: isSelected ? null : slug })}>
+              <Link key={slug} href={buildHref({ category: isSelected ? null : slug }) as Route}>
                 <Button
                   variant={"ghost"}
                   key={category}
@@ -79,16 +88,21 @@ function FiltersSidebar({
       <div>
         <p className="mb-3 text-xs font-medium text-gray-500">CITY</p>
         <Select
-          value={activeCity ?? "all"}
-          onValueChange={(v) => router.replace(buildHref({ city: v === "all" ? null : v }))}
+          value={activeCity}
+          items={formattedCities}
+          onValueChange={(v) =>
+            router.replace(buildHref({ city: v === "all" ? null : v }) as Route)
+          }
         >
           <SelectTrigger className="w-full">
-            <SelectValue />
+            <SelectValue placeholder="City" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All cities</SelectItem>
-            <SelectItem value="krakow">Kraków</SelectItem>
-            <SelectItem value="warszawa">Warszawa</SelectItem>
+            <SelectItem value={null}>All cities</SelectItem>
+
+            {formattedCities.map((city) => (
+              <SelectItem value={city.value}> {city.label.toWellFormed()}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -97,7 +111,7 @@ function FiltersSidebar({
         <p className="mb-3 text-xs font-medium text-gray-500">RATING</p>
         <div className="flex gap-2">
           {RATINGS.map((value) => (
-            <Link href={buildHref({ rating: value })}>
+            <Link key={value} href={buildHref({ rating: value }) as Route}>
               <Button
                 key={value ?? "any"}
                 size="sm"
@@ -114,7 +128,9 @@ function FiltersSidebar({
         <p className="mb-3 text-xs font-medium text-gray-500">PRICE FROM</p>
         <Select
           value={activePrice ?? "any"}
-          onValueChange={(v) => router.replace(buildHref({ priceMax: v === "any" ? null : v }))}
+          onValueChange={(v) =>
+            router.replace(buildHref({ priceMax: v === "any" ? null : v }) as Route)
+          }
         >
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -139,7 +155,7 @@ function FiltersSidebar({
               <Checkbox
                 checked={searchParams.get(key) === "1"}
                 onCheckedChange={(checked) =>
-                  router.replace(buildHref({ [key]: checked ? "1" : null }))
+                  router.replace(buildHref({ [key]: checked ? "1" : null }) as Route)
                 }
               />
               {label}

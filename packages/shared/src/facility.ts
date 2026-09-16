@@ -1,6 +1,7 @@
 import * as z from "zod";
-import { isoDateSchema } from "./codecs";
-import { serviceResponseSchema } from "./service";
+import { isoDateSchema, wallTimeSchema } from "./codecs";
+import { serviceResponseSchema, servicesWithStaffMemberIdResponseSchema } from "./service";
+import { staffMemberResponseSchema } from "./staffMembers";
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -143,11 +144,12 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   updatedAt: isoDateSchema,
 });
 export type FacilityResponse = z.infer<typeof facilityResponseSchema>;
-
+// FacilityWithServices
 export const facilityWithServicesResponseSchema = facilityResponseSchema.extend({
   services: serviceResponseSchema.array(),
 });
 export type FacilityWithServicesResponse = z.infer<typeof facilityWithServicesResponseSchema>;
+
 export const facilityListQuerySchema = z.object({
   country: z.string().trim(),
   city: z.string().trim().optional(),
@@ -161,3 +163,18 @@ export const facilityListQuerySchema = z.object({
   sort: z.string().trim().optional(),
 });
 export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
+
+// booking
+export const facilityDataForBookingSchema = facilityResponseSchema.extend({
+  services: servicesWithStaffMemberIdResponseSchema.array(),
+  staff: staffMemberResponseSchema.array(),
+});
+export type FacilityDataForBookingResponse = z.infer<typeof facilityDataForBookingSchema>;
+
+export const facilityBookingQuerySchema = z.object({
+  date: z.iso.date().optional(),
+  service: z.uuid().optional(),
+  staff: z.uuid().optional(),
+  time: wallTimeSchema.optional(),
+});
+export type FacilityBookingQuery = z.infer<typeof facilityBookingQuerySchema>;
