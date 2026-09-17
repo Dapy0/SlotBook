@@ -13,6 +13,7 @@ import { durationFormatter, moneyFormatter } from "@/lib/format";
 import { convertMinutesToTime, convertToSelectFormat, isoStringToWallTime } from "@/lib/utils";
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
+import { Button } from "@base-ui/react";
 import type { AvailabilityResponse, AvailabilitySlot } from "@slotbook/shared/availability";
 import type { FacilityDataForBookingResponse, FacilityResponse } from "@slotbook/shared/facility";
 import type { FacilityScheduleResponse } from "@slotbook/shared/facilitySchedule";
@@ -104,8 +105,8 @@ function BookForm({
   const selectedDaySlots = slots?.days.find((d) => d.date === selectedDay)?.slots ?? [];
   return (
     <div className="">
-      <BreadCrumbs crumbsList={["categories", "hair", "Padel Club", "Booking"]} />
-      <div className="flex w-full gap-10 justify-between">
+      <BreadCrumbs crumbsList={["facilities", name , 'book']} />
+      <div className="flex w-full justify-between gap-10">
         <div className="flex flex-col gap-6">
           <header>
             <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
@@ -181,9 +182,11 @@ function BookForm({
                 <div className="flex max-w-2xl gap-2 overflow-x-scroll pb-1">
                   {slots.days.map((day) => {
                     const isSelected = day.date === selectedDay;
+                    const isDisabled = day.slots.length === 0;
                     return (
-                      <button
+                      <Button
                         key={day.date}
+                        disabled={isDisabled}
                         onClick={() => {
                           setSelectedDay(day.date);
                           setSelectedStartTime(null);
@@ -193,19 +196,19 @@ function BookForm({
                           isSelected
                             ? "border-primary bg-primary text-white"
                             : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                        }`}
+                        } ${isDisabled ? "border-gray-100! bg-gray-100! text-gray-400!" : ""}`}
                       >
                         <span
                           className={`text-[11px] font-medium uppercase ${
                             isSelected ? "text-orange-100" : "text-gray-400"
-                          }`}
+                          } `}
                         >
                           {new Date(day.date).getDate()}
                         </span>
                         <span className="text-md font-medium">
                           {weekdayShort[new Date(day.date).getDay()]}
                         </span>
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -224,6 +227,7 @@ function BookForm({
                       return (
                         <button
                           key={startTimeIso}
+
                           onClick={() => {
                             setSelectedStartTime(startTimeIso);
                             setSelectedEndTime(endTimeIso);

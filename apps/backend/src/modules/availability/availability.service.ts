@@ -54,7 +54,7 @@ export async function getAvailableSlotsFor30days(
   ]);
 
   const now = new Date();
-  const firstDate = todayInTimeZone(facility.timezoneIANA, now);
+  const firstDate = todayInTimeZone(facility.timezoneIANA, now);  // 
   const lastDate = addDaysToIso(firstDate, 29);
 
   const windowEnd = fromZonedTime(`${lastDate}T23:59:59`, facility.timezoneIANA);
