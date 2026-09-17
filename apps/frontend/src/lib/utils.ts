@@ -31,7 +31,11 @@ const numberToDayName = Object.fromEntries(
 export function convertDayNumberToShortDayName(dayNumber: number): string {
   return numberToDayName[dayNumber as DayOfTheWeek];
 }
+export function isoStringToWallTime(time: string) {
+  const [date, wallTime] = time.split("T");
 
+  return removeExtraSecondsFromTime(wallTime);
+}
 export function removeExtraSecondsFromTime(time: string) {
   const [hours, minutes, seconds] = time.split(":");
   return `${hours}:${minutes}`;
@@ -47,11 +51,11 @@ export function convertToSelectFormat<T extends Record<string, unknown>>(
   labelField: keyof T,
   valueField: keyof T,
 ): Array<{
-  value: string ;
+  value: string;
   label: string;
 }> {
   const res: Array<{
-    value: string ;
+    value: string;
     label: string;
   }> = [];
   for (const val of arrObj) {

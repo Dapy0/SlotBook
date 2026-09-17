@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isoDateSchema, wallTimeSchema } from "./codecs";
+import { instantSchema, wallTimeSchema } from "./codecs";
 import { serviceResponseSchema, servicesWithStaffMemberIdResponseSchema } from "./service";
 import { staffMemberResponseSchema } from "./staffMembers";
 export const FACILITY_CATEGORIES = [
@@ -140,8 +140,8 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   ownerId: z.uuid(),
   score: z.number().min(0).max(5).nullable(),
   reviewsCount: z.int().nonnegative(),
-  createdAt: isoDateSchema,
-  updatedAt: isoDateSchema,
+  createdAt: instantSchema,
+  updatedAt: instantSchema,
 });
 export type FacilityResponse = z.infer<typeof facilityResponseSchema>;
 // FacilityWithServices
