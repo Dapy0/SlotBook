@@ -2,11 +2,10 @@ import z from "zod";
 
 export const availabilityParamSchema = z.object({
   id: z.uuid(),
-  staffId: z.uuid(),
 });
 export const availabilityQuerySchema = z.object({
-  serviceId: z.uuid(),
-  date: z.iso.date(),
+  service: z.uuid(),
+  staff: z.uuid(),
 });
 export type AvailabilityParamsAndQuery = {
   Params: z.infer<typeof availabilityParamSchema>;

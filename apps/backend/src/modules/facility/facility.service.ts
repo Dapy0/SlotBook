@@ -99,10 +99,9 @@ export async function changeFacilityWeekSchedule(
   requestedUserId: string,
   newSchedule: CreateFacilitySchedule[],
 ) {
-  console.log(newSchedule);
   await checkFacilityOwnership(db, facilityId, requestedUserId);
   await checkNoOverlapWithinSchedule(newSchedule);
-  console.log("passed checks");
+
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
     const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);

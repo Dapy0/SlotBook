@@ -5,6 +5,7 @@ import { findFacilityById } from "../facility/facility.repository.ts";
 import { checkFacilityOwnership } from "../facility/facility.service.ts";
 import {
   getServiceByFacilityIdAndServiceId,
+  getServiceByServiceIdAndStaffMemberId,
   getServicesByFacilityId,
   insertService,
 } from "./service.repository.ts";
@@ -19,6 +20,13 @@ export async function getFacilityServicesById(db: DB, facilityId: string) {
   await checkIfFacilityWithIdExists(db, facilityId);
   const services = await getServicesByFacilityId(db, facilityId);
   return services;
+}
+export async function getServiceForStaffMember(db: DB, serviceId: string, staffMemberId: string) {
+  const service = await getServiceByServiceIdAndStaffMemberId(db, serviceId, staffMemberId);
+  if (!service) {
+    throw new NotFoundError("No such service found");
+  }
+  return service;
 }
 
 export async function getFacilityServiceById(db: DB, serviceId: string, facilityId: string) {

@@ -29,6 +29,23 @@ export default defineConfig([
 
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "no-console": ["warn", { allow: ["error", "warn"] }],
+      "no-restricted-properties": [
+        "error",
+        ...[
+          "getHours",
+          "getMinutes",
+          "getDate",
+          "getDay",
+          "getMonth",
+          "getFullYear",
+          "toLocaleString",
+          "toLocaleDateString",
+          "toLocaleTimeString",
+        ].map((property) => ({
+          property,
+          message: "Works in pc timeZone. Use Intl.DateTimeFormat with timeZone.",
+        })),
+      ],
     },
   },
 

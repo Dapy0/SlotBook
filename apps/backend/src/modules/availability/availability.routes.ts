@@ -1,12 +1,11 @@
-import type { FastifyInstance } from "fastify";
-import { getAvailableTime } from "./availability.controller.ts";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   availabilityParamSchema,
   availabilityQuerySchema,
   type AvailabilityParamsAndQuery,
 } from "./availability.schema.ts";
-import { availabilitySlotSchema } from "@slotbook/shared/availability";
-import z from "zod";
+import { availabilityResponseSchema } from "@slotbook/shared/availability";
+import { getAvailableSlotsFor30days } from './availability.service.ts';
 
 export function availabilityRoutes(fastify: FastifyInstance) {
   fastify.get<AvailabilityParamsAndQuery>(
@@ -16,10 +15,18 @@ export function availabilityRoutes(fastify: FastifyInstance) {
         params: availabilityParamSchema,
         querystring: availabilityQuerySchema,
         response: {
-          200: z.array(availabilitySlotSchema),
+          200: availabilityResponseSchema,
         },
       },
     },
-    getAvailableTime,
+    async function (request: FastifyRequest<AvailabilityParamsAndQuery>, response: FastifyReply) {
+      const availableTime = await getAvailableSlotsFor30days(
+        request.server.drizzle,
+        request.params.id,
+        request.query.staff,
+        request.query.service,
+      );
+      return response.send(availableTime);
+    },
   );
 }

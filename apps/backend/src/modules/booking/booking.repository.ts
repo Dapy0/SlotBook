@@ -1,13 +1,38 @@
 import type { PatchBookingStatus } from "@slotbook/shared/bookings";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import { eq } from "drizzle-orm";
+import { eq, and, sql, ne } from "drizzle-orm";
 
 export async function findBookingsByFacilityId(db: DB, facilityId: string) {
   const facilityBookings = await db
     .select()
     .from(bookings)
     .where(eq(bookings.facilityId, facilityId));
+  return facilityBookings;
+}
+export async function findBusyRangesForStaff(
+  db: DB,
+  facilityId: string,
+  staffId: string,
+  windowStart: Date,
+  windowEnd: Date,
+) {
+  const facilityBookings = await db
+    .select({
+      start: sql<Date>`lower(${bookings.timeRange})`,
+      end: sql<Date>`upper(${bookings.timeRange})`,
+    })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.facilityId, facilityId),
+        eq(bookings.staffMemberId, staffId),
+        ne(bookings.status, "canceled"),
+        sql`${bookings.timeRange} && tstzrange(${windowStart}, ${windowEnd})`,
+      ),
+    )
+    .orderBy(sql`lower(${bookings.timeRange})`);
+
   return facilityBookings;
 }
 export async function findBookingById(db: DB, bookingId: string) {

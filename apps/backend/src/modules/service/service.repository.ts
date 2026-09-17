@@ -17,6 +17,25 @@ export async function getServicesByFacilityId(
     .innerJoin(facilities, eq(facilities.id, services.facilityId))
     .where(eq(services.facilityId, facilityId));
 }
+export async function getServiceByServiceIdAndStaffMemberId(
+  db: DB,
+  serviceId: string,
+  staffMemberId: string,
+): Promise<ServiceWithCurrency | null> {
+  const [service] = await db
+    .select({ ...getColumns(services), currency: facilities.currency })
+    .from(services)
+    .innerJoin(facilities, eq(facilities.id, services.facilityId))
+    .innerJoin(staffServices, eq(staffServices.serviceId, services.id))
+    .where(
+      and(
+        eq(services.id, serviceId),
+        eq(staffServices.staffMemberId, staffMemberId),
+        eq(services.isActive, true),
+      ),
+    );
+  return service ?? null;
+}
 
 export async function getServicesByFacilityIds(
   db: DB,

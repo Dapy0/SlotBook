@@ -44,12 +44,12 @@ import {
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
 import { findAllFacilitiesByParams, findCitiesByCountry } from "./facility.repository.ts";
 import {
-  getServicesByFacilityId,
   getServicesByFacilityIds,
   getServicesWithStaffIds,
 } from "../service/service.repository.ts";
 import { getFacilityDetails } from "./facility.service.ts";
 import { findStaffByFacilityId } from "../staff/staff.repository.ts";
+import { availabilityRoutes } from "../availability/availability.routes.ts";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -262,4 +262,5 @@ export async function facilityRoutes(fastify: FastifyInstance) {
   );
   fastify.register(staffRoutes, { prefix: "/" });
   fastify.register(bookingRoutes, { prefix: "/" });
+  fastify.register(availabilityRoutes, { prefix: "/:id" });
 }

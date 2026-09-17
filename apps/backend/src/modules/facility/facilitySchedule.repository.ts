@@ -8,7 +8,7 @@ import { and, eq } from "drizzle-orm";
 export async function findFacilitySchedule(
   db: DB,
   facilityId: string,
-): Promise<FacilityScheduleEntity[] | null> {
+): Promise<FacilityScheduleEntity[]> {
   const schedule = await db
     .select()
     .from(facilitySchedules)
