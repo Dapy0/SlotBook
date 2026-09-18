@@ -6,15 +6,13 @@ import type { AvailabilityResponse } from "@slotbook/shared/availability";
 import { findBusyRangesForStaff } from "../booking/booking.repository.ts";
 import { getServiceForStaffMember } from "../service/service.service.ts";
 import {
-  addDaysToIso,
-  getIsoWeekDay,
   intersectIntervals,
   overlaps,
   scheduleRowsToIntervals,
   sliceIntoSlots,
-  todayInTimeZone,
 } from "./availability.utils.ts";
 import { fromZonedTime } from "date-fns-tz";
+import { addDaysToIso, getIsoWeekDay, todayInTimeZone } from "../../lib/utils.ts";
 
 // function generateNext30Days(timezone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
 //   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -54,7 +52,7 @@ export async function getAvailableSlotsFor30days(
   ]);
 
   const now = new Date();
-  const firstDate = todayInTimeZone(facility.timezoneIANA, now);  // 
+  const firstDate = todayInTimeZone(facility.timezoneIANA, now); //
   const lastDate = addDaysToIso(firstDate, 29);
 
   const windowEnd = fromZonedTime(`${lastDate}T23:59:59`, facility.timezoneIANA);
@@ -69,14 +67,14 @@ export async function getAvailableSlotsFor30days(
 
     const facilityIntervals = scheduleRowsToIntervals(facilitySchedule, date, weekday, tz);
 
-    const workingIntervals =
-      staffSchedule.length === 0
-        ? facilityIntervals
-        : intersectIntervals(
-            facilityIntervals,
-            scheduleRowsToIntervals(staffSchedule, date, weekday, tz),
-          );
+    const workingIntervals = intersectIntervals(
+      facilityIntervals,
+      scheduleRowsToIntervals(staffSchedule, date, weekday, tz),
+    );
 
+    if (workingIntervals.length === 0) {
+      return { date, slots: [] };
+    }
     const slots = workingIntervals
       .flatMap((interval) => sliceIntoSlots(interval, service.durationMinutes))
       .filter((slot) => slot.start >= earliestStart)

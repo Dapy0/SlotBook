@@ -3,18 +3,7 @@ import { fromZonedTime } from 'date-fns-tz';
 export type Interval = { start: Date; end: Date };
 export type ScheduleRow = { dayOfTheWeek: number; startTime: string; endTime: string };
 
-export function addDaysToIso(isoDate: string, amount: number): string {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day + amount)).toISOString().slice(0, 10);
-}
-export function getIsoWeekDay(isoDate: string): number {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  const UTCWeekDay = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
-  return UTCWeekDay === 0 ? 8 : UTCWeekDay;
-}
-export function todayInTimeZone(timeZone: string, now = new Date()): string {
-  return Intl.DateTimeFormat("sv-SE", { timeZone }).format(now);
-}
+
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.start < b.end && b.start < a.end;
 }

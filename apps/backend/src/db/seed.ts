@@ -460,7 +460,6 @@ async function seed() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const db = drizzle({ client: pool });
 
-  // хешируем один раз: bcrypt намеренно медленный, 17 вызовов — это секунды впустую
   const passwordHash = await bcrypt.hash("password123", 10);
   const { serviceRows, scheduleRows, staffUserRows, staffMemberRows, staffServiceRows } =
     buildRows();

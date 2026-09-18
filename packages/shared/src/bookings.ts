@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { instantSchema } from './codecs';
+import { instantSchema } from "./codecs";
 const TSRANGE_RE =
   /^([[(])(?:"((?:[^"\\]|\\.)*)"|([^",]*))?,(?:"((?:[^"\\]|\\.)*)"|([^\])"]*))?([)\]])$/;
 
@@ -59,8 +59,9 @@ export const tsRangeSchema = z.codec(
 export const bookingRequestSchema = z.object({
   staffId: z.uuid(),
   serviceId: z.uuid(),
-  startTime: z.iso.datetime(),
+  startTime: z.iso.datetime().transform((val) => new Date(val)),
 });
+export type BookingRequestInput = z.input<typeof bookingRequestSchema>;
 export type BookingRequest = z.infer<typeof bookingRequestSchema>;
 
 export const updateBookingSchema = bookingRequestSchema.partial();

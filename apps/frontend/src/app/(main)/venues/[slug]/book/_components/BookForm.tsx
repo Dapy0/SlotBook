@@ -42,6 +42,7 @@ function BookForm({
     date: initialDate,
     slot: initialTime ? { start: initialTime, end: "" } : null,
   });
+  const [error, setError] = useState<string | null>(null);
   const handleReset = () => {
     setSelection({
       staff: null,
@@ -108,10 +109,11 @@ function BookForm({
         serviceId,
         startTime,
       });
+      handleReset();
     } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create booking");
       console.log(err instanceof Error ? err.message : "Failed to create booking");
     } finally {
-      handleReset();
     }
   }
   const allowedServiceIds = useMemo(() => {
@@ -285,6 +287,8 @@ function BookForm({
               </div>
             </>
           )}
+
+          {error && <div className='text-red-400'>Error happen: {error}</div>}
         </div>
         <div className="w-72 shrink-0">
           <BookingSummaryCard

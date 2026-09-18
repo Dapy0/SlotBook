@@ -5,8 +5,6 @@ import {
 } from "@slotbook/shared/facilitySchedule";
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type { ResponseStaffScheduleSchema } from "@slotbook/shared/staffSchedule";
-import type { FacilityScheduleEntity } from "../db/schema/facilitySchedule.ts";
-import type { StaffScheduleEntity } from "../db/schema/staffSchedule.ts";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
 
 export function checkNoOverlapWithinSchedule(
@@ -48,7 +46,7 @@ export function checkStaffScheduleFitsFacility(
 export async function checkIfBookingFitsAllSchedules(
   startTime: string,
   endTime: string,
-  dayOfTheWeek: DayOfTheWeek,
+  dayOfTheWeek: number,
   staffSchedule: ResponseStaffScheduleSchema[],
   facilitySchedule: FacilityScheduleResponse[],
 ) {
@@ -73,11 +71,6 @@ export async function checkIfBookingFitsAllSchedules(
   if (!fitsStaff) {
     throw new ConflictError(`Booking is outside staff working hours on day ${dayOfTheWeek}`);
   }
-}
-export function toTimeString(date: Date): string {
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  return `${hours}:${minutes}`;
 }
 
 export function convertShortDayNameToDayNumber(dayName: string): DayOfTheWeek {

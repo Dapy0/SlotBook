@@ -1,9 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import {
-  bodySchema,
   paramsPatchSchema,
   paramsSchema,
-  type BookingBody,
   type BookingParams,
   type BookingPatchParams,
 } from "./booking.schema.ts";
@@ -15,8 +13,10 @@ import {
 } from "./booking.controller.ts";
 import z from "zod";
 import {
+  bookingRequestSchema,
   bookingResponseSchema,
   patchBookingStatusSchema,
+  type BookingRequest,
   type PatchBookingStatus,
 } from "@slotbook/shared/bookings";
 import {
@@ -39,13 +39,13 @@ export async function bookingRoutes(fastify: FastifyInstance) {
     getBookings,
   );
 
-  fastify.post<{ Params: BookingParams; Body: BookingBody }>(
+  fastify.post<{ Params: BookingParams; Body: BookingRequest }>(
     "/:id/bookings",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsSchema,
-        body: bodySchema,
+        body: bookingRequestSchema,
       },
     },
     createBooking,

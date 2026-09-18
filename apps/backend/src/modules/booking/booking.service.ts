@@ -13,10 +13,10 @@ import {
   insertBooking,
   patchStatusByBookingId,
 } from "./booking.repository.ts";
-import type { BookingBody } from "./booking.schema.ts";
-import { checkIfBookingFitsAllSchedules, toTimeString } from "../../lib/scheduleHelpers.ts";
+import { checkIfBookingFitsAllSchedules } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type { PatchBookingStatus } from "@slotbook/shared/bookings";
+import type { BookingRequest, PatchBookingStatus } from "@slotbook/shared/bookings";
+import { getLocalDayOfWeek, getLocalWallTime } from "../../lib/utils.ts";
 export async function getFacilityBookingsForOwner(db: DB, userId: string, facilityId: string) {
   await checkFacilityOwnership(db, facilityId, userId);
 
@@ -28,42 +28,45 @@ export async function createBookingForFacility(
   db: DB,
   userId: string,
   facilityId: string,
-  data: BookingBody,
+  data: BookingRequest,
 ) {
-  const facility = await getFacilityDetails(db, facilityId);
-  const staffMember = await checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId);
-  const staffMemberSchedule = await receiveStaffSchedule(db, facilityId, staffMember.id);
-  const serviceDetails = await getFacilityServiceById(db, data.serviceId, facilityId);
-  const facilitySchedule = await findFacilitySchedule(db, facility.id);
-  await checkIfStaffMemberIsDoingService(db, staffMember.id, data.serviceId);
+  const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
+    getFacilityDetails(db, facilityId),
+    checkIfStaffIsFacilityWorker(db, facilityId, data.staffId),
+    getFacilityServiceById(db, data.serviceId, facilityId),
+    receiveStaffSchedule(db, facilityId, data.staffId),
+    findFacilitySchedule(db, facilityId),
+  ]);
 
-  if (userId === facility.ownerId) {
-    throw new ForbiddenError("No self bookings allowed");
-  }
-  if (data.startDatetime <= new Date()) {
+  await checkIfStaffMemberIsDoingService(db, staff.id, service.id);
+
+  // if (userId === facility.ownerId) {
+  //   throw new ForbiddenError("No self bookings allowed");
+  // }
+  if (data.startTime.getTime() <= Date.now()) {
     throw new ConflictError("Start time is in the past");
   }
 
-  const localDay = ((data.startDatetime.getDay() + 6) % 7) as 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  const startDatetime = data.startTime;
+  const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60_000);
 
-  const endDatetime = new Date(
-    data.startDatetime.getTime() + serviceDetails.durationMinutes * 60_000,
-  );
-
+  const localDay = getLocalDayOfWeek(startDatetime, facility.timezoneIANA);
+  const localStartTime = getLocalWallTime(startDatetime, facility.timezoneIANA);
+  const localEndTime = getLocalWallTime(endDatetime, facility.timezoneIANA);
   await checkIfBookingFitsAllSchedules(
-    toTimeString(data.startDatetime),
-    toTimeString(endDatetime),
+    localStartTime,
+    localEndTime,
     localDay,
-    staffMemberSchedule,
+    staffSchedule,
     facilitySchedule,
   );
 
   const booking = await insertBooking(db, {
     clientId: userId,
     facilityId,
-    staffMemberId: staffMember.id,
-    serviceId: data.serviceId,
-    startDatetime: data.startDatetime,
+    staffMemberId: staff.id,
+    serviceId: service.id,
+    startDatetime,
     endDatetime,
   }).catch((e) => {
     if (e.code === "23P01") {

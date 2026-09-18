@@ -17,15 +17,12 @@ import {
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 
 export async function receiveStaffSchedule(db: DB, facilityID: string, staffId: string) {
-  const facility = await findFacilityById(db, facilityID);
-  if (!facility) {
-    throw new NotFoundError("No such facility found");
-  }
+
   const staffMemberFacility = await findStaffMemberById(db, staffId);
   if (!staffMemberFacility) {
     throw new NotFoundError("No such worker found in facilities");
   }
-  if (staffMemberFacility.facilityId !== facility.id) {
+  if (staffMemberFacility.facilityId !== facilityID) {
     throw new NotFoundError("No such worker found in this facility");
   }
   const staffSchedule = await findScheduleByStaffId(db, staffId);
