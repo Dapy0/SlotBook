@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { instantSchema } from './codecs';
 const TSRANGE_RE =
   /^([[(])(?:"((?:[^"\\]|\\.)*)"|([^",]*))?,(?:"((?:[^"\\]|\\.)*)"|([^\])"]*))?([)\]])$/;
 
@@ -54,6 +55,17 @@ export const tsRangeSchema = z.codec(
     encode: parseTsRangeLiteral,
   },
 );
+// Request
+export const bookingRequestSchema = z.object({
+  staffId: z.uuid(),
+  serviceId: z.uuid(),
+  startTime: z.iso.datetime(),
+});
+export type BookingRequest = z.infer<typeof bookingRequestSchema>;
+
+export const updateBookingSchema = bookingRequestSchema.partial();
+export type UpdateBookingBody = z.infer<typeof updateBookingSchema>;
+
 // Response DTOs
 
 export const bookingResponseSchema = z.object({

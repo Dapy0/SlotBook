@@ -1,4 +1,5 @@
 "use client";
+import { useFilterHref } from "@/components/hooks/useFilterHref";
 import BookingSummaryCard from "@/components/layout/BookingSummaryCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import {
@@ -14,13 +15,10 @@ import { convertMinutesToTime, convertToSelectFormat, isoStringToWallTime } from
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
 import { Button } from "@base-ui/react";
-import type { AvailabilityResponse, AvailabilitySlot } from "@slotbook/shared/availability";
+import type { AvailabilityResponse } from "@slotbook/shared/availability";
 import type { FacilityDataForBookingResponse, FacilityResponse } from "@slotbook/shared/facility";
-import type { FacilityScheduleResponse } from "@slotbook/shared/facilitySchedule";
-import type { ServiceResponseDTO } from "@slotbook/shared/service";
-import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
 import { MapPinIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 const weekdayShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function BookForm({
@@ -36,60 +34,104 @@ function BookForm({
   initialDate: string | null;
   initialTime: string | null;
 }) {
-  const [selectedStaff, setSelectedStaff] = useState<string | null>(initialStaff);
-  const [selectedService, setSelectedService] = useState<string | null>(initialService);
-  const [selectedDay, setSelectedDay] = useState<string | null>(initialDate);
-  const [selectedStartTime, setSelectedStartTime] = useState<string | null>(initialTime);
-  const [selectedEndTime, setSelectedEndTime] = useState<string | null>();
   const [slots, setSlots] = useState<AvailabilityResponse | null>();
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const { id, name, services, staff, reviewsCount, city, address, score } = bookingData;
-  const selectedServiceData = services.find((service) => service.id === selectedService);
 
-  const fetchSlots = useCallback(() => {
-    if (!selectedStaff || !selectedService) {
+  const [selection, setSelection] = useState({
+    staff: initialStaff,
+    service: initialService,
+    date: initialDate,
+    slot: initialTime ? { start: initialTime, end: "" } : null,
+  });
+  const handleReset = () => {
+    setSelection({
+      staff: null,
+      date: null,
+      slot: null,
+      service: null,
+    });
+  };
+  const handleSelectStaff = (staffId: string | null) => {
+    setSelection({
+      ...selection,
+      staff: staffId,
+      date: null,
+      slot: null,
+    });
+  };
+  const handleSelectService = (serviceId: string | null) => {
+    setSelection({
+      ...selection,
+      service: serviceId,
+      date: null,
+      slot: null,
+    });
+  };
+  const handleSelectDate = (date: string) => {
+    setSelection({
+      ...selection,
+
+      date: date,
+      slot: null,
+    });
+  };
+  const handleSelectSlotTime = (start: string, end: string) => {
+    setSelection({
+      ...selection,
+      slot: { start, end },
+    });
+  };
+  const { id, name, services, staff, reviewsCount, city, address, score } = bookingData;
+  const selectedServiceData = services.find((service) => service.id === selection.service);
+  useEffect(() => {
+    if (!selection.staff || !selection.service) {
       setSlots(null);
       return;
     }
-    setIsLoadingSlots(true);
+    let ignore = false;
 
-    getAvailability(id, selectedStaff, selectedService)
-      .then(setSlots)
-      .finally(() => setIsLoadingSlots(false));
-  }, [selectedStaff, selectedService]);
+    getAvailability(id, selection.staff, selection.service)
+      .then((res) => {
+        if (!ignore) setSlots(res);
+      })
+      .finally(() => {
+        // if (!ignore) setIsLoadingSlots(false);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [id, selection.staff, selection.service]);
 
-  useEffect(() => {
-    fetchSlots();
-  }, [fetchSlots]);
-
-  // async function handleBookSlot(startTime: string, staffMemberId: string, serviceId: string) {
-  //   try {
-  //     await createBooking(facility.id, {
-  //       staffMemberId,
-  //       serviceId,
-  //       startDatetime: startTime,
-  //     });
-
-  //     fetchSlots();
-  //   } catch (err) {
-  //     console.log(err instanceof Error ? err.message : "Failed to create booking");
-  //   } finally {
-  //     setSelectedTime(null);
-  //   }
-  // }
-  const allowedServiceIds = useMemo(() => {
-    if (!selectedStaff) {
-      return null;
+  async function handleBookSlot(startTime: string, staffId: string, serviceId: string) {
+    try {
+      await createBooking(id, {
+        staffId,
+        serviceId,
+        startTime,
+      });
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : "Failed to create booking");
+    } finally {
+      handleReset();
     }
-    return new Set(
-      services.filter((service) => service.staffMemberIds.includes(selectedStaff)).map((s) => s.id),
-    );
-  }, [selectedStaff, services]);
+  }
+  const allowedServiceIds = useMemo(() => {
+    const staffId = selection.staff;
+    if (!staffId) return null;
+
+    const ids = new Set<string>();
+    for (const service of services) {
+      if (service.staffMemberIds.includes(staffId)) {
+        ids.add(service.id);
+      }
+    }
+
+    return ids;
+  }, [selection.staff, services]);
   const allowedStaffIds = useMemo(() => {
-    if (!selectedService) return null;
-    const service = services.find((s) => s.id === selectedService);
+    if (!selection.service) return null;
+    const service = services.find((s) => s.id === selection.service);
     return service ? new Set(service.staffMemberIds) : null;
-  }, [selectedService, services]);
+  }, [selection.service, services]);
 
   const staffOptions = useMemo(
     () => [
@@ -102,10 +144,10 @@ function BookForm({
     () => [{ label: "Any service", value: null }, ...convertToSelectFormat(services, "name", "id")],
     [services],
   );
-  const selectedDaySlots = slots?.days.find((d) => d.date === selectedDay)?.slots ?? [];
+  const selectedDaySlots = slots?.days.find((d) => d.date === selection.date)?.slots ?? [];
   return (
     <div className="">
-      <BreadCrumbs crumbsList={["facilities", name , 'book']} />
+      <BreadCrumbs crumbsList={["facilities", name, "book"]} />
       <div className="flex w-full justify-between gap-10">
         <div className="flex flex-col gap-6">
           <header>
@@ -121,7 +163,7 @@ function BookForm({
           {/* Staff select */}
           <div>
             <p className="mb-2 text-sm font-medium text-gray-900">Select Staff</p>
-            <Select items={staffOptions} value={selectedStaff} onValueChange={setSelectedStaff}>
+            <Select items={staffOptions} value={selection.staff} onValueChange={handleSelectStaff}>
               <SelectTrigger className="w-full max-w-72">
                 <SelectValue></SelectValue>
               </SelectTrigger>
@@ -147,9 +189,8 @@ function BookForm({
             <p className="mb-2 text-sm font-medium text-gray-900">Select Service</p>
             <Select
               items={serviceOptions}
-              value={selectedService}
-              defaultValue={null}
-              onValueChange={setSelectedService}
+              value={selection.service}
+              onValueChange={handleSelectService}
             >
               <SelectTrigger className="w-full max-w-72">
                 <SelectValue></SelectValue>
@@ -181,16 +222,14 @@ function BookForm({
 
                 <div className="flex max-w-2xl gap-2 overflow-x-scroll pb-1">
                   {slots.days.map((day) => {
-                    const isSelected = day.date === selectedDay;
+                    const isSelected = day.date === selection.date;
                     const isDisabled = day.slots.length === 0;
                     return (
                       <Button
                         key={day.date}
                         disabled={isDisabled}
                         onClick={() => {
-                          setSelectedDay(day.date);
-                          setSelectedStartTime(null);
-                          setSelectedEndTime(null);
+                          handleSelectDate(day.date);
                         }}
                         className={`flex size-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border text-sm transition ${
                           isSelected
@@ -223,14 +262,13 @@ function BookForm({
                     {selectedDaySlots.map((slot) => {
                       const startTimeIso = slot.start.toISOString();
                       const endTimeIso = slot.end.toISOString();
-                      const isSelected = startTimeIso === selectedStartTime;
+                      const isSelected = startTimeIso === selection.slot?.start;
                       return (
                         <button
                           key={startTimeIso}
 
                           onClick={() => {
-                            setSelectedStartTime(startTimeIso);
-                            setSelectedEndTime(endTimeIso);
+                            handleSelectSlotTime(startTimeIso, endTimeIso);
                           }}
                           className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
                             isSelected
@@ -264,10 +302,12 @@ function BookForm({
                   })
                 : "Select something"
             }
-            date={selectedDay ? new Date(selectedDay).toLocaleDateString() : "Select something"}
+            date={
+              selection.date ? new Date(selection.date).toLocaleDateString() : "Select something"
+            }
             time={
-              selectedStartTime && selectedEndTime
-                ? `${isoStringToWallTime(selectedStartTime)} - ${isoStringToWallTime(selectedEndTime)}`
+              selection.slot
+                ? `${isoStringToWallTime(selection.slot.start)} - ${isoStringToWallTime(selection.slot.end)}`
                 : "Select something"
             }
             price={
@@ -276,8 +316,8 @@ function BookForm({
                 : "-"
             }
             onConfirm={() => {
-              if (selectedStartTime && selectedStaff) {
-                // handleBookSlot(selectedTime, selectedStaff, service.id);
+              if (selection.slot && selection.staff && selection.service) {
+                handleBookSlot(selection.slot.start, selection.staff, selection.service);
               }
             }}
           />
