@@ -35,16 +35,18 @@ export function Header<T extends string>({
 }: {
   navBtns?: NavButton<T>[];
   rightBtns?: NavButton<T>[];
-  countries: CountryOption[];
-  country: string;
+  countries?: CountryOption[];
+  country?: string;
 }) {
   const { user, isLoading, logout } = useAuth();
   const [isPending, startTransition] = useTransition();
 
-  const items = countries.map((option) => ({
-    value: option.country,
-    label: `${countryFlag(option.country)} ${countryName(option.country)}`,
-  }));
+  const items = countries
+    ? countries.map((option) => ({
+        value: option.country,
+        label: `${countryFlag(option.country)} ${countryName(option.country)}`,
+      }))
+    : null;
   return (
     <header className="shrink-0 border-b border-border bg-background">
       <div className="align-center mx-auto my-0 flex max-w-7xl justify-between gap-4 p-4">
@@ -63,28 +65,30 @@ export function Header<T extends string>({
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Select
-            items={items}
-            value={country}
-            disabled={isPending}
-            onValueChange={(value) => {
-              if (!value || value === country) return;
-              startTransition(() => setCountry(value));
-            }}
-          >
-            <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false}>
-              <SelectGroup>
-                {items.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          {countries && (
+            <Select
+              items={items!}
+              value={country}
+              disabled={isPending}
+              onValueChange={(value) => {
+                if (!value || value === country) return;
+                startTransition(() => setCountry(value));
+              }}
+            >
+              <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                <SelectGroup>
+                  {items!.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
           {!isLoading && user ? (
             <ProfileMenu user={user} profilePicture={""} onLogout={logout} />
           ) : (
