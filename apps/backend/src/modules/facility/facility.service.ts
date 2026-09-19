@@ -18,8 +18,7 @@ import {
   findFacilitySchedule,
   insertFacilityScheduleByFacilityId,
 } from "./facilitySchedule.repository.ts";
-import type { CreateFacilitySchedule } from "@slotbook/shared/facilitySchedule";
-import { checkNoOverlapWithinSchedule } from "../../lib/scheduleHelpers.ts";
+import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 
 export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
   const facility = await findFacilityById(db, facilityId);
@@ -97,15 +96,13 @@ export async function changeFacilityWeekSchedule(
   db: DB,
   facilityId: string,
   requestedUserId: string,
-  newSchedule: CreateFacilitySchedule[],
+  newSchedule: ChangeWeekScheduleRequest,
 ) {
   await checkFacilityOwnership(db, facilityId, requestedUserId);
-  await checkNoOverlapWithinSchedule(newSchedule);
 
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
-    const inserted = await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
-    return inserted;
+    return await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
   });
   if (!transaction) {
     throw new Error("Something in transaction went wrong");

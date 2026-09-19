@@ -1,19 +1,6 @@
 import * as z from "zod";
 import { instantSchema } from "./codecs";
-
-function isValidTimeZone(timeZone: string): boolean {
-  try {
-    new Intl.DateTimeFormat("en", { timeZone });
-    return true;
-  } catch {
-    return false;
-  }
-}
-export const timezoneSchema = z
-  .string()
-  .trim()
-  .refine(isValidTimeZone, { error: "Incorrect IANA" });
-
+import { timezoneSchema } from './facility';
 
 export const userSchema = z.strictObject({
   id: z.uuid(),

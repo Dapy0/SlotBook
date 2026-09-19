@@ -12,9 +12,7 @@ export const staffSchedules = pgTable(
     dayOfTheWeek: smallint("day_of_the_week").$type<DayOfTheWeek>().notNull(),
     startTime: time("start_time", { precision: 0 }).notNull(),
     endTime: time("end_time", { precision: 0 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
     index("staff_schedule_member_idx").on(table.staffMemberId),

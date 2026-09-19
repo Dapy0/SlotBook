@@ -1,12 +1,8 @@
 import { api } from "@/lib/api";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import {
-  daysAndThereNames,
-  type DayOfTheWeek,
-  type FacilityScheduleResponse,
-} from "@slotbook/shared/facilitySchedule";
-import type { FacilityCityResponse } from "@slotbook/shared";
+
+import { WEEKDAY_BY_NAME, type FacilityCityResponse, type Weekday } from "@slotbook/shared";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,11 +21,11 @@ export function getMapLink(address: string, lat: number, lng: number) {
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 const numberToDayName = Object.fromEntries(
-  Object.entries(daysAndThereNames).map(([name, num]) => [num, name]),
-) as Record<DayOfTheWeek, string>;
+  Object.entries(WEEKDAY_BY_NAME).map(([name, num]) => [num, name]),
+) as Record<Weekday, string>;
 
 export function convertDayNumberToShortDayName(dayNumber: number): string {
-  return numberToDayName[dayNumber as DayOfTheWeek];
+  return numberToDayName[dayNumber as Weekday];
 }
 export function isoStringToWallTime(time: string) {
   const [date, wallTime] = time.split("T");

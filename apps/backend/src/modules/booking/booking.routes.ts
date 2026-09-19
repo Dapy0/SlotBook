@@ -19,10 +19,7 @@ import {
   type BookingRequest,
   type PatchBookingStatus,
 } from "@slotbook/shared/bookings";
-import {
-  createReviewRequestSchema,
-  type CreateReviewRequest,
-} from "@slotbook/shared/reviews";
+import { reviewRequestSchema, type ReviewRequest } from '@slotbook/shared/reviews';
 
 export async function bookingRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: BookingParams }>(
@@ -51,13 +48,13 @@ export async function bookingRoutes(fastify: FastifyInstance) {
     createBooking,
   );
 
-  fastify.post<{ Params: BookingPatchParams; Body: CreateReviewRequest }>(
+  fastify.post<{ Params: BookingPatchParams; Body: ReviewRequest }>(
     "/:id/bookings/:bookingId/reviews",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsPatchSchema,
-        body: createReviewRequestSchema,
+        body: reviewRequestSchema,
       },
     },
     postReviewForBooking,

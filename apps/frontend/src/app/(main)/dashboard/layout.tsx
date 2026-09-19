@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from 'next';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={item.href as Route}
                 className={`rounded-md px-3 py-2 text-lg transition ${
                   isActive
                     ? "bg-gray-100 font-medium text-gray-900"

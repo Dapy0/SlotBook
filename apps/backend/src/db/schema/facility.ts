@@ -40,12 +40,8 @@ export const facilities = pgTable(
     reviewsCount: integer("reviews_count").notNull().default(0),
     isPublished: boolean("is_published").notNull().default(false),
     timezoneIANA: text("timezone_IANA").notNull().default("Europe/Warsaw"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     // telegram_chat_id
   },
   (table) => [

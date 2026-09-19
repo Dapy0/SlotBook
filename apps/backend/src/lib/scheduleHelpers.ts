@@ -1,11 +1,6 @@
-import {
-  daysAndThereNames,
-  type DayOfTheWeek,
-  type FacilityScheduleResponse,
-} from "@slotbook/shared/facilitySchedule";
 import { BadRequestError, ConflictError } from "./errors.ts";
-import type { ResponseStaffScheduleSchema } from "@slotbook/shared/staffSchedule";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
+import { WEEKDAY_BY_NAME, type FacilityWeekScheduleResponse, type StaffWeekScheduleResponse, type Weekday, type WeekdayByName } from "@slotbook/shared";
 
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
@@ -47,8 +42,8 @@ export async function checkIfBookingFitsAllSchedules(
   startTime: string,
   endTime: string,
   dayOfTheWeek: number,
-  staffSchedule: ResponseStaffScheduleSchema[],
-  facilitySchedule: FacilityScheduleResponse[],
+  staffSchedule: StaffWeekScheduleResponse,
+  facilitySchedule: FacilityWeekScheduleResponse,
 ) {
   const facilityDaySchedules = facilitySchedule.filter((f) => f.dayOfTheWeek === dayOfTheWeek);
   const staffDaySchedules = staffSchedule.filter((s) => s.dayOfTheWeek === dayOfTheWeek);
@@ -73,8 +68,8 @@ export async function checkIfBookingFitsAllSchedules(
   }
 }
 
-export function convertShortDayNameToDayNumber(dayName: string): DayOfTheWeek {
-  return daysAndThereNames[dayName];
+export function convertShortDayNameToDayNumber(dayName: WeekdayByName): Weekday {
+  return WEEKDAY_BY_NAME[dayName];
 }
 export function addMinutesToTimeString(time: string, minutesToAdd: number): string {
   const [hours, minutes, seconds] = time.split(":").map(Number);

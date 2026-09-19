@@ -10,12 +10,13 @@ import {
   type FacilityListQuery,
   type FacilityResponse,
 } from "@slotbook/shared/facility";
-import {
-  facilityScheduleResponseSchema,
-  type FacilityScheduleResponse,
-} from "@slotbook/shared/facilitySchedule";
+
 import type { ServiceResponseDTO } from "@slotbook/shared/service";
 import { facilities } from "../../../backend/src/db/schema/facility";
+import {
+  facilityScheduleEntryResponseSchema,
+  type FacilityScheduleEntryResponse,
+} from "@slotbook/shared";
 
 export async function getFacilities(params: FacilityListQuery): Promise<FacilityResponse[]> {
   const query = createParams(params);
@@ -59,10 +60,10 @@ export async function getDataForBooking(
   );
 }
 
-export async function getFacilityScheduleById(id: string): Promise<FacilityScheduleResponse[]> {
-  return facilityScheduleResponseSchema
-    .array()
-    .parse(await api(`/facilities/${id}/schedule`, { method: "GET" }));
+export async function getFacilityScheduleById(id: string): Promise<FacilityScheduleEntryResponse> {
+  return facilityScheduleEntryResponseSchema.parse(
+    await api(`/facilities/${id}/schedule`, { method: "GET" }),
+  );
 }
 
 export async function getMyFacilities(): Promise<FacilityResponse[]> {

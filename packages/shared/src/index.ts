@@ -2,8 +2,8 @@ export * from "./codecs.ts";
 
 export * from "./auth";
 export * from "./facility";
-export * from "./facilitySchedule";
 export * from "./user";
+export * from "./schedule.ts";
 export * from "./service";
 export * from "./staffMembers";
 export * from "./staffServices";

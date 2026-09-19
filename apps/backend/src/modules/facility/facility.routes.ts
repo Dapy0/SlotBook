@@ -36,11 +36,7 @@ import {
 } from "@slotbook/shared/facility";
 import { staffRoutes } from "../staff/staff.routes.ts";
 import { bookingRoutes } from "../booking/booking.routes.ts";
-import {
-  createFacilityScheduleSchema,
-  facilityScheduleResponseSchema,
-  type CreateFacilitySchedule,
-} from "@slotbook/shared/facilitySchedule";
+
 import { reviewResponseSchema } from "@slotbook/shared/reviews";
 import { findAllFacilitiesByParams, findCitiesByCountry } from "./facility.repository.ts";
 import {
@@ -50,6 +46,11 @@ import {
 import { getFacilityDetails } from "./facility.service.ts";
 import { findStaffByFacilityId } from "../staff/staff.repository.ts";
 import { availabilityRoutes } from "../availability/availability.routes.ts";
+import {
+  changeWeekScheduleRequestSchema,
+  facilityWeekScheduleResponseSchema,
+  type ChangeWeekScheduleRequest,
+} from "@slotbook/shared";
 
 export async function facilityRoutes(fastify: FastifyInstance) {
   fastify.get(
@@ -94,7 +95,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     {
       onRequest: [fastify.authenticate],
       schema: {
-        querystring: facilityListQuerySchema,
+        
         response: {
           200: z.array(facilityResponseSchema),
         },
@@ -181,14 +182,14 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       schema: {
         params: facilityParamsSchema,
         response: {
-          200: z.array(facilityScheduleResponseSchema),
+          200: facilityWeekScheduleResponseSchema,
         },
       },
     },
     getFacilitySchedule,
   );
   fastify.put<{
-    Body: CreateFacilitySchedule[];
+    Body: ChangeWeekScheduleRequest;
     Params: FacilityParams;
   }>(
     "/:id/schedule",
@@ -196,9 +197,9 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
-        body: z.array(createFacilityScheduleSchema),
+        body: changeWeekScheduleRequestSchema,
         response: {
-          200: z.array(facilityScheduleResponseSchema),
+          200: facilityWeekScheduleResponseSchema,
         },
       },
     },

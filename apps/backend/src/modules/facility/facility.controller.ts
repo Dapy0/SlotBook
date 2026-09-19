@@ -15,9 +15,9 @@ import {
   removeOwnedFacilityById,
   updateOwnedFacility,
 } from "./facility.service.ts";
-import type { CreateFacilitySchedule } from "@slotbook/shared/facilitySchedule";
 import { getAllFacilityReviews } from "../review/review.service.ts";
 import { getAllCategories } from "./facility.repository.ts";
+import type { ChangeWeekScheduleRequest } from '@slotbook/shared';
 
 export async function getAllFacilities(
   request: FastifyRequest<{ Querystring: FacilityListQuery }>,
@@ -86,7 +86,7 @@ export async function getFacilitySchedule(
 export async function putFacilitySchedule(
   request: FastifyRequest<{
     Params: FacilityParams;
-    Body: CreateFacilitySchedule[];
+    Body: ChangeWeekScheduleRequest;
   }>,
   response: FastifyReply,
 ) {

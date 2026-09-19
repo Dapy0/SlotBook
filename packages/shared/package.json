@@ -38,7 +38,8 @@
     "./availability": "./src/availability.ts",
     "./reviews": "./src/reviews.ts",
     "./errors": "./src/errors.ts",
-    "./geo": "./src/geo.ts"
+    "./geo": "./src/geo.ts",
+    "./schedule": "./src/schedule.ts"
   },
   "devDependencies": {
     "zod": "^4.4.3",
