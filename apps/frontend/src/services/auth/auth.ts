@@ -1,16 +1,15 @@
 import { api } from "@/lib/api";
-import type { LoginFormValues, RegisterFormValues } from "@/lib/validations/auth";
-import type { AuthResponseDTO } from "@slotbook/shared/auth";
+import type { AuthResponse, LoginRequest, RegisterRequest } from "@slotbook/shared/auth";
 
-export const register = (data: RegisterFormValues) => {
-  return api<AuthResponseDTO>("/auth/register", {
+export const register = (data: RegisterRequest) => {
+  return api<AuthResponse>("/auth/register", {
     method: "POST",
     body: JSON.stringify(data),
   });
 };
 
-export const login = (data: LoginFormValues) => {
-  return api<AuthResponseDTO>("/auth/login", {
+export const login = (data: LoginRequest) => {
+  return api<AuthResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
   });

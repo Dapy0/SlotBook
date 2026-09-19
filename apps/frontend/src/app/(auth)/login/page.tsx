@@ -9,7 +9,6 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
 import { login } from "@/services/auth/auth";
 import {
   Card,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
+import { loginSchema, type LoginRequest } from '@slotbook/shared';
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -31,14 +31,14 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
   });
   useEffect(() => {
     if (user) router.push("/");
   }, [user]);
 
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (values: LoginRequest) => {
     setServerError(null);
     try {
       await login(values);

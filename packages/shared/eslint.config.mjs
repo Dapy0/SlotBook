@@ -8,7 +8,7 @@ const eslintConfig = defineConfig(
   tseslint.configs.stylisticTypeChecked,
   eslintPluginZod.configs.recommended,
   baseConfig,
-  globalIgnores(["src/codecs.ts"]),
+  globalIgnores(["src/codecs.ts", "src/*.test.ts"]),
   {
     ignores: ["node_modules"],
     languageOptions: {

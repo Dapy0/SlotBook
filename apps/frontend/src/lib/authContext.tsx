@@ -2,7 +2,7 @@
 
 import { toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
-import type { AuthResponseDTO } from "@slotbook/shared/auth";
+import type { AuthResponse } from "@slotbook/shared/auth";
 import type { UserResponse } from "@slotbook/shared/user";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const res = await api<AuthResponseDTO>(`/auth/me`, {
+      const res = await api<AuthResponse>(`/auth/me`, {
         method: "GET",
       });
       setUser(res.user);

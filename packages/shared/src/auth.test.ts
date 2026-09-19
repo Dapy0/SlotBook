@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared/auth";
+import * as z from "zod";
 
 const validPayload = {
   name: "Test",
@@ -23,18 +24,43 @@ describe("LoginRequest", () => {
     expect(loginSchema.safeParse({ password: validPayload.password }).success).toBe(false);
   });
 });
-describe("AuthResponseDTO", () => {
-  test("accepts server auth response", () => {
-    const fixture = {
-      user: {
-        id: "dc752901-46a1-4727-b0d1-1952550ef1f1",
-        name: "Test",
-        email: "test@test.test",
+type AuthWire = z.input<typeof authResponseSchema>;
+type AuthDomain = z.output<typeof authResponseSchema>;
 
-        createdAt: "2026-08-12T12:29:59.998Z",
-        updatedAt: "2026-08-12T12:29:59.998Z",
-      },
-    };
-    expect(authResponseSchema.safeParse(fixture).success).toBe(true);
+describe("AuthResponse", () => {
+  const fixture: AuthWire = {
+    user: {
+      id: "dc752901-46a1-4727-b0d1-1952550ef1f1",
+      name: "Test",
+      email: "test@test.test",
+      timezone: "Europe/Warsaw",
+      createdAt: "2026-08-12T12:29:59.998Z",
+      updatedAt: "2026-08-12T12:29:59.998Z",
+      deletedAt: null,
+    },
+  };
+  test("decodes ISO string into date", () => {
+    const result = authResponseSchema.safeParse(fixture);
+    expect(result.success).toBe(true);
+    if (!result.success) return; // сужение типа
+
+    const { user } = result.data;
+    expect(user.createdAt).toBeInstanceOf(Date);
+    expect(user.createdAt.getTime()).toBe(Date.parse("2026-08-12T12:29:59.998Z"));
+    expect(user.updatedAt.getTime()).toBe(Date.parse("2026-08-12T12:29:59.998Z"));
+    expect(user.deletedAt).toBe(null);
+  });
+  test("encodes back to exact wire format", () => {
+    const decoded: AuthDomain = authResponseSchema.parse(fixture);
+    const encoded = z.encode(authResponseSchema, decoded);
+    expect(encoded).toEqual(fixture);
+  });
+  test("rejects non ISO date string", () => {
+    const bad = { user: { ...fixture.user, createdAt: "12/08/2026" } };
+    expect(authResponseSchema.safeParse(bad).success).toBe(false);
+  });
+  test("rejects a Date object on the wire side", () => {
+    const bad = { user: { ...fixture.user, createdAt: new Date() } };
+    expect(authResponseSchema.safeParse(bad).success).toBe(false);
   });
 });

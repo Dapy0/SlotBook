@@ -9,7 +9,6 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signUpSchema, type RegisterFormValues } from "@/lib/validations/auth";
 import { register as userRegister } from "@/services/auth/auth";
 import {
   Card,
@@ -22,6 +21,8 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
+import { registerSchema, type RegisterRequest } from '@slotbook/shared';
+import { registerValidationSchema, type RegisterValidation } from '@/app/(auth)/_lib/types';
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();
@@ -29,14 +30,14 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(signUpSchema),
+  } = useForm<RegisterValidation>({
+    resolver: zodResolver(registerValidationSchema),
   });
   const { user, refetch } = useAuth();
   useEffect(() => {
     if (user) router.push("/");
   }, [user]);
-  const onSubmit = async (values: RegisterFormValues) => {
+  const onSubmit = async (values: RegisterRequest) => {
     setServerError(null);
     try {
       await userRegister(values);
