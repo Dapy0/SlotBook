@@ -1,9 +1,9 @@
 import { api } from "@/lib/api";
-import type { ChangeWeekScheduleRequest, FacilityScheduleEntryResponse } from '@slotbook/shared';
+import type { ChangeWeekScheduleRequest, FacilityScheduleEntryResponse, FacilityWeekScheduleResponse } from '@slotbook/shared';
 
 
 export async function getFacilitySchedule(facilityId: string) {
-  const result = await api<FacilityScheduleEntryResponse>(`/facilities/${facilityId}/schedule`, {
+  const result = await api<FacilityWeekScheduleResponse>(`/facilities/${facilityId}/schedule`, {
     method: "GET",
   });
 

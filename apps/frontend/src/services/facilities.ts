@@ -66,9 +66,12 @@ export async function getFacilityScheduleById(id: string): Promise<FacilitySched
   );
 }
 
-export async function getMyFacilities(): Promise<FacilityResponse[]> {
+export async function getMyFacilities(cookie: string): Promise<FacilityResponse[]> {
   const res = await api<FacilityResponse[] | null>(`/facilities/mine`, {
     method: "GET",
+    headers: {
+      cookie: cookie,
+    },
   });
   return res ?? [];
 }
