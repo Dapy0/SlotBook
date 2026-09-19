@@ -33,9 +33,13 @@ export const bookings = pgTable(
     status: text("status", { enum: ["pending", "confirmed", "canceled"] })
       .notNull()
       .default("pending"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
   },
-  (table) => [index("bookings_facilities_idx").on(table.facilityId)],
+  (table) => [
+    index("bookings_facilities_idx").on(table.facilityId),
+    index("bookings_clients_idx").on(table.clientId),
+    index("bookings_staff_members_idx").on(table.staffMemberId),
+  ],
 );
 
 export type BookingEntity = typeof bookings.$inferSelect;

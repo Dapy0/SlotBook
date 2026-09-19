@@ -26,8 +26,12 @@ export const services = pgTable(
 
     isActive: boolean("is_active").notNull().default(true),
 
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [index("services_facility_idx").on(table.facilityId)],
 );

@@ -12,7 +12,9 @@ export const facilitySchedules = pgTable(
     dayOfTheWeek: smallint("day_of_the_week").$type<DayOfTheWeek>().notNull(),
     startTime: time("start_time", { precision: 0 }).notNull(),
     endTime: time("end_time", { precision: 0 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [
     unique("facility_schedules_unique_slot").on(

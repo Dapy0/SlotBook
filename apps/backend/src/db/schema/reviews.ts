@@ -9,7 +9,7 @@ export const reviews = pgTable("reviews", {
     .references(() => bookings.id, { onDelete: "cascade" }),
   rating: integer().notNull(),
   comment: text(),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
 });
 export type ReviewEntity = typeof reviews.$inferSelect;
 export type NewReviewEntity = typeof reviews.$inferInsert;

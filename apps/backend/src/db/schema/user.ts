@@ -4,10 +4,11 @@ export const users = pgTable("users", {
   id: uuid().defaultRandom().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
+  timezone: varchar({ length: 64 }).default("Europe/Warsaw"),
   passwordHash: text("password_hash").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
   // telegram_chat_id
 });
 export type SelectUserEntity = typeof users.$inferSelect;
