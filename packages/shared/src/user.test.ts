@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { userSchema } from "./user";
+import { userResponseSchema } from "./user";
 
 describe("UserResponse", () => {
   test("accepts server user", () => {
@@ -10,6 +10,6 @@ describe("UserResponse", () => {
       createdAt: "2026-08-12T12:29:59.998Z",
       updatedAt: "2026-08-12T12:29:59.998Z",
     };
-    expect(userSchema.safeParse(fixture).success).toBe(true);
+    expect(userResponseSchema.safeParse(fixture).success).toBe(true);
   });
 });

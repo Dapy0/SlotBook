@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { calendarDateSchema, instantSchema } from "./codecs";
+import { calendarDateSchema, instantSchema } from "./common/codecs";
 export const availabilitySlotSchema = z.object({
   start: instantSchema,
   end: instantSchema,

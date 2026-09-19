@@ -3,7 +3,6 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "lib": ["esnext"],
     "types": ["node", "vitest/globals"],
 

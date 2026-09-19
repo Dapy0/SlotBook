@@ -1,7 +1,8 @@
 import * as z from "zod";
-import { instantSchema, wallTimeSchema } from "./codecs";
-import { serviceResponseSchema, servicesWithStaffMemberIdResponseSchema } from "./service";
+import { instantSchema, wallTimeSchema } from "./common/codecs";
+import { serviceResponseSchema, serviceWithStaffMemberIdsResponseSchema } from "./service";
 import { staffMemberResponseSchema } from "./staffMembers";
+import { timezoneSchema } from './common/primitives';
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -88,18 +89,6 @@ export const facilityCityResponseSchema = z.object({
 });
 export type FacilityCityResponse = z.infer<typeof facilityCityResponseSchema>;
 
-function isValidTimeZone(timeZone: string): boolean {
-  try {
-    new Intl.DateTimeFormat("en", { timeZone });
-    return true;
-  } catch {
-    return false;
-  }
-}
-export const timezoneSchema = z
-  .string()
-  .trim()
-  .refine(isValidTimeZone, { error: "Incorrect IANA" });
 
 // Request DTOs
 export const facilityFieldsSchema = z.object({
@@ -166,7 +155,7 @@ export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
 
 // booking
 export const facilityDataForBookingSchema = facilityResponseSchema.extend({
-  services: servicesWithStaffMemberIdResponseSchema.array(),
+  services: serviceWithStaffMemberIdsResponseSchema.array(),
   staff: staffMemberResponseSchema.array(),
 });
 export type FacilityDataForBookingResponse = z.infer<typeof facilityDataForBookingSchema>;

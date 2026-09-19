@@ -1,38 +1,45 @@
 import * as z from "zod";
-import { instantSchema } from "./codecs";
+import { instantSchema } from "./common/codecs";
+import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
 
-// Request DTOs
-export const serviceFieldsSchema = z.object({
+const serviceBaseSchema = z.object({
   name: z.string().trim().min(2).max(255),
-  description: z.string().trim(),
-  category: z.string().trim(),
+  description: z.string().trim().max(1000),
+  category: z.string().trim().min(1).max(100),
   durationMinutes: z
     .int()
     .positive()
     .max(24 * 60),
   priceCents: z.int().nonnegative(),
+  isActive: z.boolean(),
+});
+
+// Request
+export const createServiceRequestSchema = serviceBaseSchema.extend({
   isActive: z.boolean().default(false),
 });
-export const createServiceSchema = serviceFieldsSchema;
-export type CreateServiceRequest = z.infer<typeof createServiceSchema>;
-export const updateServiceSchema = createServiceSchema.partial();
-export type UpdateServiceRequest = z.infer<typeof updateServiceSchema>;
-// Response DTOs
+export type CreateServiceRequest = z.infer<typeof createServiceRequestSchema>;
 
-export const serviceResponseSchema = createServiceSchema.extend({
+export const updateServiceRequestSchema = createServiceRequestSchema
+  .partial()
+  .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
+export type UpdateServiceRequest = z.infer<typeof updateServiceRequestSchema>;
+
+// Response
+export const serviceResponseSchema = serviceBaseSchema.extend({
   id: z.uuid(),
   facilityId: z.uuid(),
+  currency: z.string().trim().length(3),
   createdAt: instantSchema,
   updatedAt: instantSchema,
-  currency: z.string().trim().length(3),
 });
 
-export type ServiceResponseDTO = z.infer<typeof serviceResponseSchema>;
+export type ServiceResponse = z.infer<typeof serviceResponseSchema>;
 
-export const servicesWithStaffMemberIdResponseSchema = serviceResponseSchema.extend({
-  staffMemberIds: z.array(z.string().trim()),
+export const serviceWithStaffMemberIdsResponseSchema = serviceResponseSchema.extend({
+  staffMemberIds: z.array(z.uuid()),
 });
 
-export type ServicesWithStaffMemberIdResponse = z.infer<
-  typeof servicesWithStaffMemberIdResponseSchema
+export type ServiceWithStaffMemberIdsResponse = z.infer<
+  typeof serviceWithStaffMemberIdsResponseSchema
 >;

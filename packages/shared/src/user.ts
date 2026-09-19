@@ -1,8 +1,8 @@
 import * as z from "zod";
-import { instantSchema } from "./codecs";
-import { timezoneSchema } from './facility';
+import { instantSchema } from "./common/codecs";
+import { timezoneSchema } from './common/primitives';
 
-export const userSchema = z.strictObject({
+export const userResponseSchema = z.strictObject({
   id: z.uuid(),
   name: z.string().trim(),
   email: z.email(),
@@ -12,4 +12,4 @@ export const userSchema = z.strictObject({
   deletedAt: instantSchema.nullable(),
 });
 
-export type UserResponse = z.infer<typeof userSchema>;
+export type UserResponse = z.infer<typeof userResponseSchema>;

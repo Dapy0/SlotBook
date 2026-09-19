@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { instantSchema } from "./codecs";
+import { instantSchema } from "./common/codecs";
 
 export const reviewFieldsSchema = z.object({
   rating: z.int().min(1).max(5),

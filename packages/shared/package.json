@@ -3,19 +3,8 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-  "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "esnext",
-    "noEmit": true,
-    "strict": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "src/**/*.ts"
-  ],
+
+  "sideEffects": true,
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -24,22 +13,7 @@
     "lint:fix": "eslint . --fix"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./codecs": "./src/codecs.ts",
-    "./auth": "./src/auth.ts",
-    "./user": "./src/user.ts",
-    "./facility": "./src/facility.ts",
-    "./facilitySchedule": "./src/facilitySchedule.ts",
-    "./service": "./src/service.ts",
-    "./staffMembers": "./src/staffMembers.ts",
-    "./staffServices": "./src/staffServices.ts",
-    "./staffSchedule": "./src/staffSchedule.ts",
-    "./bookings": "./src/bookings.ts",
-    "./availability": "./src/availability.ts",
-    "./reviews": "./src/reviews.ts",
-    "./errors": "./src/errors.ts",
-    "./geo": "./src/geo.ts",
-    "./schedule": "./src/schedule.ts"
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "zod": "^4.4.3",

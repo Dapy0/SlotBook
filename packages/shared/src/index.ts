@@ -1,9 +1,9 @@
-export * from "./codecs.ts";
-
+export * from "./common/codecs";
+export * from "./common/primitives";
 export * from "./auth";
 export * from "./facility";
 export * from "./user";
-export * from "./schedule.ts";
+export * from "./schedule";
 export * from "./service";
 export * from "./staffMembers";
 export * from "./staffServices";
