@@ -1,20 +1,13 @@
 import { api } from "@/lib/api";
 import { createParams } from "@/lib/queryStrings";
-import {
-  availabilityResponseSchema,
-  type AvailabilityResponse,
-  type AvailabilitySlot,
-} from "@slotbook/shared/availability";
+import type { AvailabilityQuery } from "@slotbook/shared";
+import { availabilityResponseSchema } from "@slotbook/shared";
 
-export async function getAvailability(
-  facilityId: string,
-  staff: string,
-  service: string,
-): Promise<AvailabilityResponse> {
-  const query = createParams({ staff, service });
-  return availabilityResponseSchema.parse(
-    await api<AvailabilityResponse>(`/facilities/${facilityId}/availability?${query}`, {
-      method: "GET",
-    }),
-  );
+export async function getAvailability({
+  facilityId,
+  staffId,
+  serviceId,
+}: AvailabilityQuery) {
+  const query = createParams({ staffId, serviceId });
+  return await api(`/facilities/${facilityId}/availability?${query}`, availabilityResponseSchema);
 }

@@ -2,31 +2,20 @@ import { api } from "@/lib/api";
 import {
   serviceResponseSchema,
   type CreateServiceRequest,
-  type ServiceResponseDTO,
-} from "@slotbook/shared/service";
+} from "@slotbook/shared";
 
-export async function getServicesByFacilityId(id: string): Promise<ServiceResponseDTO[]> {
-  const result = await api<ServiceResponseDTO[]>(`/facilities/${id}/services`, {
-    method: "GET",
-  });
-  return result;
+export async function getServicesByFacilityId(id: string) {
+  return await api(`/facilities/${id}/services`, serviceResponseSchema.array());
 }
-export async function getServiceByFacilityIdServiceId(
-  facilityId: string,
-  serviceId: string,
-): Promise<ServiceResponseDTO> {
-  const result = serviceResponseSchema.parse(
-    await api<ServiceResponseDTO>(`/facilities/${facilityId}/services/${serviceId}`, {
-      method: "GET",
-    }),
+export async function getServiceByFacilityIdServiceId(facilityId: string, serviceId: string) {
+
+  return await api(
+    `/facilities/${facilityId}/services/${serviceId}`,
+    serviceResponseSchema
   );
-  return result;
 }
-export async function createService(
-  facilityId: string,
-  payload: CreateServiceRequest,
-): Promise<ServiceResponseDTO> {
-  return await api<ServiceResponseDTO>(`/facilities/${facilityId}/services`, {
+export async function createService(facilityId: string, payload: CreateServiceRequest) {
+  return await api(`/facilities/${facilityId}/services`, serviceResponseSchema, {
     method: "POST",
     body: JSON.stringify(payload),
   });

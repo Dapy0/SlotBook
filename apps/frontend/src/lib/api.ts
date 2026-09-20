@@ -1,12 +1,12 @@
-import { toast } from "@/components/ui/toast";
-import type { ApiErrorCodeShared } from "@slotbook/shared/errors";
+import * as z from "zod";
+import type { ApiErrorCode } from "@slotbook/shared";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
 export class ApiError extends Error {
   constructor(
     public status: number,
-    public code: ApiErrorCodeShared,
+    public code: ApiErrorCode,
     message: string,
   ) {
     super(message);
@@ -15,7 +15,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+export async function api<T extends z.ZodType>(
+  endpoint: string,
+  schema: T,
+  options: RequestInit = {},
+): Promise<z.infer<T>> {
   const url = `${BACKEND_URL}${endpoint}`;
   const config: RequestInit = {
     ...options,
@@ -39,8 +43,10 @@ export async function api<T>(endpoint: string, options: RequestInit = {}): Promi
   }
 
   if (response.status === 204) {
-    return {} as T;
+    return {} as z.infer<T>;
   }
 
-  return response.json();
+  const data = await response.json();
+
+  return schema.parse(data);
 }

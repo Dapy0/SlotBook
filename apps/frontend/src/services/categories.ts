@@ -1,19 +1,14 @@
 import { api } from "@/lib/api";
 import { createParams } from "@/lib/queryStrings";
 import {
-  facilityCategoryResponseSchema,
-  type FacilityCategoryResponse,
-} from "@slotbook/shared/facility";
+  facilityCategoryCountResponseSchema,
+  type FacilityListQuery,
+} from "@slotbook/shared";
 
-export async function getCategories(getParams: { country: string; limit?: number }) {
-  const query = createParams(getParams);
+export async function getCategories(params: FacilityListQuery) {
+  const query = createParams(params);
   const endpoint = query ? `/facilities/categories?${query}` : "/facilities/categories";
 
-  const result = facilityCategoryResponseSchema.array().parse(
-    await api<FacilityCategoryResponse[]>(endpoint, {
-      method: "GET",
-    }),
-  );
 
-  return result;
+  return await api(endpoint, facilityCategoryCountResponseSchema.array());
 }

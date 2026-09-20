@@ -1,25 +1,16 @@
 import { api } from "@/lib/api";
 import {
   bookingResponseSchema,
-  type BookingRequest,
-  type BookingRequestInput,
-  type BookingResponse,
-} from "@slotbook/shared/bookings";
+  type CreateBookingRequest,
+} from "@slotbook/shared";
 
-export async function createBooking(facilityId: string, data: BookingRequestInput) {
-  const result = bookingResponseSchema.parse(
-    await api<BookingResponse>(`/facilities/${facilityId}/bookings`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  );
+export async function createBooking(facilityId: string, data: CreateBookingRequest) {
 
-  return result;
+  return await api(`/facilities/${facilityId}/bookings`, bookingResponseSchema, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 export async function getFacilityBookings(facilityId: string) {
-  const result = await api<BookingResponse>(`/facilities/${facilityId}/bookings`, {
-    method: "GET",
-  });
-
-  return result;
+  return await api(`/facilities/${facilityId}/bookings`, bookingResponseSchema);
 }

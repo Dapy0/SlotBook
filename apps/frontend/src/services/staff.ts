@@ -1,15 +1,10 @@
 import { api } from "@/lib/api";
-import {
-  staffMemberResponseSchema,
-  type StaffMemberResponseDTO,
-} from "@slotbook/shared/staffMembers";
+import { staffMemberPublicResponseSchema } from "@slotbook/shared";
 
-export async function getStaffMembersByFacilityId(
-  facilityId: string,
-): Promise<StaffMemberResponseDTO[]> {
-  return staffMemberResponseSchema.array().parse(
-    await api<StaffMemberResponseDTO>(`/facilities/${facilityId}/staff`, {
-      method: "GET",
-    }),
+export async function getStaffMembersByFacilityId(facilityId: string) {
+
+  return await api(
+    `/facilities/${facilityId}/staff`,
+    staffMemberPublicResponseSchema.array()
   );
 }
