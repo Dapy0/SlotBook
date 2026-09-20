@@ -1,10 +1,11 @@
+import { emailInputSchema } from './common/primitives';
 import { userResponseSchema } from "./user";
 import * as z from "zod";
 
 // Request
 export const registerRequestSchema = z.object({
   name: z.string().trim().min(2, "Minimum 2 characters").max(255, "Name is too long"),
-  email: z.email("Enter a valid email address"),
+  email: emailInputSchema,
   // eslint-disable-next-line zod/prefer-string-schema-with-trim
   password: z.string().min(8, "Minimum 8 characters").max(128, "Password is too long"),
 });

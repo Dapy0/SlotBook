@@ -1,10 +1,11 @@
 import * as z from "zod";
 import { calendarDateSchema, instantSchema } from "./common/codecs";
-export const availabilitySlotSchema = z.object({
-  start: instantSchema,
-  end: instantSchema,
+const availabilitySlotSchema = z.object({
+  startsAt: instantSchema,
+  endsAt: instantSchema,
+  staffMemberIds: z.array(z.uuid()),
 });
-export const availabilityDaySchema = z.object({
+const availabilityDaySchema = z.object({
   date: calendarDateSchema,
   slots: availabilitySlotSchema.array(),
 });
@@ -13,6 +14,4 @@ export const availabilityResponseSchema = z.object({
   days: availabilityDaySchema.array(),
 });
 
-export type AvailabilitySlot = z.infer<typeof availabilitySlotSchema>;
-export type AvailabilityDay = z.infer<typeof availabilityDaySchema>;
 export type AvailabilityResponse = z.infer<typeof availabilityResponseSchema>;

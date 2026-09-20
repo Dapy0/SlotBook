@@ -9,7 +9,6 @@ export const userResponseSchema = z.strictObject({
   timezone: timezoneSchema,
   createdAt: instantSchema,
   updatedAt: instantSchema,
-  deletedAt: instantSchema.nullable(),
 });
 
 export type UserResponse = z.infer<typeof userResponseSchema>;

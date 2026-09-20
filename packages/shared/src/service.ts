@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
+import { currencyCodeSchema } from './common/primitives';
 
 const serviceBaseSchema = z.object({
   name: z.string().trim().min(2).max(255),
@@ -20,7 +21,7 @@ export const createServiceRequestSchema = serviceBaseSchema.extend({
 });
 export type CreateServiceRequest = z.infer<typeof createServiceRequestSchema>;
 
-export const updateServiceRequestSchema = createServiceRequestSchema
+export const updateServiceRequestSchema = serviceBaseSchema
   .partial()
   .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
 export type UpdateServiceRequest = z.infer<typeof updateServiceRequestSchema>;
@@ -29,7 +30,7 @@ export type UpdateServiceRequest = z.infer<typeof updateServiceRequestSchema>;
 export const serviceResponseSchema = serviceBaseSchema.extend({
   id: z.uuid(),
   facilityId: z.uuid(),
-  currency: z.string().trim().length(3),
+  currency: currencyCodeSchema,
   createdAt: instantSchema,
   updatedAt: instantSchema,
 });

@@ -1,24 +1,25 @@
 import z from "zod";
 import { describe, expect, test } from "vitest";
-import { reviewRequestSchema, reviewResponseSchema, type ReviewResponse } from "./reviews";
+import { createReviewRequestSchema, reviewResponseSchema, type ReviewResponse } from "./reviews";
 
 describe("Review Request", () => {
   const fixture = { rating: 5, comment: "Great service" };
 
   test("accepts review with comment", () => {
-    expect(reviewRequestSchema.safeParse(fixture).success).toBe(true);
+    expect(createReviewRequestSchema.safeParse(fixture).success).toBe(true);
   });
   test("accepts review without comment", () => {
-    expect(reviewRequestSchema.safeParse({ rating: 5 }).success).toBe(true);
+    expect(createReviewRequestSchema.safeParse({ rating: 5 }).success).toBe(true);
   });
   test.each([1, 5])("accepts boundary rating %i", (rating) => {
-    expect(reviewRequestSchema.safeParse({ rating }).success).toBe(true);
+    expect(createReviewRequestSchema.safeParse({ rating }).success).toBe(true);
   });
 });
 
 describe("Review Response", () => {
   const fixture: z.input<typeof reviewResponseSchema> = {
     id: "dc752901-46a1-4727-b0d1-1952550ef1f1",
+    authorName: "Diana",
     staffMemberName: "Anna",
     serviceName: "Haircut",
     rating: 5,
@@ -41,6 +42,4 @@ describe("Review Response", () => {
     const r = reviewResponseSchema.safeParse({ ...fixture, comment: null });
     expect(r.success).toBe(false);
   });
-
- 
 });

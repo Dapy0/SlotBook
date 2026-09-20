@@ -1,7 +1,19 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
-import { WEEKDAY_BY_NAME, type FacilityWeekScheduleResponse, type StaffWeekScheduleResponse, type Weekday, type WeekdayByName } from "@slotbook/shared";
+import Weekday from '@slotbook/shared';
+import type { FacilityWeekScheduleResponse, StaffWeekScheduleResponse } from "@slotbook/shared";
 
+
+export const WEEKDAY_BY_NAME = {
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+  Sun: 7,
+} as const satisfies Record<string, Weekday>;
+export type WeekdayByName = keyof typeof WEEKDAY_BY_NAME;
 export function checkNoOverlapWithinSchedule(
   schedule: Array<{ dayOfTheWeek: number; startTime: string; endTime: string }>,
 ) {

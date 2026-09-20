@@ -1,72 +1,26 @@
 import * as z from "zod";
-const TSRANGE_RE =
-  /^([[(])(?:"((?:[^"\\]|\\.)*)"|([^",]*))?,(?:"((?:[^"\\]|\\.)*)"|([^\])"]*))?([)\]])$/;
+import { instantSchema } from "./common/codecs";
+import { currencyCodeSchema } from './common/primitives';
 
-function unescapeBound(s: string): string {
-  return s.replace(/\\(.)/g, "$1");
-}
+export const BOOKING_STATUSES = ["pending", "confirmed", "canceled"] as const;
+export const bookingStatusSchema = z.enum(BOOKING_STATUSES);
+export type BookingStatus = z.infer<typeof bookingStatusSchema>;
 
-function normalizeTimestamp(raw: string): string {
-  // "2026-08-25 13:51:00+00" -> "2026-08-25T13:51:00+00:00"
-  return raw
-    .trim()
-    .replace(" ", "T")
-    .replace(/([+-]\d{2})(\d{2})?$/, (_, hh, mm) => `${hh}:${mm ?? "00"}`);
-}
-export function parseTsRangeLiteral(raw: string) {
-  if (raw === "empty") {
-    return { start: null, end: null, startInclusive: false, endInclusive: false };
-  }
-  const m = TSRANGE_RE.exec(raw.trim());
-  if (!m) throw new Error(`Unable to parse tstzrange literal: ${raw}`);
-  const [, open, sQ, sU, eQ, eU, close] = m;
-  const startRaw = sQ !== undefined ? unescapeBound(sQ) : sU;
-  const endRaw = eQ !== undefined ? unescapeBound(eQ) : eU;
-  return {
-    start: startRaw ? new Date(normalizeTimestamp(startRaw)).toISOString() : null,
-    end: endRaw ? new Date(normalizeTimestamp(endRaw)).toISOString() : null,
-    startInclusive: open === "[",
-    endInclusive: close === "]",
-  };
-}
-
-function toTsRangeLiteral(obj: {
-  start: Date | null;
-  end: Date | null;
-  startInclusive: boolean;
-  endInclusive: boolean;
-}): string {
-  const s = obj.start ? obj.start.toISOString() : "";
-  const e = obj.end ? obj.end.toISOString() : "";
-  return `${obj.startInclusive ? "[" : "("}${s},${e}${obj.endInclusive ? "]" : ")"}`;
-}
-
-export const tsRangeSchema = z.codec(
-  z.object({
-    start: z.date().nullable(),
-    end: z.date().nullable(),
-    startInclusive: z.boolean(),
-    endInclusive: z.boolean(),
-  }),
-  z.string().trim(),
-  {
-    decode: toTsRangeLiteral,
-    encode: parseTsRangeLiteral,
-  },
-);
 // Request
-export const bookingRequestSchema = z.object({
-  staffId: z.uuid(),
+
+export const createBookingRequestSchema = z.object({
+  staffMemberId: z.uuid(),
   serviceId: z.uuid(),
-  startTime: z.iso.datetime().transform((val) => new Date(val)),
+  startsAt: instantSchema,
 });
-export type BookingRequestInput = z.input<typeof bookingRequestSchema>;
-export type BookingRequest = z.infer<typeof bookingRequestSchema>;
+export type CreateBookingRequest = z.infer<typeof createBookingRequestSchema>;
 
-export const updateBookingSchema = bookingRequestSchema.partial();
-export type UpdateBookingBody = z.infer<typeof updateBookingSchema>;
+export const changeBookingStatusRequestSchema = z.object({
+  status: bookingStatusSchema.extract(["confirmed", "canceled"]),
+});
+export type ChangeBookingStatusRequest = z.infer<typeof changeBookingStatusRequestSchema>;
 
-// Response DTOs
+// Response
 
 export const bookingResponseSchema = z.object({
   id: z.uuid(),
@@ -74,13 +28,20 @@ export const bookingResponseSchema = z.object({
   facilityId: z.uuid(),
   staffMemberId: z.uuid(),
   serviceId: z.uuid(),
-  timeRange: tsRangeSchema,
-  createdAt: z.coerce.date(),
-  status: z.enum(["pending", "confirmed", "canceled"]),
+  startsAt: instantSchema,
+  endsAt: instantSchema,
+  status: bookingStatusSchema,
+  createdAt: instantSchema,
 });
 export type BookingResponse = z.infer<typeof bookingResponseSchema>;
 
-export const patchBookingStatusSchema = z.object({
-  status: z.enum(["confirmed", "canceled"]),
+
+export const bookingWithDetailsResponseSchema = bookingResponseSchema.extend({
+  facilityName: z.string().trim(),
+  facilitySlug: z.string().trim(), 
+  serviceName: z.string().trim(),
+  staffMemberName: z.string().trim(),
+  priceCents: z.int().nonnegative(),
+  currency: currencyCodeSchema,
 });
-export type PatchBookingStatus = z.infer<typeof patchBookingStatusSchema>;
+export type BookingWithDetailsResponse = z.infer<typeof bookingWithDetailsResponseSchema>;

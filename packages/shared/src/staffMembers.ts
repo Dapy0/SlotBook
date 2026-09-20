@@ -1,26 +1,36 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 
-// Request DTOs
+// Request
 
 export const createStaffMemberSchema = z.object({
-  facilityId: z.uuid(),
   userId: z.uuid(),
   isActive: z.boolean().default(true),
 });
 
 export type CreateStaffMemberRequest = z.infer<typeof createStaffMemberSchema>;
-export const updateStaffMemberSchema = createStaffMemberSchema.partial();
-export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberSchema>;
+export const updateStaffMemberRequestSchema = z.object({ isActive: z.boolean() });
+export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberRequestSchema>;
 
-// Response DTOs
+// Response
 
-export const staffMemberResponseSchema = createStaffMemberSchema.extend({
+export const staffMemberResponseSchema = z.object({
   id: z.uuid(),
-  score: z.string().trim().nullable(),
-  reviewsCount: z.number(),
+  facilityId: z.uuid(),
+  isActive: z.boolean(),
   name: z.string().trim(),
+  score: z.number().min(0).max(5).nullable(),
+  reviewsCount: z.int().nonnegative(),
   createdAt: instantSchema,
   updatedAt: instantSchema,
 });
-export type StaffMemberResponseDTO = z.infer<typeof staffMemberResponseSchema>;
+
+export type StaffMemberResponse = z.infer<typeof staffMemberResponseSchema>;
+// Public
+export const staffMemberPublicResponseSchema = staffMemberResponseSchema.pick({
+  id: true,
+  name: true,
+  score: true,
+  reviewsCount: true,
+});
+export type StaffMemberPublicResponse = z.infer<typeof staffMemberPublicResponseSchema>;

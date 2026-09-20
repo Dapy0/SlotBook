@@ -1,16 +1,16 @@
 import * as z from "zod";
 
-// Request DTOs
-
-export const requestStaffServiceSchema = z.object({
-  staffMemberId: z.uuid(),
-  serviceId: z.uuid(),
+//Request
+export const setStaffMemberServicesRequestSchema = z.object({
+  serviceIds: z.array(z.uuid()).refine((ids) => new Set(ids).size === ids.length, {
+    error: "duplicate serviceIds",
+  }),
 });
+export type SetStaffMemberServicesRequest = z.infer<typeof setStaffMemberServicesRequestSchema>;
 
-export type CreateStaffServiceRequest = z.infer<typeof requestStaffServiceSchema>;
-export const updateStaffServiceSchema = requestStaffServiceSchema.partial();
-export type UpdateStaffServiceRequest = z.infer<typeof updateStaffServiceSchema>;
-
-// Response DTOs
-
-export type StaffServiceResponseDTO = z.infer<typeof requestStaffServiceSchema>;
+//Response
+export const staffMemberServicesResponseSchema = z.object({
+  staffMemberId: z.uuid(),
+  serviceIds: z.array(z.uuid()),
+});
+export type StaffMemberServicesResponse = z.infer<typeof staffMemberServicesResponseSchema>;

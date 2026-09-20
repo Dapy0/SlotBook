@@ -1,8 +1,14 @@
 import * as z from "zod";
-import { instantSchema, wallTimeSchema } from "./common/codecs";
+import { calendarDateSchema, instantSchema, wallTimeSchema } from "./common/codecs";
 import { serviceResponseSchema, serviceWithStaffMemberIdsResponseSchema } from "./service";
 import { staffMemberResponseSchema } from "./staffMembers";
-import { timezoneSchema } from './common/primitives';
+import {
+  countryCodeInputSchema,
+  currencyCodeInputSchema,
+  timezoneSchema,
+} from "./common/primitives";
+import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
+
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -11,87 +17,23 @@ export const FACILITY_CATEGORIES = [
   "EDUCATION",
   "OTHER",
 ] as const;
-export const CATEGORY_METADATA: Record<
-  (typeof FACILITY_CATEGORIES)[number],
-  {
-    label: string;
-    description: string;
-    icon: string;
-    color: string;
-    badgeClassName: string;
-    slug: string;
-  }
-> = {
-  BEAUTY: {
-    slug: "beauty",
-    label: "Beauty & Wellness",
-    description: "Salons, barbers, nails, spa and massage",
-    icon: "Sparkles",
-    color: "oklch(59.2% 0.249 0.584)",
-    badgeClassName: "text-pink-500 rounded-md bg-pink-100 shadow-s",
-  },
-  SPORT_FITNESS: {
-    slug: "sport-fitness",
-    label: "Sport & Fitness",
-    description: "Gyms, personal training and fitness studios",
-    icon: "Dumbbell",
-    color: "oklch(64.6% 0.222 41.116)",
-    badgeClassName: "text-orange-500 rounded-md bg-orange-100 shadow-s",
-  },
-  MEDICAL: {
-    slug: "medical",
-    label: "Medical & Health",
-    description: "Clinics, dentists and health specialists",
-    icon: "Stethoscope",
-    color: "oklch(58.8% 0.158 241.966)",
-    badgeClassName: "text-sky-500 rounded-md bg-sky-100 shadow-s",
-  },
-  AUTO: {
-    slug: "auto",
-    label: "Auto Services",
-    description: "Car service, detailing and repair shops",
-    icon: "Car",
-    color: "oklch(44.6% 0.03 256.802)",
-    badgeClassName: "text-slate-500 rounded-md bg-slate-100 shadow-s",
-  },
-  EDUCATION: {
-    slug: "education",
-    label: "Education & Tutoring",
-    description: "Private lessons, courses and tutors",
-    icon: "GraduationCap",
-    color: "oklch(51.1% 0.262 276.966)",
-    badgeClassName: "text-indigo-500 rounded-md bg-indigo-100 shadow-s",
-  },
-  OTHER: {
-    slug: "other",
-    label: "Other",
-    description: "Everything else",
-    icon: "Shapes",
-    color: "oklch(44.2% 0.017 285.786)",
-    badgeClassName: "text-zinc-500 rounded-md bg-zinc-100 shadow-s",
-  },
-};
-
-export const CATEGORY_BY_SLUG = Object.fromEntries(
-  Object.entries(CATEGORY_METADATA).map(([key, meta]) => [meta.slug, key]),
-) as Record<string, FacilityCategory>;
-
 export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
-export const facilityCategoryResponseSchema = z.object({
+
+//  Response Category
+export const facilityCategoryCountResponseSchema = z.object({
   categoryName: facilityCategorySchema,
-  count: z.number(),
+  count: z.int().nonnegative(),
 });
-export type FacilityCategoryResponse = z.infer<typeof facilityCategoryResponseSchema>;
+export type FacilityCategoryCountResponse = z.infer<typeof facilityCategoryCountResponseSchema>;
 
 export const facilityCityResponseSchema = z.object({
   city: z.string().trim(),
 });
 export type FacilityCityResponse = z.infer<typeof facilityCityResponseSchema>;
 
-
-// Request DTOs
-export const facilityFieldsSchema = z.object({
+// Request
+const facilityBaseSchema = z.object({
   name: z.string().trim().min(2).max(255),
   slug: z
     .string()
@@ -101,30 +43,37 @@ export const facilityFieldsSchema = z.object({
     .regex(/^[a-z0-9-]+$/),
   city: z.string().trim().min(1),
   country: z.string().trim().length(2),
-  currency: z.string().trim().length(3).default("EUR"),
+  currency: z.string().trim().length(3),
   address: z.string().trim().min(1),
   phone: z.string().trim().min(5).max(32),
   email: z.email(),
-  timezoneIANA: timezoneSchema,
+  timezone: timezoneSchema,
   category: facilityCategorySchema,
-  description: z.string().trim(),
-  images: z.array(z.string().trim()).default([]),
-  isPublished: z.boolean().default(false),
+  description: z.string().trim().max(1000),
+  images: z.array(z.url()),
+  isPublished: z.boolean(),
   latitude: z.number(),
   longitude: z.number(),
 });
 
-export const createFacilityRequestSchema = facilityFieldsSchema.extend({
-  country: z.string().trim().toUpperCase().pipe(z.string().trim().length(2)),
-  currency: z.string().trim().toUpperCase().pipe(z.string().trim().length(3)).default("PLN"),
+const facilityRequestBaseSchema = facilityBaseSchema.extend({
+  country: countryCodeInputSchema,
+  currency: currencyCodeInputSchema,
+});
+export const createFacilityRequestSchema = facilityRequestBaseSchema.extend({
+  currency: currencyCodeInputSchema.default("PLN"),
+  images: z.array(z.url()).default([]),
+  isPublished: z.boolean().default(false),
 });
 export type CreateFacilityRequest = z.infer<typeof createFacilityRequestSchema>;
-// update
-export const updateFacilityRequestSchema = facilityFieldsSchema.partial();
+
+export const updateFacilityRequestSchema = facilityRequestBaseSchema
+  .partial()
+  .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
 export type UpdateFacilityRequest = z.infer<typeof updateFacilityRequestSchema>;
 
-// Response DTOs
-export const facilityResponseSchema = facilityFieldsSchema.extend({
+// Response
+export const facilityResponseSchema = facilityBaseSchema.extend({
   id: z.uuid(),
   ownerId: z.uuid(),
   score: z.number().min(0).max(5).nullable(),
@@ -133,6 +82,7 @@ export const facilityResponseSchema = facilityFieldsSchema.extend({
   updatedAt: instantSchema,
 });
 export type FacilityResponse = z.infer<typeof facilityResponseSchema>;
+
 // FacilityWithServices
 export const facilityWithServicesResponseSchema = facilityResponseSchema.extend({
   services: serviceResponseSchema.array(),
@@ -140,25 +90,19 @@ export const facilityWithServicesResponseSchema = facilityResponseSchema.extend(
 export type FacilityWithServicesResponse = z.infer<typeof facilityWithServicesResponseSchema>;
 
 export const facilityListQuerySchema = z.object({
-  country: z.string().trim(),
+  country: countryCodeInputSchema,
   city: z.string().trim().optional(),
-  time: z.string().trim().optional(),
-  date: z.string().trim().optional(),
+  time: wallTimeSchema.optional(),
+  date: calendarDateSchema.optional(),
   category: facilityCategorySchema.optional(),
-  limit: z.coerce.number().nonnegative().optional(),
-  rating: z.coerce.number().optional(),
-  priceMax: z.coerce.number().optional(),
+  limit: z.coerce.number().int().positive().max(50).default(20),
+  offset: z.coerce.number().int().nonnegative().default(0),
+  rating: z.coerce.number().min(0).max(5).optional(),
+  priceMaxCents: z.coerce.number().int().nonnegative().optional(),
   q: z.string().trim().optional(),
-  sort: z.string().trim().optional(),
+  sort: z.enum(["rating", "priceAsc", "priceDesc"]).optional(),
 });
 export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
-
-// booking
-export const facilityDataForBookingSchema = facilityResponseSchema.extend({
-  services: serviceWithStaffMemberIdsResponseSchema.array(),
-  staff: staffMemberResponseSchema.array(),
-});
-export type FacilityDataForBookingResponse = z.infer<typeof facilityDataForBookingSchema>;
 
 export const facilityBookingQuerySchema = z.object({
   date: z.iso.date().optional(),
@@ -167,3 +111,9 @@ export const facilityBookingQuerySchema = z.object({
   time: wallTimeSchema.optional(),
 });
 export type FacilityBookingQuery = z.infer<typeof facilityBookingQuerySchema>;
+// booking
+export const facilityBookingDataResponseSchema = facilityResponseSchema.extend({
+  services: serviceWithStaffMemberIdsResponseSchema.array(),
+  staff: staffMemberResponseSchema.array(),
+});
+export type FacilityDataForBookingResponse = z.infer<typeof facilityBookingDataResponseSchema>;

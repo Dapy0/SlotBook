@@ -1,41 +1,31 @@
 import * as z from "zod";
 import { instantSchema, wallTimeSchema } from "./common/codecs";
 
-// Request DTOs
-const weekdaySchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
+export const weekdaySchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
 export type Weekday = z.infer<typeof weekdaySchema>;
-export const WEEKDAY_BY_NAME = {
-  Mon: 1,
-  Tue: 2,
-  Wed: 3,
-  Thu: 4,
-  Fri: 5,
-  Sat: 6,
-  Sun: 7,
-} as const satisfies Record<string, Weekday>;
-export type WeekdayByName = keyof typeof WEEKDAY_BY_NAME;
+
 // BASE
-const scheduleEntryFieldsSchema = z.object({
+const scheduleEntryBaseSchema = z.object({
   dayOfTheWeek: weekdaySchema,
   startTime: wallTimeSchema,
   endTime: wallTimeSchema,
 });
-type ScheduleEntryFields = z.infer<typeof scheduleEntryFieldsSchema>;
+type ScheduleEntryBase = z.infer<typeof scheduleEntryBaseSchema>;
 
-const scheduleEntryResponseBaseSchema = scheduleEntryFieldsSchema.extend({
+const scheduleEntryResponseBaseSchema = scheduleEntryBaseSchema.extend({
   id: z.uuid(),
   createdAt: instantSchema,
 });
 
 // Intersection Rule
 
-function findOverlappingIndexes(entries: readonly ScheduleEntryFields[]) {
+function findOverlappingIndexes(entries: readonly ScheduleEntryBase[]) {
   const byDay = new Map<
     Weekday,
     {
       index: number;
-      start: ScheduleEntryFields["startTime"];
-      end: ScheduleEntryFields["endTime"];
+      start: ScheduleEntryBase["startTime"];
+      end: ScheduleEntryBase["endTime"];
     }[]
   >();
   entries.forEach((e, index) => {
@@ -46,7 +36,7 @@ function findOverlappingIndexes(entries: readonly ScheduleEntryFields[]) {
   const overlapping: number[] = [];
   for (const list of byDay.values()) {
     list.sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0));
-    let prevEnd: ScheduleEntryFields["endTime"] | null = null;
+    let prevEnd: ScheduleEntryBase["endTime"] | null = null;
     for (const cur of list) {
       if (prevEnd !== null && cur.start < prevEnd) overlapping.push(cur.index);
       if (prevEnd === null || cur.end > prevEnd) prevEnd = cur.end; // максимум, не просто cur.end
@@ -56,7 +46,7 @@ function findOverlappingIndexes(entries: readonly ScheduleEntryFields[]) {
 }
 // Request
 
-export const scheduleEntryRequestSchema = scheduleEntryFieldsSchema.refine(
+export const scheduleEntryRequestSchema = scheduleEntryBaseSchema.refine(
   (e) => e.startTime < e.endTime,
   { path: ["endTime"], message: "endTime must be after startTime" },
 );
@@ -64,6 +54,7 @@ export type ScheduleEntryRequest = z.infer<typeof scheduleEntryRequestSchema>;
 
 export const changeWeekScheduleRequestSchema = z
   .array(scheduleEntryRequestSchema)
+  .max(70, "too many entries")
   .superRefine((entries, ctx) => {
     for (const index of findOverlappingIndexes(entries)) {
       ctx.addIssue({
@@ -81,14 +72,8 @@ export const facilityScheduleEntryResponseSchema = scheduleEntryResponseBaseSche
 });
 export type FacilityScheduleEntryResponse = z.infer<typeof facilityScheduleEntryResponseSchema>;
 
-export const facilityWeekScheduleResponseSchema = z.array(facilityScheduleEntryResponseSchema);
-export type FacilityWeekScheduleResponse = z.infer<typeof facilityWeekScheduleResponseSchema>;
-
 // Responses staffSchedule
 export const staffScheduleEntryResponseSchema = scheduleEntryResponseBaseSchema.extend({
-  staffId: z.uuid(),
+  staffMemberId: z.uuid(),
 });
 export type StaffScheduleEntryResponse = z.infer<typeof staffScheduleEntryResponseSchema>;
-
-export const staffWeekScheduleResponseSchema = z.array(staffScheduleEntryResponseSchema);
-export type StaffWeekScheduleResponse = z.infer<typeof staffWeekScheduleResponseSchema>;
