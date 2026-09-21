@@ -12,7 +12,7 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 import { users } from "./user.ts";
-import { FACILITY_CATEGORIES } from "@slotbook/shared/facility";
+import { FACILITY_CATEGORIES } from "@slotbook/shared";
 
 export const facilityCategoryEnum = pgEnum("facility_category", FACILITY_CATEGORIES);
 
@@ -39,7 +39,7 @@ export const facilities = pgTable(
     score: numeric({ precision: 3, scale: 1, mode: "number" }),
     reviewsCount: integer("reviews_count").notNull().default(0),
     isPublished: boolean("is_published").notNull().default(false),
-    timezoneIANA: text("timezone_IANA").notNull().default("Europe/Warsaw"),
+    timezone: text("timezone").notNull().default("Europe/Warsaw"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     // telegram_chat_id

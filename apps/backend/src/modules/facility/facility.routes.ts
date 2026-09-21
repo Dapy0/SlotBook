@@ -1,58 +1,51 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  createFacility,
-  getAllFacilities,
-  getAllFacilitiesCategory,
-  getFacilityById,
-  getFacilityReviews,
-  getFacilitySchedule,
-  getOwnFacilities,
-  patchFacilityById,
-  putFacilitySchedule,
-  removeFacilityById,
-} from "./facility.controller.ts";
 import {
   facilityCategoryQuerystringSchema,
   facilityParamsSchema,
-  type FacilityCategoryQuerystring,
-  type FacilityParams,
 } from "./facility.schema.ts";
 
 import z from "zod";
 import {
   createFacilityRequestSchema,
+  facilityBookingDataResponseSchema,
   facilityBookingQuerySchema,
-  facilityCategoryResponseSchema,
+  facilityCategoryCountResponseSchema,
   facilityCityResponseSchema,
-  facilityDataForBookingSchema,
   facilityListQuerySchema,
   facilityResponseSchema,
+  facilityScheduleEntryResponseSchema,
   facilityWithServicesResponseSchema,
   updateFacilityRequestSchema,
-  type CreateFacilityRequest,
-  type FacilityBookingQuery,
-  type FacilityListQuery,
-  type UpdateFacilityRequest,
-} from "@slotbook/shared/facility";
+} from "@slotbook/shared";
 import { staffRoutes } from "../staff/staff.routes.ts";
 import { bookingRoutes } from "../booking/booking.routes.ts";
 
-import { reviewResponseSchema } from "@slotbook/shared/reviews";
-import { findAllFacilitiesByParams, findCitiesByCountry } from "./facility.repository.ts";
+import { reviewResponseSchema } from "@slotbook/shared";
+import {
+  findAllFacilitiesByParams,
+  findCitiesByCountry,
+  getAllCategories,
+} from "./facility.repository.ts";
 import {
   getServicesByFacilityIds,
   getServicesWithStaffIds,
 } from "../service/service.repository.ts";
-import { getFacilityDetails } from "./facility.service.ts";
+import {
+  changeFacilityWeekSchedule,
+  createFacilityByUserId,
+  getAllPublicFacilities,
+  getFacilityOrThrow,
+  getFacilityScheduleById,
+  getOwnFacilitiesByUserId,
+  removeOwnedFacilityById,
+  updateOwnedFacility,
+} from "./facility.service.ts";
 import { findStaffByFacilityId } from "../staff/staff.repository.ts";
 import { availabilityRoutes } from "../availability/availability.routes.ts";
-import {
-  changeWeekScheduleRequestSchema,
-  facilityWeekScheduleResponseSchema,
-  type ChangeWeekScheduleRequest,
-} from "@slotbook/shared";
+import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { getAllFacilityReviews } from "../review/review.service";
 
-export async function facilityRoutes(fastify: FastifyInstance) {
+export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/",
     {
@@ -63,7 +56,14 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getAllFacilities,
+    async (request, response) => {
+      const facilities = await getAllPublicFacilities(request.server.drizzle, request.query);
+      response.header(
+        "Cache-Control",
+        "public, max-age=60, s-maxage=600, stale-while-revalidate=30"
+      );
+      return response.send(facilities);
+    },
   );
   fastify.get(
     "/search",
@@ -73,7 +73,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         response: { 200: facilityWithServicesResponseSchema.array() },
       },
     },
-    async (request: FastifyRequest<{ Querystring: FacilityListQuery }>) => {
+    async (request) => {
       const facilities = await findAllFacilitiesByParams(request.server.drizzle, request.query);
       const servicesByFacilityIds = await getServicesByFacilityIds(
         request.server.drizzle,
@@ -95,13 +95,16 @@ export async function facilityRoutes(fastify: FastifyInstance) {
     {
       onRequest: [fastify.authenticate],
       schema: {
-        
         response: {
           200: z.array(facilityResponseSchema),
         },
       },
     },
-    getOwnFacilities,
+    async (request, response) => {
+      const facilities = await getOwnFacilitiesByUserId(request.server.drizzle, request.user.id);
+      response.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      return response.send(facilities);
+    },
   );
   fastify.get(
     "/:id",
@@ -113,7 +116,11 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getFacilityById,
+    async (request, response) => {
+      const facility = await getFacilityOrThrow(request.server.drizzle, request.params.id);
+      response.header("Cache-Control", "public, no-cache");
+      return response.send(facility);
+    },
   );
   fastify.get(
     "/:id/bookingData",
@@ -121,13 +128,11 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       schema: {
         params: facilityParamsSchema,
         querystring: facilityBookingQuerySchema,
-        response: { 200: facilityDataForBookingSchema },
+        response: { 200: facilityBookingDataResponseSchema },
       },
     },
-    async (
-      request: FastifyRequest<{ Params: FacilityParams; Querystring: FacilityBookingQuery }>,
-    ) => {
-      const facility = await getFacilityDetails(request.server.drizzle, request.params.id);
+    async (request) => {
+      const facility = await getFacilityOrThrow(request.server.drizzle, request.params.id);
       const servicesByFacilityId = await getServicesWithStaffIds(
         request.server.drizzle,
         facility.id,
@@ -141,9 +146,7 @@ export async function facilityRoutes(fastify: FastifyInstance) {
       };
     },
   );
-  fastify.post<{
-    Body: CreateFacilityRequest;
-  }>(
+  fastify.post(
     "/",
     {
       onRequest: [fastify.authenticate],
@@ -154,12 +157,16 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    createFacility,
+    async (request, response) => {
+      const facility = await createFacilityByUserId(
+        request.server.drizzle,
+        request.body,
+        request.user.id,
+      );
+      return response.status(201).send(facility);
+    },
   );
-  fastify.patch<{
-    Body: UpdateFacilityRequest;
-    Params: FacilityParams;
-  }>(
+  fastify.patch(
     "/:id",
     {
       onRequest: [fastify.authenticate],
@@ -171,27 +178,33 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    patchFacilityById,
+    async (request, response) => {
+      const updated = await updateOwnedFacility(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+        request.body,
+      );
+      return response.status(200).send(updated);
+    },
   );
 
-  fastify.get<{
-    Params: FacilityParams;
-  }>(
+  fastify.get(
     "/:id/schedule",
     {
       schema: {
         params: facilityParamsSchema,
         response: {
-          200: facilityWeekScheduleResponseSchema,
+          200: facilityScheduleEntryResponseSchema.array(),
         },
       },
     },
-    getFacilitySchedule,
+    async (request, response) => {
+      const schedule = await getFacilityScheduleById(request.server.drizzle, request.params.id);
+      return response.send(schedule);
+    },
   );
-  fastify.put<{
-    Body: ChangeWeekScheduleRequest;
-    Params: FacilityParams;
-  }>(
+  fastify.put(
     "/:id/schedule",
     {
       onRequest: [fastify.authenticate],
@@ -199,15 +212,21 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         params: facilityParamsSchema,
         body: changeWeekScheduleRequestSchema,
         response: {
-          200: facilityWeekScheduleResponseSchema,
+          201: facilityScheduleEntryResponseSchema.array(),
         },
       },
     },
-    putFacilitySchedule,
+    async (request, response) => {
+      const schedule = await changeFacilityWeekSchedule(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+        request.body,
+      );
+      return response.status(201).send(schedule);
+    },
   );
-  fastify.delete<{
-    Params: FacilityParams;
-  }>(
+  fastify.delete(
     "/:id",
     {
       onRequest: [fastify.authenticate],
@@ -218,9 +237,13 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    removeFacilityById,
+    async (request, response) => {
+      await removeOwnedFacilityById(request.server.drizzle, request.params.id, request.user.id);
+
+      return response.status(204);
+    },
   );
-  fastify.get<{ Params: FacilityParams }>(
+  fastify.get(
     "/:id/reviews",
     {
       schema: {
@@ -230,21 +253,31 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getFacilityReviews,
+    async (request, response) => {
+      const reviews = await getAllFacilityReviews(request.server.drizzle, request.params.id);
+      return response.send(reviews);
+    },
   );
-  fastify.get<{ Querystring: FacilityCategoryQuerystring }>(
+  fastify.get(
     "/categories",
     {
       schema: {
         querystring: facilityCategoryQuerystringSchema,
         response: {
-          200: z.array(facilityCategoryResponseSchema),
+          200: facilityCategoryCountResponseSchema.array(),
         },
       },
     },
-    getAllFacilitiesCategory,
+    async (request, response) => {
+      const categories = await getAllCategories(
+        request.server.drizzle,
+        request.query.country,
+        request.query.limit,
+      );
+      return response.send(categories);
+    },
   );
-  fastify.get<{ Querystring: FacilityCategoryQuerystring }>(
+  fastify.get(
     "/cities",
     {
       schema: {
@@ -254,14 +287,11 @@ export async function facilityRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    async (
-      request: FastifyRequest<{ Querystring: FacilityCategoryQuerystring }>,
-      response: FastifyReply,
-    ) => {
+    async (request, response) => {
       response.send(await findCitiesByCountry(request.server.drizzle, request.query.country));
     },
   );
   fastify.register(staffRoutes, { prefix: "/" });
   fastify.register(bookingRoutes, { prefix: "/" });
   fastify.register(availabilityRoutes, { prefix: "/:id" });
-}
+};

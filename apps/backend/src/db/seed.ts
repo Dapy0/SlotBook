@@ -9,9 +9,8 @@ import { facilitySchedules } from "./schema/facilitySchedule.ts";
 import { services } from "./schema/service.ts";
 import { staffMembers } from "./schema/staffMember.ts";
 import { staffServices } from "./schema/staffService.ts";
-import type { CreateFacilityRequest, FacilityCategory } from "@slotbook/shared/facility";
-import type { CreateServiceRequest } from "@slotbook/shared/service";
-import type { DayOfTheWeek } from "@slotbook/shared/facilitySchedule";
+import type { CreateFacilityRequest, FacilityCategory, Weekday } from "@slotbook/shared";
+import type { CreateServiceRequest } from "@slotbook/shared";
 
 const OWNER_ID = "11111111-1111-4111-a111-111111111111";
 const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
@@ -27,7 +26,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Test street 1",
     phone: "+48000000000",
     email: "shop@test.com",
-    timezoneIANA: "Europe/Warsaw",
+    timezone: "Europe/Warsaw",
     images: [],
     isPublished: true,
     latitude: 52.2297,
@@ -45,7 +44,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Grodzka 12",
     phone: "+48111222333",
     email: "hello@wawelnails.pl",
-    timezoneIANA: "Europe/Warsaw",
+    timezone: "Europe/Warsaw",
     images: [],
     isPublished: true,
     latitude: 50.0568,
@@ -63,7 +62,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Karlova 8",
     phone: "+420601234567",
     email: "info@vltavadental.cz",
-    timezoneIANA: "Europe/Prague",
+    timezone: "Europe/Prague",
     images: [],
     isPublished: true,
     latitude: 50.0862,
@@ -81,7 +80,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Kentish Town Road 44",
     phone: "+442079460000",
     email: "train@camdenstrength.co.uk",
-    timezoneIANA: "Europe/London",
+    timezone: "Europe/London",
     images: [],
     isPublished: true,
     latitude: 51.539,
@@ -99,7 +98,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Naberezhno-Khreshchatytska 5",
     phone: "+380441234567",
     email: "study@podillab.ua",
-    timezoneIANA: "Europe/Kyiv",
+    timezone: "Europe/Kyiv",
     images: [],
     isPublished: true,
     latitude: 50.466,
@@ -117,7 +116,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Bedford Ave 301",
     phone: "+12125550147",
     email: "book@bkdetailing.com",
-    timezoneIANA: "America/New_York",
+    timezone: "America/New_York",
     images: [],
     isPublished: true,
     latitude: 40.7108,
@@ -135,7 +134,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Jinnan 1-14-5",
     phone: "+81355551234",
     email: "yoyaku@shibuyahair.jp",
-    timezoneIANA: "Asia/Tokyo",
+    timezone: "Asia/Tokyo",
     images: [],
     isPublished: true,
     latitude: 35.6627,
@@ -153,7 +152,7 @@ const facilitySeeds: Array<CreateFacilityRequest & { id: string }> = [
     address: "Hill Road 27",
     phone: "+912226001234",
     email: "namaste@bandrayoga.in",
-    timezoneIANA: "Asia/Kolkata",
+    timezone: "Asia/Kolkata",
     images: [],
     isPublished: false,
     latitude: 19.0544,
@@ -402,7 +401,7 @@ function buildRows() {
     for (const day of hours.days) {
       scheduleRows.push({
         facilityId: facility.id,
-        dayOfTheWeek: day as DayOfTheWeek,
+        dayOfTheWeek: day as Weekday,
         startTime: hours.startTime,
         endTime: hours.endTime,
       });
@@ -469,7 +468,13 @@ async function seed() {
       await tx
         .insert(users)
         .values([
-          { id: OWNER_ID, name: "Test Owner", email: "owner@test.com", passwordHash },
+          {
+            id: OWNER_ID,
+            name: "Test Owner",
+            email: "owner@test.com",
+            timezone: "Europe/Warsaw",
+            passwordHash,
+          },
           ...staffUserRows.map((u) => ({ ...u, passwordHash })),
         ])
         .onConflictDoNothing();

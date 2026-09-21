@@ -4,7 +4,7 @@ import {
   type FacilityScheduleEntity,
 } from "../../db/schema/facilitySchedule.ts";
 import { and, eq } from "drizzle-orm";
-import type { ChangeWeekScheduleRequest, Weekday } from '@slotbook/shared';
+import type { ChangeWeekScheduleRequest, Weekday } from "@slotbook/shared";
 export async function findFacilitySchedule(
   db: DB,
   facilityId: string,
@@ -13,7 +13,7 @@ export async function findFacilitySchedule(
     .select()
     .from(facilitySchedules)
     .where(eq(facilitySchedules.facilityId, facilityId));
-  return schedule ?? null;
+  return schedule;
 }
 
 export async function findFacilityScheduleByDay(
@@ -27,14 +27,14 @@ export async function findFacilityScheduleByDay(
     .where(
       and(eq(facilitySchedules.facilityId, facilityId), eq(facilitySchedules.dayOfTheWeek, day)),
     );
-  return schedule ?? null;
+  return schedule;
 }
 
 export async function insertFacilityScheduleByFacilityId(
   db: DB,
   facilityId: string,
   newFacilitySchedule: ChangeWeekScheduleRequest,
-): Promise<FacilityScheduleEntity[] | null> {
+): Promise<FacilityScheduleEntity[]> {
   const insertedValues = await db
     .insert(facilitySchedules)
     .values(

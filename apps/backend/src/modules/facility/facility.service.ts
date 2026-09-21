@@ -1,8 +1,10 @@
 import type {
   CreateFacilityRequest,
   FacilityListQuery,
+  FacilityResponse,
+  FacilityScheduleEntryResponse,
   UpdateFacilityRequest,
-} from "@slotbook/shared/facility";
+} from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   findAllFacilitiesByParams,
@@ -19,30 +21,37 @@ import {
   insertFacilityScheduleByFacilityId,
 } from "./facilitySchedule.repository.ts";
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
+import { assertFound } from "../utils";
 
-export async function checkFacilityOwnership(db: DB, facilityId: string, userId: string) {
+export async function getFacilityOrThrow(db: DB, facilityId: string): Promise<FacilityResponse> {
   const facility = await findFacilityById(db, facilityId);
+  assertFound(facility, "Facility not found");
+  return facility;
+}
 
-  if (!facility) {
-    throw new NotFoundError("Facility not found");
-  }
+export async function checkFacilityOwnership(
+  db: DB,
+  facilityId: string,
+  userId: string,
+): Promise<FacilityResponse> {
+  const facility = await getFacilityOrThrow(db, facilityId);
 
   if (userId !== facility.ownerId) {
     throw new ForbiddenError("Not owned facility");
   }
   return facility;
 }
-export async function getAllPublicFacilities(db: DB, query: FacilityListQuery) {
+export async function getAllPublicFacilities(
+  db: DB,
+  query: FacilityListQuery,
+): Promise<FacilityResponse[]> {
   return findAllFacilitiesByParams(db, query);
 }
-export async function getFacilityDetails(db: DB, facilityId: string) {
-  const facility = await findFacilityById(db, facilityId);
-  if (!facility) {
-    throw new NotFoundError("Facility not found");
-  }
-  return facility;
-}
-export async function getOwnFacilitiesByUserId(db: DB, userId: string) {
+
+export async function getOwnFacilitiesByUserId(
+  db: DB,
+  userId: string,
+): Promise<FacilityResponse[]> {
   return findFacilitiesByOwnerId(db, userId);
 }
 export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest, userId: string) {
@@ -51,8 +60,8 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
       ...data,
       ownerId: userId,
     });
-  } catch (e) {
-    if (e.code === "23505") {
+  } catch (e: unknown) {
+    if (e != null && typeof e === "object" && "code" in e && e.code === "23505") {
       throw new ConflictError("Slug already exists");
     }
 
@@ -65,7 +74,7 @@ export async function updateOwnedFacility(
   facilityId: string,
   userId: string,
   data: UpdateFacilityRequest,
-) {
+): Promise<FacilityResponse> {
   await checkFacilityOwnership(db, facilityId, userId);
 
   const updatedFacility = await updateFacilityById(db, facilityId, data);
@@ -76,7 +85,11 @@ export async function updateOwnedFacility(
   return updatedFacility;
 }
 
-export async function removeOwnedFacilityById(db: DB, facilityId: string, userId: string) {
+export async function removeOwnedFacilityById(
+  db: DB,
+  facilityId: string,
+  userId: string,
+): Promise<FacilityResponse> {
   await checkFacilityOwnership(db, facilityId, userId);
 
   const deletedFacility = await deleteFacilityById(db, facilityId);
@@ -85,7 +98,10 @@ export async function removeOwnedFacilityById(db: DB, facilityId: string, userId
   }
   return deletedFacility;
 }
-export async function getFacilityScheduleById(db: DB, facilityId: string) {
+export async function getFacilityScheduleById(
+  db: DB,
+  facilityId: string,
+): Promise<FacilityScheduleEntryResponse[]> {
   const schedule = await findFacilitySchedule(db, facilityId);
   if (!schedule) {
     throw new NotFoundError("No schedule for this facility");
@@ -97,7 +113,7 @@ export async function changeFacilityWeekSchedule(
   facilityId: string,
   requestedUserId: string,
   newSchedule: ChangeWeekScheduleRequest,
-) {
+): Promise<FacilityScheduleEntryResponse[]> {
   await checkFacilityOwnership(db, facilityId, requestedUserId);
 
   const transaction = await db.transaction(async (tx) => {

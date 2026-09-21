@@ -1,4 +1,4 @@
-import { and, asc, avg, count, desc, eq, exists, gte, ilike, lte, or, sql } from "drizzle-orm";
+import { and, asc, avg, count, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
   facilities,
@@ -6,19 +6,18 @@ import {
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
 import type {
-  FacilityCategoryResponse,
+  FacilityCategoryCountResponse,
   FacilityListQuery,
   UpdateFacilityRequest,
-} from "@slotbook/shared/facility";
+} from "@slotbook/shared";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import { services } from "../../db/schema/service.ts";
 
 export async function findAllFacilitiesByParams(
   db: DB,
   params: FacilityListQuery,
-): Promise<Array<FacilityEntity>> {
-  const { country, category, rating, priceMax, q, sort, limit, city } = params;
+): Promise<FacilityEntity[]> {
+  const { country, category, rating, q, sort, limit, city } = params;
   const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
 
   if (category !== undefined) filters.push(eq(facilities.category, category));
@@ -26,22 +25,6 @@ export async function findAllFacilitiesByParams(
   if (city !== undefined) filters.push(eq(facilities.city, city));
   if (q !== undefined && q !== "") {
     filters.push(or(ilike(facilities.name, `%${q}%`), ilike(facilities.description, `%${q}%`))!);
-  }
-  if (priceMax !== undefined) {
-    filters.push(
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(services)
-          .where(
-            and(
-              eq(services.facilityId, facilities.id),
-              eq(services.isActive, true),
-              lte(services.priceCents, priceMax * 100),
-            ),
-          ),
-      ),
-    );
   }
 
   const query = db
@@ -61,10 +44,7 @@ export async function findFacilityById(db: DB, id: string): Promise<FacilityEnti
   const [facility] = await db.select().from(facilities).where(eq(facilities.id, id));
   return facility ?? null;
 }
-export async function findFacilitiesByOwnerId(
-  db: DB,
-  ownerId: string,
-): Promise<Array<FacilityEntity>> {
+export async function findFacilitiesByOwnerId(db: DB, ownerId: string): Promise<FacilityEntity[]> {
   return db.select().from(facilities).where(eq(facilities.ownerId, ownerId));
 }
 
@@ -101,7 +81,7 @@ export async function getAllCategories(
   db: DB,
   country: string,
   limit?: number,
-): Promise<FacilityCategoryResponse[]> {
+): Promise<FacilityCategoryCountResponse[]> {
   const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
 
   const query = db
@@ -119,7 +99,7 @@ export async function getAllCategories(
   return await query;
 }
 
-export async function updateFacilityScore(db: DB, facilityId: string) {
+export async function updateFacilityScore(db: DB, facilityId: string): Promise<FacilityEntity> {
   const [result] = await db
     .select({
       avgRating: avg(reviews.rating),
@@ -129,7 +109,7 @@ export async function updateFacilityScore(db: DB, facilityId: string) {
     .innerJoin(bookings, eq(bookings.id, reviews.bookingId))
     .where(eq(bookings.facilityId, facilityId));
 
-  const updatedFacility = await db
+  const [updatedFacility] = await db
     .update(facilities)
     .set({
       reviewsCount: result?.count ?? 0,
@@ -139,7 +119,12 @@ export async function updateFacilityScore(db: DB, facilityId: string) {
     .returning();
   return updatedFacility;
 }
-export async function findCountriesWithFacilities(db: DB) {
+export async function findCountriesWithFacilities(db: DB): Promise<
+  {
+    country: string;
+    facilitiesCount: number;
+  }[]
+> {
   return db
     .select({ country: facilities.country, facilitiesCount: count() })
     .from(facilities)
@@ -147,7 +132,15 @@ export async function findCountriesWithFacilities(db: DB) {
     .groupBy(facilities.country)
     .orderBy(desc(count()));
 }
-export async function findCitiesByCountry(db: DB, country: string) {
+export async function findCitiesByCountry(
+  db: DB,
+  country: string,
+): Promise<
+  {
+    city: string;
+    facilitiesCount: number;
+  }[]
+> {
   return db
     .select({ city: facilities.city, facilitiesCount: count() })
     .from(facilities)

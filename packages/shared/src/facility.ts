@@ -103,6 +103,7 @@ export const facilityListQuerySchema = z.object({
   sort: z.enum(["rating", "priceAsc", "priceDesc"]).optional(),
 });
 export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
+// booking
 
 export const facilityBookingQuerySchema = z.object({
   date: z.iso.date().optional(),
@@ -111,7 +112,7 @@ export const facilityBookingQuerySchema = z.object({
   time: wallTimeSchema.optional(),
 });
 export type FacilityBookingQuery = z.infer<typeof facilityBookingQuerySchema>;
-// booking
+
 export const facilityBookingDataResponseSchema = facilityResponseSchema.extend({
   services: serviceWithStaffMemberIdsResponseSchema.array(),
   staff: staffMemberResponseSchema.array(),

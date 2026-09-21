@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared/auth";
+import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared";
 import * as z from "zod";
 
 const validPayload = {
