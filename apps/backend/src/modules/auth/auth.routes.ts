@@ -1,39 +1,49 @@
-import { type FastifyInstance } from "fastify";
-import {
-  getAuthMe,
-  postAuthLogout,
-  postAuthRegister,
-  postAuthLogin,
-  deleteUserAccount,
-} from "./auth.controller.ts";
+import { authResponseSchema, loginRequestSchema, registerRequestSchema } from "@slotbook/shared";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { authorizeUser, deleteUser, signInUser, signUpUser } from "./auth.service";
+import { setAuthCookie } from "./auth.utils";
 
-import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared/auth";
-
-export async function authRoutes(fastify: FastifyInstance) {
+export const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.post(
     "/register",
     {
       schema: {
-        body: registerSchema,
+        body: registerRequestSchema,
         response: {
           201: authResponseSchema,
         },
       },
     },
-    postAuthRegister,
+    async (request, response) => {
+      const { token, user } = await signUpUser(
+        request.server.drizzle,
+        request.server.jwt,
+        request.body,
+      );
+      setAuthCookie(response, token);
+      return response.code(201).send({ user: user });
+    },
   );
 
   fastify.post(
     "/login",
     {
       schema: {
-        body: loginSchema,
+        body: loginRequestSchema,
         response: {
           200: authResponseSchema,
         },
       },
     },
-    postAuthLogin,
+    async (request, response) => {
+      const { token, user } = await signInUser(
+        request.server.drizzle,
+        request.server.jwt,
+        request.body,
+      );
+      setAuthCookie(response, token);
+      return response.send({ user: user });
+    },
   );
   fastify.get(
     "/me",
@@ -45,7 +55,11 @@ export async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getAuthMe,
+    async (request, response) => {
+      const { user } = await authorizeUser(request.server.drizzle, request.user.id);
+      response.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+      return response.send({ user: user });
+    },
   );
   fastify.delete(
     "/me",
@@ -55,7 +69,13 @@ export async function authRoutes(fastify: FastifyInstance) {
         response: {},
       },
     },
-    deleteUserAccount,
+    async (request, response) => {
+      await deleteUser(request.server.drizzle, request.user.id);
+      return response.send(204);
+    },
   );
-  fastify.get("/logout", postAuthLogout);
-}
+  fastify.get("/logout", async (request, response) => {
+    response.clearCookie("token", { path: "/" });
+    return response.send({ message: "Logged out" });
+  });
+};

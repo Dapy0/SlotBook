@@ -24,6 +24,8 @@ describe("signUpUser Tests", async () => {
       passwordHash: "hashedPassword",
       createdAt: now,
       updatedAt: now,
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     const { user, token } = await signUpUser(fakeDb, fakeJwt as any, {
       name: "test",
@@ -50,6 +52,8 @@ describe("signUpUser Tests", async () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     await signUpUser(fakeDb, fakeJwt as any, {
       name: "test",
@@ -74,6 +78,8 @@ describe("signUpUser Tests", async () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     const { user, token } = await signUpUser(fakeDb, fakeJwt as any, {
       name: "test",
@@ -116,6 +122,8 @@ describe("signUpUser Tests", async () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
 
     await signUpUser(fakeDb, fakeJwt as any, {
@@ -138,6 +146,8 @@ describe("Sign In service unit tests", () => {
       passwordHash: "hashedPassword",
       createdAt: now,
       updatedAt: now,
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
     const { user, token } = await signInUser(fakeDb, fakeJwt as any, {
@@ -172,6 +182,8 @@ describe("Sign In service unit tests", () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(false as never);
     await expect(
@@ -189,6 +201,8 @@ describe("Sign In service unit tests", () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 
@@ -207,6 +221,8 @@ describe("Sign In service unit tests", () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 
@@ -225,6 +241,8 @@ describe("Sign In service unit tests", () => {
       passwordHash: "hashedPassword",
       createdAt: new Date(),
       updatedAt: new Date(),
+      timezone: "Europe/Warsaw",
+      deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 

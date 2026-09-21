@@ -38,7 +38,7 @@ export const findUserById = async (db: DB, userId: string): Promise<SelectUserEn
   return newUser ?? null;
 };
 
-export async function deleteUserById(db: DB, userId: string) {
+export async function deleteUserById(db: DB, userId: string): Promise<SelectUserEntity> {
   const [deletedUser] = await db
     .update(users)
     .set({
@@ -52,4 +52,5 @@ export async function deleteUserById(db: DB, userId: string) {
   if (!deletedUser) {
     throw new Error("Failed to delete user");
   }
+  return deletedUser;
 }
