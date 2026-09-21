@@ -1,14 +1,15 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import {
   availabilityParamSchema,
   availabilityQuerySchema,
   type AvailabilityParamsAndQuery,
 } from "./availability.schema.ts";
-import { availabilityResponseSchema } from "@slotbook/shared/availability";
-import { getAvailableSlotsFor30days } from './availability.service.ts';
+import { availabilityResponseSchema } from "@slotbook/shared";
+import { getAvailableSlotsFor30days } from "./availability.service.ts";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 
-export function availabilityRoutes(fastify: FastifyInstance) {
-  fastify.get<AvailabilityParamsAndQuery>(
+export const availabilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.get(
     "/availability",
     {
       schema: {
@@ -29,4 +30,4 @@ export function availabilityRoutes(fastify: FastifyInstance) {
       return response.send(availableTime);
     },
   );
-}
+};

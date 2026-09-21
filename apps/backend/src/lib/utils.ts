@@ -1,5 +1,7 @@
+import { formatInTimeZone } from "date-fns-tz";
+
 export function todayInTimeZone(timeZone: string, now = new Date()): string {
-  return Intl.DateTimeFormat("sv-SE", { timeZone }).format(now);
+  return formatInTimeZone(now, timeZone, "yyyy-MM-dd");
 }
 export function getLocalWallTime(date: Date, timeZone: string): string {
   return Intl.DateTimeFormat("en-GB", {
@@ -20,6 +22,5 @@ export function getLocalDayOfWeek(date: Date, timeZone: string): number {
 export function getIsoWeekDay(isoDate: string): number {
   const [year, month, day] = isoDate.split("-").map(Number);
   const UTCWeekDay = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
-  return UTCWeekDay === 0 ? 8 : UTCWeekDay;
+  return UTCWeekDay === 0 ? 7 : UTCWeekDay;
 }
-
