@@ -1,7 +1,7 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
-import Weekday from '@slotbook/shared';
-import type { FacilityWeekScheduleResponse, StaffWeekScheduleResponse } from "@slotbook/shared";
+import type { StaffScheduleEntryResponse, Weekday } from '@slotbook/shared';
+import type { FacilityScheduleEntryResponse } from "@slotbook/shared";
 
 
 export const WEEKDAY_BY_NAME = {
@@ -54,8 +54,8 @@ export async function checkIfBookingFitsAllSchedules(
   startTime: string,
   endTime: string,
   dayOfTheWeek: number,
-  staffSchedule: StaffWeekScheduleResponse,
-  facilitySchedule: FacilityWeekScheduleResponse,
+  staffSchedule: StaffScheduleEntryResponse[],
+  facilitySchedule: FacilityScheduleEntryResponse[],
 ) {
   const facilityDaySchedules = facilitySchedule.filter((f) => f.dayOfTheWeek === dayOfTheWeek);
   const staffDaySchedules = staffSchedule.filter((s) => s.dayOfTheWeek === dayOfTheWeek);

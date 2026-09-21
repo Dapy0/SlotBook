@@ -1,4 +1,4 @@
-import type { CreateReviewRequest } from "@slotbook/shared";
+import type { CreateReviewRequest, ReviewResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
@@ -38,7 +38,7 @@ export async function createReviewForBooking(
   await updateFacilityScore(db, facilityId);
   return;
 }
-export async function getAllFacilityReviews(db: DB, facilityId: string) {
+export async function getAllFacilityReviews(db: DB, facilityId: string): Promise<ReviewResponse[]> {
   const reviews = await findReviewsByFacilityId(db, facilityId);
   return reviews;
 }

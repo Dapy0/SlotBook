@@ -8,6 +8,7 @@ import {
 import type {
   FacilityCategoryCountResponse,
   FacilityListQuery,
+  GeoCountryResponse,
   UpdateFacilityRequest,
 } from "@slotbook/shared";
 import { reviews } from "../../db/schema/reviews.ts";
@@ -119,12 +120,7 @@ export async function updateFacilityScore(db: DB, facilityId: string): Promise<F
     .returning();
   return updatedFacility;
 }
-export async function findCountriesWithFacilities(db: DB): Promise<
-  {
-    country: string;
-    facilitiesCount: number;
-  }[]
-> {
+export async function findCountriesWithFacilities(db: DB): Promise<GeoCountryResponse[]> {
   return db
     .select({ country: facilities.country, facilitiesCount: count() })
     .from(facilities)
