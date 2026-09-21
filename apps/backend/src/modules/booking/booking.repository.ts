@@ -1,9 +1,12 @@
-import type { PatchBookingStatus } from "@slotbook/shared/bookings";
+import type { BookingStatus } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { bookings } from "../../db/schema/booking.ts";
+import { bookings, type BookingEntity } from "../../db/schema/booking.ts";
 import { eq, and, sql, ne } from "drizzle-orm";
 
-export async function findBookingsByFacilityId(db: DB, facilityId: string) {
+export async function findBookingsByFacilityId(
+  db: DB,
+  facilityId: string,
+): Promise<BookingEntity[]> {
   const facilityBookings = await db
     .select()
     .from(bookings)
@@ -16,7 +19,7 @@ export async function findBusyRangesForStaff(
   staffId: string,
   windowStart: Date,
   windowEnd: Date,
-) {
+): Promise<{ start: Date; end: Date }[]> {
   const facilityBookings = await db
     .select({
       start: sql<Date>`lower(${bookings.timeRange})`,
@@ -35,13 +38,11 @@ export async function findBusyRangesForStaff(
 
   return facilityBookings;
 }
-export async function findBookingById(db: DB, bookingId: string) {
+export async function findBookingById(db: DB, bookingId: string): Promise<BookingEntity> {
   const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
   return booking;
 }
-function toTsRangeLiteral(start: Date, end: Date): string {
-  return `[${start.toISOString()},${end.toISOString()})`;
-}
+
 
 export async function insertBooking(
   db: DB,
@@ -53,7 +54,7 @@ export async function insertBooking(
     startDatetime: Date;
     endDatetime: Date;
   },
-) {
+): Promise<BookingEntity> {
   const [booking] = await db
     .insert(bookings)
     .values({
@@ -61,7 +62,10 @@ export async function insertBooking(
       facilityId: data.facilityId,
       staffMemberId: data.staffMemberId,
       serviceId: data.serviceId,
-      timeRange: toTsRangeLiteral(data.startDatetime, data.endDatetime), // ключ как в схеме
+      timeRange: {
+        start: data.startDatetime,
+        end: data.endDatetime,
+      }, // ключ как в схеме
     })
     .returning();
 
@@ -74,8 +78,8 @@ export async function insertBooking(
 export async function patchStatusByBookingId(
   db: DB,
   bookingId: string,
-  status: PatchBookingStatus["status"],
-) {
+  status: BookingStatus,
+): Promise<BookingEntity> {
   const [updatedBooking] = await db
     .update(bookings)
     .set({

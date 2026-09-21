@@ -1,76 +1,102 @@
-import type { FastifyInstance } from "fastify";
-import {
-  paramsPatchSchema,
-  paramsSchema,
-  type BookingParams,
-  type BookingPatchParams,
-} from "./booking.schema.ts";
-import {
-  getBookings,
-  createBooking,
-  patchBookingStatus,
-  postReviewForBooking,
-} from "./booking.controller.ts";
-import z from "zod";
-import {
-  bookingRequestSchema,
-  bookingResponseSchema,
-  patchBookingStatusSchema,
-  type BookingRequest,
-  type PatchBookingStatus,
-} from "@slotbook/shared/bookings";
-import { reviewRequestSchema, type ReviewRequest } from '@slotbook/shared/reviews';
+import { paramsPatchSchema, paramsSchema } from "./booking.schema.ts";
 
-export async function bookingRoutes(fastify: FastifyInstance) {
-  fastify.get<{ Params: BookingParams }>(
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import {
+  bookingResponseSchema,
+  changeBookingStatusRequestSchema,
+  createBookingRequestSchema,
+  createReviewRequestSchema,
+} from "@slotbook/shared";
+import {
+  changeBookingStatus,
+  createBookingForFacility,
+  getFacilityBookingsForOwner,
+} from "./booking.service";
+import { createReviewForBooking } from "../review/review.service";
+
+export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.get(
     "/:id/bookings",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsSchema,
         response: {
-          200: z.array(bookingResponseSchema),
+          200: bookingResponseSchema.array(),
         },
       },
     },
-    getBookings,
+    async (request, response) => {
+      const bookings = await getFacilityBookingsForOwner(
+        request.server.drizzle,
+        request.user.id,
+        request.params.id
+      );
+      return response.send(bookings);
+    },
   );
 
-  fastify.post<{ Params: BookingParams; Body: BookingRequest }>(
+  fastify.post(
     "/:id/bookings",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsSchema,
-        body: bookingRequestSchema,
+        body: createBookingRequestSchema,
       },
     },
-    createBooking,
+    async (request, response) => {
+      const booking = await createBookingForFacility(
+        request.server.drizzle,
+        request.user.id,
+        request.params.id,
+        request.body
+      );
+      return response.send(booking);
+    },
   );
 
-  fastify.post<{ Params: BookingPatchParams; Body: ReviewRequest }>(
+  fastify.post(
     "/:id/bookings/:bookingId/reviews",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsPatchSchema,
-        body: reviewRequestSchema,
+        body: createReviewRequestSchema,
       },
     },
-    postReviewForBooking,
+    async (request, response) => {
+      await createReviewForBooking(
+        request.server.drizzle,
+        request.user.id,
+        request.params.bookingId,
+        request.params.id,
+        request.body
+      );
+      return response.code(201);
+    },
   );
-  fastify.patch<{ Params: BookingPatchParams; Body: PatchBookingStatus }>(
+  fastify.patch(
     "/:id/bookings/:bookingId",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsPatchSchema,
-        body: patchBookingStatusSchema,
+        body: changeBookingStatusRequestSchema,
       },
     },
-    patchBookingStatus,
+    async (request, response) => {
+      const patchedBooking = await changeBookingStatus(
+        request.server.drizzle,
+        request.user.id,
+        request.params.id,
+        request.params.bookingId,
+        request.body
+      );
+      return response.send(patchedBooking);
+    },
   );
-}
+};
 
 export async function mineBookingsRoutes() {
   // fastify.get(

@@ -1,6 +1,6 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
-import { checkFacilityOwnership, getFacilityDetails } from "../facility/facility.service.ts";
+import { ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { checkFacilityOwnership, getFacilityOrThrow } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
 import {
@@ -15,26 +15,59 @@ import {
 } from "./booking.repository.ts";
 import { checkIfBookingFitsAllSchedules } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type { BookingRequest, PatchBookingStatus } from "@slotbook/shared/bookings";
 import { getLocalDayOfWeek, getLocalWallTime } from "../../lib/utils.ts";
-export async function getFacilityBookingsForOwner(db: DB, userId: string, facilityId: string) {
+import type {
+  BookingResponse,
+  ChangeBookingStatusRequest,
+  CreateBookingRequest,
+} from "@slotbook/shared";
+import type { BookingEntity } from "../../db/schema";
+function mapBookingToContractFormat(booking: BookingEntity): BookingResponse;
+
+function mapBookingToContractFormat(bookings: BookingEntity[]): BookingResponse[];
+
+function mapBookingToContractFormat(
+  bookings: BookingEntity | BookingEntity[],
+): BookingResponse | BookingResponse[] {
+  if (Array.isArray(bookings)) {
+    return bookings.map(({ timeRange, ...booking }) => ({
+      ...booking,
+      startsAt: timeRange.start,
+      endsAt: timeRange.end,
+    }));
+  }
+
+  const { timeRange, ...booking } = bookings;
+
+  return {
+    ...booking,
+    startsAt: timeRange.start,
+    endsAt: timeRange.end,
+  };
+}
+
+export async function getFacilityBookingsForOwner(
+  db: DB,
+  userId: string,
+  facilityId: string,
+): Promise<BookingResponse[]> {
   await checkFacilityOwnership(db, facilityId, userId);
 
   const facilityBookings = await findBookingsByFacilityId(db, facilityId);
 
-  return facilityBookings;
+  return mapBookingToContractFormat(facilityBookings);
 }
 export async function createBookingForFacility(
   db: DB,
   userId: string,
   facilityId: string,
-  data: BookingRequest,
-) {
+  data: CreateBookingRequest,
+): Promise<BookingResponse> {
   const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
-    getFacilityDetails(db, facilityId),
-    checkIfStaffIsFacilityWorker(db, facilityId, data.staffId),
+    getFacilityOrThrow(db, facilityId),
+    checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId),
     getFacilityServiceById(db, data.serviceId, facilityId),
-    receiveStaffSchedule(db, facilityId, data.staffId),
+    receiveStaffSchedule(db, facilityId, data.staffMemberId),
     findFacilitySchedule(db, facilityId),
   ]);
 
@@ -43,16 +76,16 @@ export async function createBookingForFacility(
   // if (userId === facility.ownerId) {
   //   throw new ForbiddenError("No self bookings allowed");
   // }
-  if (data.startTime.getTime() <= Date.now()) {
+  if (data.startsAt.getTime() <= Date.now()) {
     throw new ConflictError("Start time is in the past");
   }
 
-  const startDatetime = data.startTime;
+  const startDatetime = data.startsAt;
   const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60_000);
 
-  const localDay = getLocalDayOfWeek(startDatetime, facility.timezoneIANA);
-  const localStartTime = getLocalWallTime(startDatetime, facility.timezoneIANA);
-  const localEndTime = getLocalWallTime(endDatetime, facility.timezoneIANA);
+  const localDay = getLocalDayOfWeek(startDatetime, facility.timezone);
+  const localStartTime = getLocalWallTime(startDatetime, facility.timezone);
+  const localEndTime = getLocalWallTime(endDatetime, facility.timezone);
   await checkIfBookingFitsAllSchedules(
     localStartTime,
     localEndTime,
@@ -75,7 +108,7 @@ export async function createBookingForFacility(
     throw e;
   });
 
-  return booking;
+  return mapBookingToContractFormat(booking);
 }
 
 export async function changeBookingStatus(
@@ -83,8 +116,8 @@ export async function changeBookingStatus(
   userId: string,
   facilityId: string,
   bookingId: string,
-  data: PatchBookingStatus,
-) {
+  data: ChangeBookingStatusRequest,
+): Promise<BookingResponse> {
   const booking = await findBookingById(db, bookingId);
   if (!booking) {
     throw new NotFoundError("No such booking found");
@@ -95,14 +128,19 @@ export async function changeBookingStatus(
         case "confirmed":
           // console.log(userId, booking.clientId);
           await checkFacilityOwnership(db, facilityId, userId);
-          return await patchStatusByBookingId(db, booking.id, data.status);
+          return mapBookingToContractFormat(
+            await patchStatusByBookingId(db, booking.id, data.status),
+          );
         case "canceled":
           if (booking.clientId === userId) {
-            return await patchStatusByBookingId(db, booking.id, data.status);
+            return mapBookingToContractFormat(
+              await patchStatusByBookingId(db, booking.id, data.status),
+            );
           }
           await checkFacilityOwnership(db, facilityId, userId);
-          return await patchStatusByBookingId(db, booking.id, data.status);
-          break;
+          return mapBookingToContractFormat(
+            await patchStatusByBookingId(db, booking.id, data.status),
+          );
       }
       break;
 
@@ -113,10 +151,14 @@ export async function changeBookingStatus(
           break;
         case "canceled":
           if (booking.clientId === userId) {
-            return await patchStatusByBookingId(db, booking.id, data.status);
+            return mapBookingToContractFormat(
+              await patchStatusByBookingId(db, booking.id, data.status),
+            );
           }
           await checkFacilityOwnership(db, facilityId, userId);
-          return await patchStatusByBookingId(db, booking.id, data.status);
+          return mapBookingToContractFormat(
+            await patchStatusByBookingId(db, booking.id, data.status),
+          );
       }
       break;
 

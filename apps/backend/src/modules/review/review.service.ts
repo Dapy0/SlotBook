@@ -1,8 +1,7 @@
-import type { CreateReviewRequest } from "@slotbook/shared/reviews";
+import type { CreateReviewRequest } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
-import { parseTsRangeLiteral } from "@slotbook/shared/bookings";
 import { findReviewsByFacilityId, insertReview } from "./review.repository.ts";
 import { updateFacilityScore } from "../facility/facility.repository.ts";
 
@@ -26,9 +25,9 @@ export async function createReviewForBooking(
   if (booking.status !== "confirmed") {
     throw new ConflictError("Booking is not confirmed");
   }
-  if (new Date(parseTsRangeLiteral(booking.timeRange).end!) > new Date()) {
-    throw new ConflictError("Service has not happened yet");
-  }
+  // if (new Date(parseTsRangeLiteral(booking.timeRange).end!) > new Date()) {
+  //   throw new ConflictError("Service has not happened yet");
+  // }
   await insertReview(db, bookingId, reviewData).catch((e) => {
     if (e.code === "23505") {
       throw new ConflictError("You already reviewed this booking");

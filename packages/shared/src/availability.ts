@@ -4,7 +4,6 @@ import { calendarDateSchema, instantSchema } from "./common/codecs";
 const availabilitySlotSchema = z.object({
   startsAt: instantSchema,
   endsAt: instantSchema,
-  staffMemberIds: z.array(z.uuid()),
 });
 const availabilityDaySchema = z.object({
   date: calendarDateSchema,

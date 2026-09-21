@@ -4,12 +4,42 @@ import { facilities } from "./facility.ts";
 import { staffMembers } from "./staffMember.ts";
 import { services } from "./service.ts";
 
+type TimeRange = {
+  start: Date;
+  end: Date;
+};
+function parseRange(value: string): TimeRange {
+  const match = value.match(/^(\[|\()(.*),(.*)(\]|\))$/);
+
+  if (!match) {
+    throw new Error(`Invalid tstzrange: ${value}`);
+  }
+  const [, , startValue, endValue] = match;
+  const start = new Date(startValue.replace(/^"|"$/g, ""));
+  const end = new Date(endValue.replace(/^"|"$/g, ""));
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    throw new Error(`Invalid timestamp in tstzrange: ${value}`);
+  }
+
+  return {
+    start,
+    end,
+  };
+}
+
 export const tstzrange = customType<{
-  data: string;
+  data: TimeRange;
   driverData: string;
 }>({
   dataType() {
     return "tstzrange";
+  },
+  fromDriver(value: string): TimeRange {
+    return parseRange(value);
+  },
+  toDriver(value: TimeRange): string {
+    return `[${value.start.toISOString()},${value.end.toISOString()})`;
   },
 });
 
