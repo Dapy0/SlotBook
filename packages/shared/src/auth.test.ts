@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { authResponseSchema, loginSchema, registerSchema } from "@slotbook/shared";
+import { authResponseSchema, loginRequestSchema, registerRequestSchema } from "@slotbook/shared";
 import * as z from "zod";
 
 const validPayload = {
@@ -10,18 +10,18 @@ const validPayload = {
 
 describe("RegisterRequest", () => {
   test("accepts valid data", () => {
-    expect(registerSchema.safeParse(validPayload).success).toBe(true);
+    expect(registerRequestSchema.safeParse(validPayload).success).toBe(true);
   });
 });
 
 describe("LoginRequest", () => {
   test("accepts valid data", () => {
     expect(
-      loginSchema.safeParse({ email: validPayload.email, password: validPayload.password }).success,
+      loginRequestSchema.safeParse({ email: validPayload.email, password: validPayload.password }).success,
     ).toBe(true);
   });
   test("rejects invalid data", () => {
-    expect(loginSchema.safeParse({ password: validPayload.password }).success).toBe(false);
+    expect(loginRequestSchema.safeParse({ password: validPayload.password }).success).toBe(false);
   });
 });
 type AuthWire = z.input<typeof authResponseSchema>;
@@ -36,7 +36,6 @@ describe("AuthResponse", () => {
       timezone: "Europe/Warsaw",
       createdAt: "2026-08-12T12:29:59.998Z",
       updatedAt: "2026-08-12T12:29:59.998Z",
-      deletedAt: null,
     },
   };
   test("decodes ISO string into date", () => {
@@ -48,7 +47,6 @@ describe("AuthResponse", () => {
     expect(user.createdAt).toBeInstanceOf(Date);
     expect(user.createdAt.getTime()).toBe(Date.parse("2026-08-12T12:29:59.998Z"));
     expect(user.updatedAt.getTime()).toBe(Date.parse("2026-08-12T12:29:59.998Z"));
-    expect(user.deletedAt).toBe(null);
   });
   test("encodes back to exact wire format", () => {
     const decoded: AuthDomain = authResponseSchema.parse(fixture);
