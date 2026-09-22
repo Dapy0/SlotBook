@@ -13,17 +13,29 @@ import {
   insertFacility,
   updateFacilityById,
   deleteFacilityById,
+  findFacilityBySlug,
 } from "./facility.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import {
   deleteFacilityScheduleByFacilityId,
   findFacilitySchedule,
+  findFacilityScheduleBySlug,
   insertFacilityScheduleByFacilityId,
 } from "./facilitySchedule.repository.ts";
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
-
-export async function getFacilityOrThrow(db: DB, facilityId: string): Promise<FacilityResponse> {
+export async function getFacilityBySlugOrThrow(
+  db: DB,
+  facilityId: string,
+): Promise<FacilityResponse> {
+  const facility = await findFacilityBySlug(db, facilityId);
+  assertFound(facility, "Facility not found");
+  return facility;
+}
+export async function getFacilityByIdOrThrow(
+  db: DB,
+  facilityId: string,
+): Promise<FacilityResponse> {
   const facility = await findFacilityById(db, facilityId);
   assertFound(facility, "Facility not found");
   return facility;
@@ -34,7 +46,7 @@ export async function checkFacilityOwnership(
   facilityId: string,
   userId: string,
 ): Promise<FacilityResponse> {
-  const facility = await getFacilityOrThrow(db, facilityId);
+  const facility = await getFacilityByIdOrThrow(db, facilityId);
 
   if (userId !== facility.ownerId) {
     throw new ForbiddenError("Not owned facility");
@@ -97,6 +109,16 @@ export async function removeOwnedFacilityById(
     throw new NotFoundError("Facility not found");
   }
   return deletedFacility;
+}
+export async function getFacilityScheduleBySlug(
+  db: DB,
+  slug: string,
+): Promise<FacilityScheduleEntryResponse[]> {
+  const schedule = await findFacilityScheduleBySlug(db, slug);
+  if (!schedule) {
+    throw new NotFoundError("No schedule for this facility");
+  }
+  return schedule;
 }
 export async function getFacilityScheduleById(
   db: DB,

@@ -30,11 +30,17 @@ export async function getCitiesList(getParams: { country: string }) {
 export async function getFacilityById(id: string) {
   return await api(`/facilities/${id}`, facilityResponseSchema);
 }
+export async function getFacilityBySlug(slug: string) {
+  return await api(`/facilities/by-slug/${slug}`, facilityResponseSchema);
+}
 
 export async function getDataForBooking(facilityId: string) {
   return await api(`/facilities/${facilityId}/bookingData`, facilityBookingDataResponseSchema);
 }
 
+export async function getFacilityScheduleBySlug(slug: string) {
+  return await api(`/facilities/by-slug/${slug}/schedule`, facilityScheduleEntryResponseSchema.array());
+}
 export async function getFacilityScheduleById(id: string) {
   return await api(`/facilities/${id}/schedule`, facilityScheduleEntryResponseSchema.array());
 }

@@ -3,8 +3,20 @@ import {
   facilitySchedules,
   type FacilityScheduleEntity,
 } from "../../db/schema/facilitySchedule.ts";
-import { and, eq } from "drizzle-orm";
+import { and, eq, getColumns } from "drizzle-orm";
 import type { ChangeWeekScheduleRequest, Weekday } from "@slotbook/shared";
+import { facilities } from "../../db/schema";
+export async function findFacilityScheduleBySlug(
+  db: DB,
+  slug: string,
+): Promise<FacilityScheduleEntity[]> {
+  const schedule = await db
+    .select({ ...getColumns(facilitySchedules) })
+    .from(facilitySchedules)
+    .innerJoin(facilities, eq(facilities.id, facilitySchedules.facilityId))
+    .where(eq(facilities.slug, slug));
+  return schedule;
+}
 export async function findFacilitySchedule(
   db: DB,
   facilityId: string,

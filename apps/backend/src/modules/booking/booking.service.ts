@@ -1,6 +1,6 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { ConflictError, NotFoundError } from "../../lib/errors.ts";
-import { checkFacilityOwnership, getFacilityOrThrow } from "../facility/facility.service.ts";
+import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
 import {
@@ -64,7 +64,7 @@ export async function createBookingForFacility(
   data: CreateBookingRequest,
 ): Promise<BookingResponse> {
   const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
-    getFacilityOrThrow(db, facilityId),
+    getFacilityByIdOrThrow(db, facilityId),
     checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId),
     getFacilityServiceById(db, data.serviceId, facilityId),
     receiveStaffSchedule(db, facilityId, data.staffMemberId),

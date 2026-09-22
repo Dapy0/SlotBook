@@ -41,6 +41,10 @@ export async function findAllFacilitiesByParams(
 
   return await query;
 }
+export async function findFacilityBySlug(db: DB, slug: string): Promise<FacilityEntity | null> {
+  const [facility] = await db.select().from(facilities).where(eq(facilities.slug, slug));
+  return facility ?? null;
+}
 export async function findFacilityById(db: DB, id: string): Promise<FacilityEntity | null> {
   const [facility] = await db.select().from(facilities).where(eq(facilities.id, id));
   return facility ?? null;

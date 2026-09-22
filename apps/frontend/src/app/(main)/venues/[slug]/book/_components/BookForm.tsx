@@ -149,7 +149,7 @@ function BookForm({
   const selectedDaySlots = slots?.days.find((d) => d.date === selection.date)?.slots ?? [];
   return (
     <div className="">
-      <BreadCrumbs crumbsList={["facilities", name, "book"]} />
+      <BreadCrumbs  />
       <div className="flex w-full justify-between gap-10">
         <div className="flex flex-col gap-6">
           <header>

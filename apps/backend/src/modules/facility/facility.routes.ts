@@ -1,4 +1,3 @@
-
 import z from "zod";
 import {
   createFacilityRequestSchema,
@@ -30,8 +29,10 @@ import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
   getAllPublicFacilities,
-  getFacilityOrThrow,
+  getFacilityByIdOrThrow,
+  getFacilityBySlugOrThrow,
   getFacilityScheduleById,
+  getFacilityScheduleBySlug,
   getOwnFacilitiesByUserId,
   removeOwnedFacilityById,
   updateOwnedFacility,
@@ -41,7 +42,7 @@ import { availabilityRoutes } from "../availability/availability.routes.ts";
 import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
-import { facilityParamsSchema } from './facility.schema';
+import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -115,7 +116,23 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, response) => {
-      const facility = await getFacilityOrThrow(request.server.drizzle, request.params.id);
+      const facility = await getFacilityByIdOrThrow(request.server.drizzle, request.params.id);
+      response.header("Cache-Control", "public, no-cache");
+      return response.send(facility);
+    },
+  );
+  fastify.get(
+    "/by-slug/:slug",
+    {
+      schema: {
+        params: facilitySlugParamsSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await getFacilityBySlugOrThrow(request.server.drizzle, request.params.slug);
       response.header("Cache-Control", "public, no-cache");
       return response.send(facility);
     },
@@ -130,7 +147,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request) => {
-      const facility = await getFacilityOrThrow(request.server.drizzle, request.params.id);
+      const facility = await getFacilityByIdOrThrow(request.server.drizzle, request.params.id);
       const servicesByFacilityId = await getServicesWithStaffIds(
         request.server.drizzle,
         facility.id,
@@ -186,7 +203,21 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.status(200).send(updated);
     },
   );
-
+  fastify.get(
+    "/by-slug/:slug/schedule",
+    {
+      schema: {
+        params: facilitySlugParamsSchema,
+        response: {
+          200: facilityScheduleEntryResponseSchema.array(),
+        },
+      },
+    },
+    async (request, response) => {
+      const schedule = await getFacilityScheduleBySlug(request.server.drizzle, request.params.slug);
+      return response.send(schedule);
+    },
+  );
   fastify.get(
     "/:id/schedule",
     {

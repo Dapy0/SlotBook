@@ -1,10 +1,7 @@
-import type {
-  CreateServiceRequest,
-  ServiceResponse,
-} from "@slotbook/shared";
+import type { CreateServiceRequest, ServiceResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { NotFoundError } from "../../lib/errors.ts";
-import { checkFacilityOwnership, getFacilityOrThrow } from "../facility/facility.service.ts";
+import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import {
   getServiceByFacilityIdAndServiceId,
   getServiceByServiceIdAndStaffMemberId,
@@ -16,7 +13,7 @@ export async function getFacilityServicesById(
   db: DB,
   facilityId: string,
 ): Promise<ServiceResponse[]> {
-  await getFacilityOrThrow(db, facilityId);
+  await getFacilityByIdOrThrow(db, facilityId);
   const services = await getServicesByFacilityId(db, facilityId);
   return services;
 }

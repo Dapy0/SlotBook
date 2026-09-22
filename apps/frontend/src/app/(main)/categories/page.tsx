@@ -15,7 +15,7 @@ async function CategoriesPage() {
 
   return (
     <div>
-      <BreadCrumbs crumbsList={["categories"]} />
+      <BreadCrumbs />
       <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         <Link
           key={"All"}

@@ -7,14 +7,14 @@ import type { LucideIcon } from "lucide-react";
 import type { Route } from 'next';
 import Link from "next/link";
 function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
-  const { name, address, city, category, id, score } = facility;
+  const { name, address, city, category, id, score, slug } = facility;
   const Icon = Icons[
     CATEGORY_METADATA[category].icon as keyof typeof Icons
   ] as unknown as LucideIcon;
 
   return (
     <Link
-      href={`venues/${id}` as Route}
+      href={`venues/${slug}` as Route}
       className="relative max-w-60 min-w-60 overflow-hidden rounded-md border p-4"
     >
       <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>{" "}

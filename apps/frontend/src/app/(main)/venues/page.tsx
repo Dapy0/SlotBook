@@ -43,10 +43,7 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
   return (
     <div className="">
       <BreadCrumbs
-        crumbsList={[
-          "categories",
-          ...(categoryName ? [CATEGORY_METADATA[categoryName].label] : []),
-        ]}
+        
       />
       <div className="mb-6 flex items-baseline gap-2">
         <h1 className="text-3xl font-bold">{title} Venues</h1>

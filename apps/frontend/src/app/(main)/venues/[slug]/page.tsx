@@ -7,7 +7,9 @@ import WorkingHours from "@/app/(main)/venues/[slug]/_components/WorkingHours";
 import ContactInfo from "@/app/(main)/venues/[slug]/_components/ContactInfo";
 import {
   getFacilityById,
+  getFacilityBySlug,
   getFacilityScheduleById,
+  getFacilityScheduleBySlug,
   getFacilityServicesById,
 } from "@/services/facilities";
 import { notFound } from "next/navigation";
@@ -22,8 +24,8 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   const [facility, schedule] = await Promise.all([
-    getFacilityById(slug),
-    getFacilityScheduleById(slug),
+    getFacilityBySlug(slug),
+    getFacilityScheduleBySlug(slug),
   ]).catch((err) => {
     if (err instanceof ApiError && err.status === 404) notFound();
     throw err;
@@ -52,7 +54,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
   ]);
   return (
     <div className="mx-auto w-full">
-      <BreadCrumbs crumbsList={["facilities", name]} />
+      <BreadCrumbs />
       <div className="flex items-start gap-10">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex shrink-0 items-center gap-2">

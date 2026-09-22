@@ -1,5 +1,5 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { getFacilityOrThrow } from "../facility/facility.service.ts";
+import { getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import type { AvailabilityResponse } from "@slotbook/shared";
@@ -20,7 +20,7 @@ export async function getAvailableSlotsFor30days(
   staffId: string,
   serviceId: string,
 ): Promise<AvailabilityResponse> {
-  const facility = await getFacilityOrThrow(db, facilityId);
+  const facility = await getFacilityByIdOrThrow(db, facilityId);
   const tz = facility.timezone;
   const [service, facilitySchedule, staffSchedule] = await Promise.all([
     getServiceForStaffMember(db, serviceId, staffId),

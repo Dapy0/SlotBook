@@ -13,13 +13,13 @@ function BigFacilityPreviewCard({
 }: {
   facilityWithServices: FacilityWithServicesResponse;
 }) {
-  const { id, name, address, city, category, score, reviewsCount, description, services } =
+  const { id, name, address, city, slug, score, reviewsCount, description, services } =
     facilityWithServices;
   return (
     <div className="relative grid w-full overflow-hidden rounded-md border lg:grid-cols-[1fr_300px]">
       <div className="absolute inset-0 z-0 bg-linear-to-t from-gray-100 to-gray-50" />
 
-      <Link href={`/venues/${id}`} className="absolute inset-0 z-100" aria-label={name} />
+      <Link href={`/venues/${slug}`} className="absolute inset-0 z-100" aria-label={name} />
       <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>
       {/* <img src="" alt="" /> */}
       <div className="relative z-40 flex flex-col gap-6 p-4">
