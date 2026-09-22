@@ -1,29 +1,29 @@
-import type { FastifyInstance } from "fastify";
 import z from "zod";
+import { serviceParamsSchema } from "./service.schema.ts";
+import { createServiceRequestSchema, serviceResponseSchema } from "@slotbook/shared";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import {
-  createService,
-  getFacilityServiceDataById,
-  getFacilityServices,
-} from "./service.controller.ts";
-import { serviceParamsSchema, type ServiceParams } from "./service.schema.ts";
-import {
-  createServiceSchema,
-  serviceResponseSchema,
-  type ServiceResponseDTO,
-} from "@slotbook/shared/service";
+  createServiceByFacilityId,
+  getFacilityServiceById,
+  getFacilityServicesById,
+} from "./service.service";
 
-export async function serviceRoutes(fastify: FastifyInstance) {
+export const serviceRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/:id/services",
     {
       schema: {
         params: serviceParamsSchema,
         response: {
-          200: z.array(serviceResponseSchema),
+          200: serviceResponseSchema.array(),
         },
       },
     },
-    getFacilityServices,
+    async (request, response) => {
+      const services = await getFacilityServicesById(request.server.drizzle, request.params.id);
+
+      return response.send(services);
+    },
   );
   fastify.get(
     "/:id/services/:serviceId",
@@ -37,23 +37,37 @@ export async function serviceRoutes(fastify: FastifyInstance) {
         },
       },
     },
-    getFacilityServiceDataById,
+    async (request, response) => {
+      const service = await getFacilityServiceById(
+        request.server.drizzle,
+        request.params.serviceId,
+        request.params.id
+      );
+
+      return response.send(service);
+    },
   );
-  fastify.post<{
-    Params: ServiceParams;
-    Body: ServiceResponseDTO;
-  }>(
+  fastify.post(
     "/:id/services",
     {
       onRequest: [fastify.authenticate],
       schema: {
         params: serviceParamsSchema,
-        body: createServiceSchema,
+        body: createServiceRequestSchema,
         response: {
-          201: serviceResponseSchema,
+          201: serviceResponseSchema.omit({ currency: true }),
         },
       },
     },
-    createService,
+    async (request, response) => {
+      const createdFacility = await createServiceByFacilityId(
+        request.server.drizzle,
+        request.body,
+        request.params.id,
+        request.user.id
+      );
+
+      return response.status(201).send(createdFacility);
+    },
   );
-}
+};

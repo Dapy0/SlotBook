@@ -50,7 +50,13 @@ export async function getServicesByFacilityIds(
     .innerJoin(facilities, eq(facilities.id, services.facilityId))
     .where(and(inArray(services.facilityId, facilityIds), eq(services.isActive, true)));
 }
-export async function getServicesWithStaffIds(db: DB, facilityId: string) {
+type ServiceWithCurrencyWithStaffIds = ServiceWithCurrency & {
+  staffMemberIds: string[];
+};
+export async function getServicesWithStaffIds(
+  db: DB,
+  facilityId: string,
+): Promise<ServiceWithCurrencyWithStaffIds[]> {
   return db
     .select({
       ...getColumns(services),
@@ -68,7 +74,10 @@ export async function getServicesWithStaffIds(db: DB, facilityId: string) {
     .where(and(eq(services.facilityId, facilityId), eq(services.isActive, true)))
     .groupBy(services.id, facilities.currency);
 }
-export async function getStaffIdsByServiceIds(db: DB, serviceIds: string[]) {
+export async function getStaffIdsByServiceIds(
+  db: DB,
+  serviceIds: string[],
+): Promise<Map<string, { serviceId: string; staffMemberId: string }[]>> {
   const rows = await db
     .select({ serviceId: staffServices.serviceId, staffMemberId: staffServices.staffMemberId })
     .from(staffServices)
@@ -81,10 +90,11 @@ export async function getServiceByFacilityIdAndServiceId(
   db: DB,
   facilityId: string,
   serviceId: string,
-): Promise<ServiceEntity> {
+): Promise<ServiceWithCurrency | null> {
   const [facilityService] = await db
-    .select()
+    .select({ ...getColumns(services), currency: facilities.currency })
     .from(services)
+    .innerJoin(facilities, eq(facilities.id, services.facilityId))
     .where(and(eq(services.facilityId, facilityId), eq(services.id, serviceId)));
   return facilityService ?? null;
 }

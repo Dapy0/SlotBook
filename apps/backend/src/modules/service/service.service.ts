@@ -1,8 +1,10 @@
-import type { CreateServiceRequest } from "@slotbook/shared/service";
+import type {
+  CreateServiceRequest,
+  ServiceResponse,
+} from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { NotFoundError } from "../../lib/errors.ts";
-import { findFacilityById } from "../facility/facility.repository.ts";
-import { checkFacilityOwnership } from "../facility/facility.service.ts";
+import { checkFacilityOwnership, getFacilityOrThrow } from "../facility/facility.service.ts";
 import {
   getServiceByFacilityIdAndServiceId,
   getServiceByServiceIdAndStaffMemberId,
@@ -10,18 +12,19 @@ import {
   insertService,
 } from "./service.repository.ts";
 
-async function checkIfFacilityWithIdExists(db: DB, facilityId: string) {
-  const facility = await findFacilityById(db, facilityId);
-  if (!facility) {
-    throw new NotFoundError("Facility with this id not found");
-  }
-}
-export async function getFacilityServicesById(db: DB, facilityId: string) {
-  await checkIfFacilityWithIdExists(db, facilityId);
+export async function getFacilityServicesById(
+  db: DB,
+  facilityId: string,
+): Promise<ServiceResponse[]> {
+  await getFacilityOrThrow(db, facilityId);
   const services = await getServicesByFacilityId(db, facilityId);
   return services;
 }
-export async function getServiceForStaffMember(db: DB, serviceId: string, staffMemberId: string) {
+export async function getServiceForStaffMember(
+  db: DB,
+  serviceId: string,
+  staffMemberId: string,
+): Promise<ServiceResponse> {
   const service = await getServiceByServiceIdAndStaffMemberId(db, serviceId, staffMemberId);
   if (!service) {
     throw new NotFoundError("No such service found");
@@ -29,7 +32,11 @@ export async function getServiceForStaffMember(db: DB, serviceId: string, staffM
   return service;
 }
 
-export async function getFacilityServiceById(db: DB, serviceId: string, facilityId: string) {
+export async function getFacilityServiceById(
+  db: DB,
+  serviceId: string,
+  facilityId: string,
+): Promise<ServiceResponse> {
   const service = await getServiceByFacilityIdAndServiceId(db, facilityId, serviceId);
   if (!service) {
     throw new NotFoundError("No such service found");
@@ -42,7 +49,7 @@ export async function createServiceByFacilityId(
   data: CreateServiceRequest,
   facilityId: string,
   userId: string,
-) {
+): Promise<Omit<ServiceResponse, "currency">> {
   await checkFacilityOwnership(db, facilityId, userId);
 
   const newServiceData = {
