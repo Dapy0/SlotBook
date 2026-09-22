@@ -12,11 +12,11 @@ import {
 } from "@/services/facilities";
 import { notFound } from "next/navigation";
 import * as Icons from "lucide-react";
-import { CATEGORY_METADATA } from "@slotbook/shared/facility";
 import FacilityDetailsTab from "@/app/(main)/venues/[slug]/_components/FacilityDetailsTab";
 import { getStaffMembersByFacilityId } from "@/services/staff";
 import { getFacilityReviews } from "@/services/reviews";
 import { ApiError } from "@/lib/api";
+import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

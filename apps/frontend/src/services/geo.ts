@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { api } from "@/lib/api";
-import { geoResponseSchema } from "@slotbook/shared";
+import { geoCountryResponseSchema, geoResponseSchema } from "@slotbook/shared";
 
 export async function getCountries() {
-  return await api("/geo/countries", geoResponseSchema.array(), {
+  return await api("/geo/countries", geoCountryResponseSchema.array(), {
     next: { revalidate: 3600 },
   });
 }

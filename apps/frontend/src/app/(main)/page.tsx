@@ -1,19 +1,18 @@
-import SearchPanel from "@/app/(main)/venues/_components/SearchPanel";
+import SearchPanel from "@/app/(main)/_components/SearchPanel";
 import { Button } from "@/components/ui/button";
-import { Circle, Dot } from "lucide-react";
-import type { Route } from "next";
-import { RotatingCategory } from "@/components/layout/RotatingCategory";
-import SmallFacilityPreviewCard from "@/components/layout/SmallFacilityPreviewCard";
-import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
-import { getCitiesList, getFacilities, searchFacilities } from "@/services/facilities";
+import { Dot } from "lucide-react";
+import { RotatingCategory } from "@/app/(main)/_components/RotatingCategory";
+import SmallFacilityPreviewCard from "@/app/(main)/_components/SmallFacilityPreviewCard";
+import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
+import { getCitiesList, searchFacilities } from "@/services/facilities";
 import { getCategories } from "@/services/categories";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCookie } from "@/lib/utils";
 import { cookies } from "next/headers";
-import { CATEGORY_METADATA } from "@slotbook/shared/facility";
+
 import Link from "next/link";
 import { createParams } from "@/lib/queryStrings";
+import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
 const CATEGORY_WORDS = [
   "manicure",
   "for a haircut",
@@ -27,8 +26,8 @@ async function Page() {
   const cookieStore = await cookies();
   const local = cookieStore.get("_sb_country")?.value || "PL";
   const [facilities, categories, citiesList] = await Promise.all([
-    searchFacilities({ country: local, limit: 8 }),
-    getCategories({ country: local, limit: 4 }),
+    searchFacilities({ country: local, limit: 8, offset: 0 }),
+    getCategories({ country: local }),
     getCitiesList({ country: local }),
   ]).catch();
 

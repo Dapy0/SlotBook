@@ -1,16 +1,15 @@
-import type { FACILITY_CATEGORIES } from '@slotbook/shared';
+import type { FACILITY_CATEGORIES } from "@slotbook/shared";
+type FacilityCategory = (typeof FACILITY_CATEGORIES)[number];
 
-export const CATEGORY_METADATA: Record<
-  (typeof FACILITY_CATEGORIES)[number],
-  {
-    label: string;
-    description: string;
-    icon: string;
-    color: string;
-    badgeClassName: string;
-    slug: string;
-  }
-> = {
+type CategoryMetadata = {
+  label: string;
+  description: string;
+  icon: string;
+  color: string;
+  badgeClassName: string;
+  slug: string;
+};
+export const CATEGORY_METADATA = {
   BEAUTY: {
     slug: "beauty",
     label: "Beauty & Wellness",
@@ -59,4 +58,7 @@ export const CATEGORY_METADATA: Record<
     color: "oklch(44.2% 0.017 285.786)",
     badgeClassName: "text-zinc-500 rounded-md bg-zinc-100 shadow-s",
   },
-};
+} satisfies Record<FacilityCategory, CategoryMetadata>;
+export const CATEGORY_BY_SLUG = Object.fromEntries(
+  Object.entries(CATEGORY_METADATA).map(([key, metadata]) => [metadata.slug, key]),
+) as Record<string, FacilityCategory>;

@@ -1,9 +1,6 @@
-import {
-  daysAndThereNames,
-  type FacilityScheduleResponse,
-} from "@slotbook/shared/facilitySchedule";
+import type { FacilityScheduleEntryResponse } from "@slotbook/shared";
 
-export function convertRawResponseFacilitySchedule(rawSchema: FacilityScheduleResponse[]): Array<{
+function convertRawResponseFacilitySchedule(rawSchema: FacilityScheduleEntryResponse[]): Array<{
   dayOfTheWeek: string;
   timeIntervals: Array<string>;
 }> {
@@ -42,7 +39,7 @@ export function convertRawResponseFacilitySchedule(rawSchema: FacilityScheduleRe
   return final;
 }
 
-function WorkingHours({ hours }: { hours: FacilityScheduleResponse[] }) {
+function WorkingHours({ hours }: { hours: FacilityScheduleEntryResponse[] }) {
   if (hours.length === 0) {
     return (
       <div className="w-full max-w-xs rounded-sm border border-gray-200 bg-white p-5 shadow-sm">

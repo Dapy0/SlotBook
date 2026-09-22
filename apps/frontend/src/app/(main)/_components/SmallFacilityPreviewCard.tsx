@@ -1,8 +1,10 @@
+import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
 import ScoreBadge from "@/components/layout/ScoreBadge";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORY_METADATA, type FacilityResponse } from "@slotbook/shared/facility";
+import type { FacilityResponse } from '@slotbook/shared';
 import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { Route } from 'next';
 import Link from "next/link";
 function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
   const { name, address, city, category, id, score } = facility;
@@ -12,7 +14,7 @@ function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) 
 
   return (
     <Link
-      href={`venues/${id}`}
+      href={`venues/${id}` as Route}
       className="relative max-w-60 min-w-60 overflow-hidden rounded-md border p-4"
     >
       <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>{" "}

@@ -9,7 +9,7 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/services/auth/auth";
+import { login } from "@/services/auth";
 import {
   Card,
   CardAction,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
-import { loginSchema, type LoginRequest } from '@slotbook/shared';
+import { loginRequestSchema, type LoginRequest } from "@slotbook/shared";
 
 export default function LoginPage() {
   const [serverError, setServerError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginRequest>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginRequestSchema),
   });
   useEffect(() => {
     if (user) router.push("/");

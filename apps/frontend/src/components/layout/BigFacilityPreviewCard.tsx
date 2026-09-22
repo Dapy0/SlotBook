@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { durationFormatter, moneyFormatter } from "@/lib/format";
 import { createParams } from "@/lib/queryStrings";
 import { convertMinutesToTime } from "@/lib/utils";
-import type { FacilityResponse, FacilityWithServicesResponse } from "@slotbook/shared/facility";
+import type { FacilityWithServicesResponse } from "@slotbook/shared";
 import { MapPinIcon } from "lucide-react";
 import Link from "next/link";
 

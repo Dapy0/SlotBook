@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { createParams } from "@/lib/queryStrings";
-import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import type { StaffMemberPublicResponse } from '@slotbook/shared';
 import { StarIcon } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -10,7 +10,7 @@ export default function StaffList({
   staff,
   query = "",
 }: {
-  staff: StaffMemberResponseDTO[];
+  staff: StaffMemberPublicResponse[];
   query?: string;
 }) {
   const q = query.trim().toLowerCase();

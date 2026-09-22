@@ -1,4 +1,4 @@
-import BigFacilityPreviewCard from "@/app/(main)/venues/_components/BigFacilityPreviewCard";
+import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import FiltersSidebar from "@/app/(main)/venues/_components/FiltersSidebar";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { getCategories } from "@/services/categories";
 import { getCitiesList, getFacilities, searchFacilities } from "@/services/facilities";
-import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@slotbook/shared/facility";
 import { SearchIcon } from "lucide-react";
 import { cookies } from "next/headers";
 import { count } from "drizzle-orm";
@@ -19,29 +18,19 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import ResultsToolbar from "@/app/(main)/venues/_components/ResultsToolbar";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { FacilityListQuery } from "@slotbook/shared";
+import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@/app/(main)/_common/types";
 
-async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    category?: string;
-    city?: string;
-    rating?: string;
-    priceMax?: string;
-    q?: string;
-    sort?: string;
-  }>;
-}) {
-  const { category, rating, priceMax, q, sort, city } = await searchParams;
+async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery> }) {
+  const { category, rating, limit = 10, offset = 0, q, sort, city } = await searchParams;
   const country = (await cookies()).get("_sb_country")?.value || "PL";
 
   const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
-  console.log(categoryName);
   if (category && !categoryName) notFound();
 
   const [facilitiesWithServices, categories, cities] = await Promise.all([
-    searchFacilities({ country, category: categoryName, q, sort, city }),
-    getCategories({ country }),
+    searchFacilities({ country, limit, offset, category: categoryName, city, q, rating, sort }),
+    getCategories({ country, limit }),
     getCitiesList({ country }),
   ]);
 

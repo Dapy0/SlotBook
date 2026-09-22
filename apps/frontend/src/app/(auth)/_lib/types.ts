@@ -1,7 +1,7 @@
-import { registerSchema } from "@slotbook/shared";
+import { registerRequestSchema } from "@slotbook/shared";
 import * as z from "zod";
 
-export const registerValidationSchema = registerSchema
+export const registerValidationSchema = registerRequestSchema
   .extend({
     confirmPassword: z.string().trim().min(8, "Minimum 8 characters"),
   })

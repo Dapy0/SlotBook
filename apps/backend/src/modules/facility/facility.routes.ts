@@ -1,4 +1,3 @@
-import { facilityCategoryQuerystringSchema, facilityParamsSchema } from "./facility.schema.ts";
 
 import z from "zod";
 import {
@@ -6,6 +5,7 @@ import {
   facilityBookingDataResponseSchema,
   facilityBookingQuerySchema,
   facilityCategoryCountResponseSchema,
+  facilityCategoryQuerySchema,
   facilityCityResponseSchema,
   facilityListQuerySchema,
   facilityResponseSchema,
@@ -41,6 +41,7 @@ import { availabilityRoutes } from "../availability/availability.routes.ts";
 import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
+import { facilityParamsSchema } from './facility.schema';
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -259,7 +260,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/categories",
     {
       schema: {
-        querystring: facilityCategoryQuerystringSchema,
+        querystring: facilityCategoryQuerySchema,
         response: {
           200: facilityCategoryCountResponseSchema.array(),
         },
@@ -278,7 +279,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     "/cities",
     {
       schema: {
-        querystring: facilityCategoryQuerystringSchema,
+        querystring: facilityCategoryQuerySchema,
         response: {
           200: z.array(facilityCityResponseSchema),
         },

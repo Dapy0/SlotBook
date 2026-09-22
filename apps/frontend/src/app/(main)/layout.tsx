@@ -14,7 +14,7 @@ export default async function RootLayout({
     getCountries(),
     saved ? Promise.resolve(saved) : getCountryByIp(),
   ]);
-
+  console.log(countries);
   const country =
     detected && countries.some((c) => c.country === detected) ? detected : "PL";
 

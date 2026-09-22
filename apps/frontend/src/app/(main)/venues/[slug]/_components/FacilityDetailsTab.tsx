@@ -3,9 +3,7 @@ import ReviewsList from "@/app/(main)/venues/[slug]/_components/ReviewsList";
 import ServicesList from "@/app/(main)/venues/[slug]/_components/ServicesList";
 import StaffList from "@/components/layout/StaffList";
 import { TabsTrigger, TabsContent, Tabs, TabsList } from "@/components/ui/tabs";
-import type { ReviewResponse } from "@slotbook/shared/reviews";
-import type { ServiceResponseDTO } from "@slotbook/shared/service";
-import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import type { ReviewResponse, ServiceResponse, StaffMemberPublicResponse } from "@slotbook/shared";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -14,8 +12,8 @@ function FacilityDetailsTab({
   staff,
   reviews,
 }: {
-  services: ServiceResponseDTO[];
-  staff: StaffMemberResponseDTO[];
+  services: ServiceResponse[];
+  staff: StaffMemberPublicResponse[];
   reviews: ReviewResponse[];
 }) {
   const [activeTab, setActiveTab] = useState("services");
@@ -65,7 +63,7 @@ function FacilityDetailsTab({
         </div>
 
         <TabsContent value="services" className="mt-3">
-          <ServicesList  services={services} query={query} />
+          <ServicesList services={services} query={query} />
         </TabsContent>
         <TabsContent value="staff" className="mt-3">
           <StaffList staff={staff} query={query} />

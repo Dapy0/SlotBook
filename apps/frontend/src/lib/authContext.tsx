@@ -2,8 +2,8 @@
 
 import { toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
-import type { AuthResponse } from "@slotbook/shared/auth";
-import type { UserResponse } from "@slotbook/shared/user";
+import { authMe, logout as logoutApi } from "@/services/auth";
+import type { AuthResponse, UserResponse } from "@slotbook/shared";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 type AuthContextValue = {
@@ -20,9 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      const res = await api<AuthResponse>(`/auth/me`, {
-        method: "GET",
-      });
+      const res = await authMe();
       setUser(res.user);
     } catch (err) {
       if (err instanceof Error) {
@@ -44,10 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await api(`/auth/logout`, {
-      method: "GET",
-      credentials: "include",
-    });
+    await logoutApi();
     setUser(null);
   };
 

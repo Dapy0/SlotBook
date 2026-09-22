@@ -18,19 +18,16 @@ export const staffMemberResponseSchema = z.object({
   id: z.uuid(),
   facilityId: z.uuid(),
   isActive: z.boolean(),
-  name: z.string().trim(),
-  score: z.number().min(0).max(5).nullable(),
-  reviewsCount: z.int().nonnegative(),
   createdAt: instantSchema,
   updatedAt: instantSchema,
 });
 
 export type StaffMemberResponse = z.infer<typeof staffMemberResponseSchema>;
 // Public
-export const staffMemberPublicResponseSchema = staffMemberResponseSchema.pick({
-  id: true,
-  name: true,
-  score: true,
-  reviewsCount: true,
+export const staffMemberPublicResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string().trim(),
+  score: z.number().min(0).max(5).nullable(),
+  reviewsCount: z.int().nonnegative(),
 });
 export type StaffMemberPublicResponse = z.infer<typeof staffMemberPublicResponseSchema>;

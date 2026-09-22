@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  WEEKDAY_BY_NAME,
-  type FacilityScheduleEntryResponse,
-  type FacilityWeekScheduleResponse,
-} from "@slotbook/shared";
+import { WEEKDAY_BY_NAME } from '@/lib/sharedSchemas';
+import type { FacilityScheduleEntryResponse } from '@slotbook/shared';
 import { useState } from "react";
 type PlaceholderRange = { id: string; from: string; to: string; error?: string };
 type Day = {
@@ -68,7 +65,7 @@ const PLACEHOLDER_WEEK: Day[] = [
     ranges: [{ id: "sun-1", from: "09:00", to: "17:00" }],
   },
 ];
-function weekFromResponse(schedule: FacilityWeekScheduleResponse): Day[] {
+function weekFromResponse(schedule: FacilityScheduleEntryResponse[]): Day[] {
   return Object.entries(WEEKDAY_BY_NAME).map(([label, day]) => {
     const ranges = schedule
       .filter((e) => e.dayOfTheWeek === day)
@@ -81,7 +78,7 @@ function weekFromResponse(schedule: FacilityWeekScheduleResponse): Day[] {
   });
 }
 
-function ScheduleSelection({ schedule }: { schedule: FacilityWeekScheduleResponse }) {
+function ScheduleSelection({ schedule }: { schedule: FacilityScheduleEntryResponse[] }) {
   const [week, setWeek] = useState<Day[]>(() => weekFromResponse(schedule));
   console.log(week);
   return (

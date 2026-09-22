@@ -1,9 +1,10 @@
+import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import { Badge } from "@/components/ui/badge";
 import { getCategories } from "@/services/categories";
-import { CATEGORY_METADATA } from "@slotbook/shared/facility";
 import * as Icons from "lucide-react";
 import { FileStack, type LucideIcon } from "lucide-react";
+import type { Route } from 'next';
 import { cookies } from "next/headers";
 import Link from "next/link";
 
@@ -46,7 +47,7 @@ async function CategoriesPage() {
           return (
             <Link
               key={categoryName}
-              href={endpoint}
+              href={endpoint as Route}
               style={{ "--category-color": color } as React.CSSProperties}
               className="group flex flex-col gap-3 rounded-md border p-5 text-left transition-colors hover:border-[color-mix(in_oklch,var(--category-color)_30%,white)] hover:bg-[color-mix(in_oklch,var(--category-color)_7%,white)]"
             >

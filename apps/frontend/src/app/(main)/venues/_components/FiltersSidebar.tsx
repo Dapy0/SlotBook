@@ -1,4 +1,5 @@
 "use client";
+import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
 import { useFilterHref } from "@/components/hooks/useFilterHref";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,10 +12,9 @@ import {
 } from "@/components/ui/select";
 import { convertToSelectFormat } from "@/lib/utils";
 import {
-  CATEGORY_METADATA,
   FACILITY_CATEGORIES,
   type FacilityCityResponse,
-} from "@slotbook/shared/facility";
+} from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";

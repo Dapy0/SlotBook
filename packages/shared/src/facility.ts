@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { calendarDateSchema, instantSchema, wallTimeSchema } from "./common/codecs";
 import { serviceResponseSchema, serviceWithStaffMemberIdsResponseSchema } from "./service";
-import { staffMemberResponseSchema } from "./staffMembers";
+import { staffMemberPublicResponseSchema } from "./staffMembers";
 import {
   countryCodeInputSchema,
   currencyCodeInputSchema,
@@ -21,6 +21,12 @@ export const facilityCategorySchema = z.enum(FACILITY_CATEGORIES);
 export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
 
 //  Response Category
+export const facilityCategoryQuerySchema = z.object({
+  country: z.string().trim(),
+  limit: z.coerce.number().nonnegative().optional(),
+});
+export type FacilityCategoryQuery = z.infer<typeof facilityCategoryQuerySchema>;
+
 export const facilityCategoryCountResponseSchema = z.object({
   categoryName: facilityCategorySchema,
   count: z.int().nonnegative(),
@@ -115,6 +121,6 @@ export type FacilityBookingQuery = z.infer<typeof facilityBookingQuerySchema>;
 
 export const facilityBookingDataResponseSchema = facilityResponseSchema.extend({
   services: serviceWithStaffMemberIdsResponseSchema.array(),
-  staff: staffMemberResponseSchema.array(),
+  staff: staffMemberPublicResponseSchema.array(),
 });
 export type FacilityDataForBookingResponse = z.infer<typeof facilityBookingDataResponseSchema>;

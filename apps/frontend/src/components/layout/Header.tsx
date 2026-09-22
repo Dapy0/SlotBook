@@ -14,19 +14,35 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/authContext";
-import { countryFlag, countryName, type CountryOption } from "@slotbook/shared";
 import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, use, useEffect, useState, useTransition } from "react";
 import { setCountry } from "@/app/actions/setCountry";
 import type { Route } from "next";
+import type { CountryOption } from '@/lib/sharedSchemas';
 
 type NavButton<M extends string> = VariantProps<typeof buttonVariants> & {
   linkHref: Route<M> | URL;
   value: string;
 };
 
+export function countryFlag(code: string): string {
+  return String.fromCodePoint(
+    ...[...code.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
+  );
+}
+
+const displayNamesCache = new Map<string, Intl.DisplayNames>();
+
+export function countryName(code: string, locale = "en"): string {
+  let dn = displayNamesCache.get(locale);
+  if (!dn) {
+    dn = new Intl.DisplayNames([locale], { type: "region" });
+    displayNamesCache.set(locale, dn);
+  }
+  return dn.of(code.toUpperCase()) ?? code;
+}
 export function Header<T extends string>({
   navBtns,
   rightBtns,

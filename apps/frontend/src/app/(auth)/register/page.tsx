@@ -9,7 +9,7 @@ import { Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { register as userRegister } from "@/services/auth/auth";
+import { register as userRegister } from "@/services/auth";
 import {
   Card,
   CardAction,
@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
-import { registerSchema, type RegisterRequest } from '@slotbook/shared';
-import { registerValidationSchema, type RegisterValidation } from '@/app/(auth)/_lib/types';
+import { type RegisterRequest } from "@slotbook/shared";
+import { registerValidationSchema, type RegisterValidation } from "@/app/(auth)/_lib/types";
 export default function RegisterPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const router = useRouter();

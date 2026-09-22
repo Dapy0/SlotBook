@@ -13,13 +13,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ChevronDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FacilityCityResponse, WallTime } from "@slotbook/shared";
 import { createParams } from "@/lib/queryStrings";
-import router from "next/router";
 import { redirect } from "next/navigation";
 import { convertToSelectFormat } from "@/lib/utils";
-import { useFilterHref } from "@/components/hooks/useFilterHref";
 
 function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
   const [date, setDate] = useState<Date>();
@@ -98,7 +96,7 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
                   className="m-0 flex max-h-fit flex-0 items-center gap-1 self-center rounded-none border-0 p-0! pr-0 text-sm text-black shadow-none hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 active:bg-transparent data-[empty=true]:text-neutral-400"
                 >
                   {date ? (
-                    format(date, "PPP")
+                    format(date, "d MMMM")
                   ) : (
                     <span className="p-0 text-sm text-black shadow-none">Pick a date</span>
                   )}

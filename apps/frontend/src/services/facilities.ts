@@ -36,7 +36,7 @@ export async function getDataForBooking(facilityId: string) {
 }
 
 export async function getFacilityScheduleById(id: string) {
-  return await api(`/facilities/${id}/schedule`, facilityScheduleEntryResponseSchema);
+  return await api(`/facilities/${id}/schedule`, facilityScheduleEntryResponseSchema.array());
 }
 
 export async function getMyFacilities(cookie: string) {

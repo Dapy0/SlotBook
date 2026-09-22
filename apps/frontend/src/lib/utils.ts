@@ -2,7 +2,8 @@ import { api } from "@/lib/api";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { WEEKDAY_BY_NAME, type FacilityCityResponse, type Weekday } from "@slotbook/shared";
+import {  type FacilityCityResponse, type Weekday } from "@slotbook/shared";
+import { WEEKDAY_BY_NAME } from '@/lib/sharedSchemas';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
