@@ -1,3 +1,4 @@
+import type { StaffMemberResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { ConflictError, NotFoundError } from "../../lib/errors.ts";
 import { findUserByEmail } from "../auth/auth.repository.ts";
@@ -14,7 +15,7 @@ export async function addNewStaffMembersToFacilityById(
   data: StaffBody,
   facilityId: string,
   userId: string,
-) {
+): Promise<StaffMemberResponse> {
   await checkFacilityOwnership(db, facilityId, userId);
   const user = await findUserByEmail(db, data.email);
 
@@ -22,19 +23,20 @@ export async function addNewStaffMembersToFacilityById(
     throw new NotFoundError("User with this email not found");
   }
 
-  try {
-    const newStaff = await insertStaffMemberById(db, user.id, facilityId);
-    return newStaff;
-  } catch (e) {
-    const pgError = (e as any)?.cause ?? e;
-    if (pgError?.code === "23505") {
+  const newStaff = await insertStaffMemberById(db, user.id, facilityId).catch((e) => {
+    if (e.code === "23505") {
       throw new ConflictError("User already working here");
     }
-
     throw e;
-  }
+  });
+
+  return newStaff;
 }
-export async function checkIfStaffIsFacilityWorker(db: DB, facilityId: string, staffId: string) {
+export async function checkIfStaffIsFacilityWorker(
+  db: DB,
+  facilityId: string,
+  staffId: string,
+): Promise<StaffMemberResponse> {
   const staffMember = await findStaffMemberById(db, staffId);
   if (!staffMember) {
     throw new NotFoundError("No such staff member");

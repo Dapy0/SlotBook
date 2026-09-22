@@ -1,30 +1,29 @@
-import type { FastifyInstance } from "fastify";
-import { addStaffToFacility, getFacilityStaff } from "./staff.controller.ts";
-import {
-  staffParamsSchema,
-  staffBodySchema,
-  type StaffParams,
-  type StaffBody,
-} from "./staff.schema.ts";
-import { staffMemberResponseSchema } from "@slotbook/shared/staffMembers";
-import z from "zod";
+import { staffParamsSchema, staffBodySchema } from "./staff.schema.ts";
+import { staffMemberPublicResponseSchema, staffMemberResponseSchema } from "@slotbook/shared";
 import { scheduleRoutes } from "../schedule/schedule.routes.ts";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { addNewStaffMembersToFacilityById } from "./staff.service";
+import { findStaffByFacilityIdPublic } from './staff.repository';
 
-export async function staffRoutes(fastify: FastifyInstance) {
+export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/:id/staff",
     {
       schema: {
         params: staffParamsSchema,
         response: {
-          200: z.array(staffMemberResponseSchema),
+          200: staffMemberPublicResponseSchema.array(),
         },
       },
     },
-    getFacilityStaff,
+    async (request, response) => {
+      const { id: facilityId } = request.params;
+      const staff = await findStaffByFacilityIdPublic(request.server.drizzle, facilityId);
+      return response.status(200).send(staff);
+    },
   );
 
-  fastify.post<{ Params: StaffParams; Body: StaffBody }>(
+  fastify.post(
     "/:id/staff",
     {
       onRequest: [fastify.authenticate],
@@ -34,7 +33,15 @@ export async function staffRoutes(fastify: FastifyInstance) {
         response: { 201: staffMemberResponseSchema },
       },
     },
-    addStaffToFacility,
+    async (request, response) => {
+      const addedStaff = await addNewStaffMembersToFacilityById(
+        request.server.drizzle,
+        request.body,
+        request.params.id,
+        request.user.id,
+      );
+      return response.status(201).send(addedStaff);
+    },
   );
   fastify.register(scheduleRoutes, { prefix: "/:id/staff/:staffId" });
-}
+};

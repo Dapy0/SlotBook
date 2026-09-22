@@ -1,23 +1,23 @@
-import { and, avg, count, eq, getColumns } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { staffMembers } from "../../db/schema/staffMember.ts";
-import { staffServices } from "../../db/schema/staffService.ts";
+import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
+import { staffServices, type StaffServiceEntity } from "../../db/schema/staffService.ts";
 import { services } from "../../db/schema/service.ts";
 import { users } from "../../db/schema/user.ts";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import type { StaffMemberResponseDTO } from "@slotbook/shared/staffMembers";
+import type { StaffMemberPublicResponse } from "@slotbook/shared";
 
-export async function findStaffByFacilityId(
+export async function findStaffByFacilityIdPublic(
   db: DB,
   facilityId: string,
-): Promise<StaffMemberResponseDTO[]> {
+): Promise<StaffMemberPublicResponse[]> {
   return await db
     .select({
+      id: staffMembers.id,
       name: users.name,
-      score: avg(reviews.rating),
+      score: sql<number | null>`avg(${reviews.rating})`,
       reviewsCount: count(reviews.id),
-      ...getColumns(staffMembers),
     })
     .from(staffMembers)
     .innerJoin(users, eq(users.id, staffMembers.userId))
@@ -27,12 +27,23 @@ export async function findStaffByFacilityId(
     .groupBy(staffMembers.id, users.name);
 }
 
-export async function findStaffMemberById(db: DB, staffMemberId: string) {
-  const [member] = await db.select().from(staffMembers).where(eq(staffMembers.id, staffMemberId));
+export async function findStaffMemberById(
+  db: DB,
+  staffMemberId: string,
+): Promise<StaffMemberEntity> {
+  const [member] = await db
+    .select()
+    .from(staffMembers)
+
+    .where(eq(staffMembers.id, staffMemberId));
   return member ?? null;
 }
 
-export async function insertStaffMemberById(db: DB, userId: string, facilityId: string) {
+export async function insertStaffMemberById(
+  db: DB,
+  userId: string,
+  facilityId: string,
+): Promise<StaffMemberEntity> {
   const [staffMember] = await db.insert(staffMembers).values({ userId, facilityId }).returning();
   if (!staffMember) {
     throw new Error("Failed to insert staff member");
@@ -40,7 +51,11 @@ export async function insertStaffMemberById(db: DB, userId: string, facilityId: 
   return staffMember;
 }
 
-export async function assignServiceToStaff(db: DB, staffMemberId: string, serviceId: string) {
+export async function assignServiceToStaff(
+  db: DB,
+  staffMemberId: string,
+  serviceId: string,
+): Promise<StaffServiceEntity> {
   const [assignedService] = await db
     .insert(staffServices)
     .values({ staffMemberId, serviceId })
@@ -75,9 +90,7 @@ export async function findServiceByServiceIdAndMemberId(
   serviceId: string,
 ) {
   const [service] = await db
-    .select({
-      ...getColumns(services),
-    })
+    .select()
     .from(services)
     .innerJoin(staffServices, eq(staffServices.serviceId, services.id))
     .where(

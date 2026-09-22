@@ -1,7 +1,4 @@
-import {
-  facilityCategoryQuerystringSchema,
-  facilityParamsSchema,
-} from "./facility.schema.ts";
+import { facilityCategoryQuerystringSchema, facilityParamsSchema } from "./facility.schema.ts";
 
 import z from "zod";
 import {
@@ -39,7 +36,7 @@ import {
   removeOwnedFacilityById,
   updateOwnedFacility,
 } from "./facility.service.ts";
-import { findStaffByFacilityId } from "../staff/staff.repository.ts";
+import { findStaffByFacilityIdPublic } from "../staff/staff.repository.ts";
 import { availabilityRoutes } from "../availability/availability.routes.ts";
 import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
@@ -60,7 +57,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const facilities = await getAllPublicFacilities(request.server.drizzle, request.query);
       response.header(
         "Cache-Control",
-        "public, max-age=60, s-maxage=600, stale-while-revalidate=30"
+        "public, max-age=60, s-maxage=600, stale-while-revalidate=30",
       );
       return response.send(facilities);
     },
@@ -137,7 +134,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.server.drizzle,
         facility.id,
       );
-      const staff = await findStaffByFacilityId(request.server.drizzle, facility.id);
+      const staff = await findStaffByFacilityIdPublic(request.server.drizzle, facility.id);
 
       return {
         ...facility,
