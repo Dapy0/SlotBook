@@ -1,28 +1,29 @@
-import { responseStaffScheduleSchema } from "@slotbook/shared/staffSchedule";
-import type { FastifyInstance } from "fastify";
-import z from "zod";
-import { getStaffSchedule, updateStaffSchedule } from "./schedule.controller.ts";
-import {
-  scheduleBody,
-  scheduleParamsSchema,
-  type ScheduleBody,
-  type ScheduleParams,
-} from "./schedule.schema.ts";
+import { scheduleBody, scheduleParamsSchema } from "./schedule.schema.ts";
+import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { changeWeekSchedule, receiveStaffSchedule } from "./schedule.service";
+import { staffScheduleEntryResponseSchema } from "@slotbook/shared";
 
-export async function scheduleRoutes(fastify: FastifyInstance) {
+export const scheduleRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/schedule",
     {
       schema: {
         params: scheduleParamsSchema,
         response: {
-          200: z.array(responseStaffScheduleSchema),
+          200: staffScheduleEntryResponseSchema.array(),
         },
       },
     },
-    getStaffSchedule,
+    async (request, response) => {
+      const schedule = await receiveStaffSchedule(
+        request.server.drizzle,
+        request.params.id,
+        request.params.staffId,
+      );
+      return response.send(schedule);
+    },
   );
-  fastify.put<{ Params: ScheduleParams; Body: ScheduleBody }>(
+  fastify.put(
     "/schedule",
     {
       onRequest: [fastify.authenticate],
@@ -30,10 +31,19 @@ export async function scheduleRoutes(fastify: FastifyInstance) {
         params: scheduleParamsSchema,
         body: scheduleBody,
         response: {
-          200: z.array(responseStaffScheduleSchema),
+          200: staffScheduleEntryResponseSchema.array(),
         },
       },
     },
-    updateStaffSchedule,
+    async (request, response) => {
+      const schedule = await changeWeekSchedule(
+        request.server.drizzle,
+        request.user.id,
+        request.params.id,
+        request.params.staffId,
+        request.body,
+      );
+      return response.send(schedule);
+    },
   );
-}
+};

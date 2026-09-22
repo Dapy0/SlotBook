@@ -15,9 +15,13 @@ import {
   checkStaffScheduleFitsFacility,
 } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
+import type { StaffScheduleEntryResponse } from "@slotbook/shared";
 
-export async function receiveStaffSchedule(db: DB, facilityID: string, staffId: string) {
-
+export async function receiveStaffSchedule(
+  db: DB,
+  facilityID: string,
+  staffId: string,
+): Promise<StaffScheduleEntryResponse[]> {
   const staffMemberFacility = await findStaffMemberById(db, staffId);
   if (!staffMemberFacility) {
     throw new NotFoundError("No such worker found in facilities");
@@ -35,7 +39,7 @@ export async function changeWeekSchedule(
   facilityID: string,
   staffId: string,
   data: ScheduleBody,
-) {
+): Promise<StaffScheduleEntryResponse[]> {
   await checkFacilityOwnership(db, facilityID, requestedUserId);
 
   const facility = await findFacilityById(db, facilityID);
@@ -53,7 +57,6 @@ export async function changeWeekSchedule(
 
   checkNoOverlapWithinSchedule(data);
   checkStaffScheduleFitsFacility(data, facilitySchedule);
-  // add AsyncLocalStorage
   const transaction = await db.transaction(async (tx) => {
     await deleteScheduleByStaffId(tx, staffId);
     const inserted = await insertScheduleByStaffId(tx, staffId, data);
