@@ -1,7 +1,7 @@
-import type { BookingStatus } from "@slotbook/shared";
+import type { BookingStatus } from '@slotbook/shared';
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { bookings, type BookingEntity } from "../../db/schema/booking.ts";
-import { eq, and, sql, ne } from "drizzle-orm";
+import { eq, and, sql, inArray } from "drizzle-orm";
 
 export async function findBookingsByFacilityId(
   db: DB,
@@ -20,7 +20,7 @@ export async function findBusyRangesForStaff(
   windowStart: Date,
   windowEnd: Date,
 ): Promise<{ start: Date; end: Date }[]> {
-  const facilityBookings = await db
+  return await db
     .select({
       start: sql<Date>`lower(${bookings.timeRange})`,
       end: sql<Date>`upper(${bookings.timeRange})`,
@@ -30,19 +30,16 @@ export async function findBusyRangesForStaff(
       and(
         eq(bookings.facilityId, facilityId),
         eq(bookings.staffMemberId, staffId),
-        ne(bookings.status, "canceled"),
+        inArray(bookings.status, ["pending", "confirmed"]),
         sql`${bookings.timeRange} && tstzrange(${windowStart}, ${windowEnd})`,
       ),
     )
     .orderBy(sql`lower(${bookings.timeRange})`);
-
-  return facilityBookings;
 }
 export async function findBookingById(db: DB, bookingId: string): Promise<BookingEntity> {
   const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
   return booking;
 }
-
 
 export async function insertBooking(
   db: DB,
