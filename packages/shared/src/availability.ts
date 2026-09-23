@@ -11,7 +11,6 @@ const availabilityDaySchema = z.object({
 });
 // Query
 export const availabilityQuerySchema = z.object({
-  facilityId: z.uuid(),
   staffId: z.uuid(),
   serviceId: z.uuid(),
 });

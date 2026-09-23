@@ -1,11 +1,9 @@
 "use client";
-import { useFilterHref } from "@/components/hooks/useFilterHref";
 import BookingSummaryCard from "@/components/layout/BookingSummaryCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -15,8 +13,8 @@ import { convertMinutesToTime, convertToSelectFormat, isoStringToWallTime } from
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
 import { Button } from "@base-ui/react";
-import type { AvailabilityResponse } from "@slotbook/shared/availability";
-import type { FacilityDataForBookingResponse, FacilityResponse } from "@slotbook/shared/facility";
+import type { AvailabilityResponse } from "@slotbook/shared";
+import type { FacilityDataForBookingResponse } from "@slotbook/shared";
 import { MapPinIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 const weekdayShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -81,7 +79,7 @@ function BookForm({
       slot: { start, end },
     });
   };
-  const { id, name, services, staff, reviewsCount, city, address, score } = bookingData;
+  const { id, name, services, staff, reviewsCount, city, address, score , timezone} = bookingData;
   const selectedServiceData = services.find((service) => service.id === selection.service);
   useEffect(() => {
     if (!selection.staff || !selection.service) {
@@ -90,7 +88,7 @@ function BookForm({
     }
     let ignore = false;
 
-    getAvailability(id, selection.staff, selection.service)
+    getAvailability(id, { staffId: selection.staff, serviceId: selection.service })
       .then((res) => {
         if (!ignore) setSlots(res);
       })
@@ -102,12 +100,12 @@ function BookForm({
     };
   }, [id, selection.staff, selection.service]);
 
-  async function handleBookSlot(startTime: string, staffId: string, serviceId: string) {
+  async function handleBookSlot(startTime: Date, staffId: string, serviceId: string) {
     try {
       await createBooking(id, {
-        staffId,
-        serviceId,
-        startTime,
+        staffMemberId: staffId,
+        serviceId: serviceId,
+        startsAt: startTime,
       });
       handleReset();
     } catch (err) {
@@ -149,7 +147,7 @@ function BookForm({
   const selectedDaySlots = slots?.days.find((d) => d.date === selection.date)?.slots ?? [];
   return (
     <div className="">
-      <BreadCrumbs  />
+      <BreadCrumbs />
       <div className="flex w-full justify-between gap-10">
         <div className="flex flex-col gap-6">
           <header>
@@ -262,8 +260,8 @@ function BookForm({
                 {selectedDaySlots.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {selectedDaySlots.map((slot) => {
-                      const startTimeIso = slot.start.toISOString();
-                      const endTimeIso = slot.end.toISOString();
+                      const startTimeIso = slot.startsAt.toISOString();
+                      const endTimeIso = slot.endsAt.toISOString();
                       const isSelected = startTimeIso === selection.slot?.start;
                       return (
                         <button
@@ -278,7 +276,7 @@ function BookForm({
                               : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
                           }`}
                         >
-                          {`${isoStringToWallTime(startTimeIso)} - ${isoStringToWallTime(endTimeIso)}`}
+                          {`${isoStringToWallTime(startTimeIso, timezone)} - ${isoStringToWallTime(endTimeIso, timezone)}`}
                         </button>
                       );
                     })}
@@ -288,7 +286,7 @@ function BookForm({
             </>
           )}
 
-          {error && <div className='text-red-400'>Error happen: {error}</div>}
+          {error && <div className="text-red-400">Error happen: {error}</div>}
         </div>
         <div className="w-72 shrink-0">
           <BookingSummaryCard

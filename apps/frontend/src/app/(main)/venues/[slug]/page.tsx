@@ -18,7 +18,7 @@ import FacilityDetailsTab from "@/app/(main)/venues/[slug]/_components/FacilityD
 import { getStaffMembersByFacilityId } from "@/services/staff";
 import { getFacilityReviews } from "@/services/reviews";
 import { ApiError } from "@/lib/api";
-import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
+import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

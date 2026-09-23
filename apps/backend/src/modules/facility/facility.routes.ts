@@ -138,16 +138,16 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
   );
   fastify.get(
-    "/:id/bookingData",
+    "/:slug/bookingData",
     {
       schema: {
-        params: facilityParamsSchema,
+        params: facilitySlugParamsSchema,
         querystring: facilityBookingQuerySchema,
         response: { 200: facilityBookingDataResponseSchema },
       },
     },
     async (request) => {
-      const facility = await getFacilityByIdOrThrow(request.server.drizzle, request.params.id);
+      const facility = await getFacilityBySlugOrThrow(request.server.drizzle, request.params.slug);
       const servicesByFacilityId = await getServicesWithStaffIds(
         request.server.drizzle,
         facility.id,
@@ -322,5 +322,5 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
   fastify.register(staffRoutes, { prefix: "/" });
   fastify.register(bookingRoutes, { prefix: "/" });
-  fastify.register(availabilityRoutes, { prefix: "/:id" });
+  fastify.register(availabilityRoutes, { prefix: "/" });
 };

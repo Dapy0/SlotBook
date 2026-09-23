@@ -20,6 +20,7 @@ export async function getAvailableSlotsFor30days(
   staffId: string,
   serviceId: string,
 ): Promise<AvailabilityResponse> {
+  
   const facility = await getFacilityByIdOrThrow(db, facilityId);
   const tz = facility.timezone;
   const [service, facilitySchedule, staffSchedule] = await Promise.all([
@@ -27,7 +28,6 @@ export async function getAvailableSlotsFor30days(
     findFacilitySchedule(db, facilityId),
     receiveStaffSchedule(db, facilityId, staffId),
   ]);
-
   const now = new Date();
   const firstDate = todayInTimeZone(tz, now); //
   const lastDate = addDaysToIso(firstDate, 29);

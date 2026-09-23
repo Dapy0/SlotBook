@@ -63,6 +63,8 @@ export async function createBookingForFacility(
   facilityId: string,
   data: CreateBookingRequest,
 ): Promise<BookingResponse> {
+  // eslint-disable-next-line no-debugger
+  debugger;
   const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
     getFacilityByIdOrThrow(db, facilityId),
     checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId),
@@ -86,6 +88,7 @@ export async function createBookingForFacility(
   const localDay = getLocalDayOfWeek(startDatetime, facility.timezone);
   const localStartTime = getLocalWallTime(startDatetime, facility.timezone);
   const localEndTime = getLocalWallTime(endDatetime, facility.timezone);
+
   await checkIfBookingFitsAllSchedules(
     localStartTime,
     localEndTime,
@@ -102,6 +105,7 @@ export async function createBookingForFacility(
     startDatetime,
     endDatetime,
   }).catch((e) => {
+
     if (e.code === "23P01") {
       throw new ConflictError("This time slot is already booked");
     }

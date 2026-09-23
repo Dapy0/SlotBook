@@ -2,8 +2,8 @@ import { api } from "@/lib/api";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import {  type FacilityCityResponse, type Weekday } from "@slotbook/shared";
-import { WEEKDAY_BY_NAME } from '@/lib/sharedSchemas';
+import { type FacilityCityResponse, type Weekday } from "@slotbook/shared";
+import { WEEKDAY_BY_NAME } from "@/lib/sharedSchemas";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -28,10 +28,13 @@ const numberToDayName = Object.fromEntries(
 export function convertDayNumberToShortDayName(dayNumber: number): string {
   return numberToDayName[dayNumber as Weekday];
 }
-export function isoStringToWallTime(time: string) {
-  const [date, wallTime] = time.split("T");
-
-  return removeExtraSecondsFromTime(wallTime);
+export function isoStringToWallTime(iso: string, timeZone: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(iso));
 }
 export function removeExtraSecondsFromTime(time: string) {
   const [hours, minutes, seconds] = time.split(":");
