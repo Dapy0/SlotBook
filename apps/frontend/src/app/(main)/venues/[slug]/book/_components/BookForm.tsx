@@ -308,9 +308,10 @@ function BookForm({
               selection.date ? new Date(selection.date).toLocaleDateString() : "Select something"
             }
             time={
-              selection.slot
-                ? `${isoStringToWallTime(selection.slot.start)} - ${isoStringToWallTime(selection.slot.end)}`
-                : "Select something"
+              // selection.slot
+              //   ? `${isoStringToWallTime(selection.slot.start)} - ${isoStringToWallTime(selection.slot.end)}`
+              //   :
+                 "Select something"
             }
             price={
               selectedServiceData
@@ -319,7 +320,7 @@ function BookForm({
             }
             onConfirm={() => {
               if (selection.slot && selection.staff && selection.service) {
-                handleBookSlot(selection.slot.start, selection.staff, selection.service);
+                // handleBookSlot(selection.slot.start, selection.staff, selection.service);
               }
             }}
           />

@@ -2,13 +2,13 @@
 import ScheduleSelection from "@/app/(main)/dashboard/schedule/_components/ScheduleSelection";
 import { Button } from "@/components/ui/button";
 import { getFacilitySchedule } from "@/services/facilitySchedule";
-import type { FacilityResponse, FacilityScheduleEntryResponse, FacilityWeekScheduleResponse } from "@slotbook/shared";
+import type { FacilityResponse, FacilityScheduleEntryResponse } from "@slotbook/shared";
 import { useEffect, useState } from "react";
 
 function SchedulePageClient({ myFacilities }: { myFacilities: FacilityResponse[] }) {
   const [activeFacility, setActiveFacility] = useState<string | null>(null);
   const [selectedFacilitySchedule, setSelectedFacilitySchedule] =
-    useState<FacilityWeekScheduleResponse>();
+    useState<FacilityScheduleEntryResponse[]>();
 
   useEffect(() => {
     if (!activeFacility) {

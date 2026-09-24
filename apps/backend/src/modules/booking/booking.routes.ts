@@ -73,7 +73,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.params.id,
         request.body
       );
-      return response.code(201);
+      return response.code(201).send();
     },
   );
   fastify.patch(

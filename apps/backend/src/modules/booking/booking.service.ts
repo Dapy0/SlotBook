@@ -63,8 +63,7 @@ export async function createBookingForFacility(
   facilityId: string,
   data: CreateBookingRequest,
 ): Promise<BookingResponse> {
-  // eslint-disable-next-line no-debugger
-  debugger;
+  
   const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
     getFacilityByIdOrThrow(db, facilityId),
     checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId),

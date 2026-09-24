@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { UserResponse } from "@slotbook/shared/user";
+import type { UserResponse } from "@slotbook/shared";
 import { ArrowUp } from "lucide-react";
 
 function ProfileMenu({

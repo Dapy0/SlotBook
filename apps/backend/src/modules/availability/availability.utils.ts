@@ -1,8 +1,7 @@
-import { fromZonedTime } from 'date-fns-tz';
+import { fromZonedTime } from "date-fns-tz";
 
 export type Interval = { start: Date; end: Date };
 export type ScheduleRow = { dayOfTheWeek: number; startTime: string; endTime: string };
-
 
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.start < b.end && b.start < a.end;
@@ -37,19 +36,29 @@ export function sliceIntoSlots(
   interval: Interval,
   durationMinutes: number,
   stepMinutes = 30,
+  anchor?: Date,
 ): Interval[] {
   const slots: Interval[] = [];
+
   const durationMs = durationMinutes * 60_000;
   const stepMs = stepMinutes * 60_000;
-  const lastStart = interval.end.getTime() - durationMs;
 
-  for (let t = interval.start.getTime(); t <= lastStart; t += stepMs) {
-    slots.push({ start: new Date(t), end: new Date(t + durationMs) });
-    if (slots.length > 1000) {
-      throw new Error(
-        `sliceIntoSlots runaway: step=${stepMs}ms, interval=${interval.start.toISOString()}..${interval.end.toISOString()}`,
-      );
-    }
+  const start = interval.start.getTime();
+  const end = interval.end.getTime();
+
+  const anchorMs = anchor?.getTime() ?? start;
+
+  const offset = Math.max(0, Math.ceil((start - anchorMs) / stepMs));
+
+  let t = anchorMs + offset * stepMs;
+
+  while (t + durationMs <= end) {
+    slots.push({
+      start: new Date(t),
+      end: new Date(t + durationMs),
+    });
+
+    t += stepMs;
   }
 
   return slots;

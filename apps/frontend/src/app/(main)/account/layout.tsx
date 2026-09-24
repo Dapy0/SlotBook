@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Route } from 'next';
 
 const navItems = [
   { href: "/account/appointments", label: "Bookings" },
@@ -43,7 +44,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={item.href as Route}
                 className={`border-l-2 px-3 py-2.5 text-sm transition ${
                   isActive
                     ? "border-primary font-medium text-gray-900"
@@ -57,7 +58,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         </nav>
 
         <Button className={"w-full py-5"}>
-          <Link href={"/create"}>Create a venue</Link>
+          <Link href={"/create" as Route}>Create a venue</Link>
         </Button>
       </aside>
 

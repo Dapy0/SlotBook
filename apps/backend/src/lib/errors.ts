@@ -1,4 +1,4 @@
-import type { ApiErrorCodeShared } from "@slotbook/shared/errors";
+import type { ApiErrorCode as ApiErrorCodeShared } from "@slotbook/shared";
 export class AppError<TCode extends ApiErrorCodeShared = ApiErrorCodeShared> extends Error {
   constructor(
     public statusCode: number,

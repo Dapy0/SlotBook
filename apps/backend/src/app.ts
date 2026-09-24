@@ -5,6 +5,8 @@ import { authRoutes } from "./modules/auth/auth.routes.ts";
 import fastifyEnv from "@fastify/env";
 import cookie from "@fastify/cookie";
 import {
+  hasZodFastifySchemaValidationErrors,
+  isResponseSerializationError,
   serializerCompiler,
   validatorCompiler,
   type ZodTypeProvider,
@@ -25,7 +27,6 @@ import fastifyCaching from "@fastify/caching";
 import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
-import { ZodError } from "zod";
 const isDev = process.env.NODE_ENV !== "production";
 export async function createServer() {
   const app = Fastify({
@@ -53,17 +54,29 @@ export async function createServer() {
   //Error handler
   app.setErrorHandler<Error>(function (error, request, reply) {
     request.log.error(error);
-    if (error instanceof ZodError) {
+
+    if (hasZodFastifySchemaValidationErrors(error)) {
       return reply.status(400).send({
         code: "BAD_REQUEST",
         message: "Data validation Error.",
-        issues: error.issues,
+        issues: error.validation,
       });
     }
     if (error instanceof AppError) {
       return reply.status(error.statusCode).send({ code: error.code, message: error.message });
     }
-    return reply.status(500).send({ message: "Internal server error" });
+    if (isResponseSerializationError(error)) {
+      request.log.error(error.cause.issues);
+      // return reply.status(500).send({
+      //   code: "INTERNAL_SERVER_ERROR",
+      //   message: "Internal server error.",
+      // });
+    }
+
+    return reply.status(500).send({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Internal server error.",
+    });
   });
 
   // Plugins

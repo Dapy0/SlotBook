@@ -1,4 +1,4 @@
-import type { ReviewResponse } from "@slotbook/shared/reviews";
+import type { ReviewResponse } from "@slotbook/shared";
 import { StarIcon } from "lucide-react";
 
 function Stars({ rating }: { rating: number }) {

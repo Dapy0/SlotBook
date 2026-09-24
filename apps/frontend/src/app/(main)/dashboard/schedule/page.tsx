@@ -30,5 +30,5 @@ export default async function SchedulePage() {
   const cookieStore = await cookies();
   const myFacilities = await getMyFacilities(cookieStore.toString());
 
-  return <SchedulePageClient myFacilities={myFacilities} />;
+  // return <SchedulePageClient myFacilities={myFacilities} />;
 }

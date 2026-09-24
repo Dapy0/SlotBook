@@ -2,27 +2,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { durationFormatter, moneyFormatter } from "@/lib/format";
 import { convertMinutesToTime } from '@/lib/utils';
-import type { ServiceResponseDTO } from "@slotbook/shared/service";
+import type { ServiceResponse } from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 function groupByCategory(
-  services: ServiceResponseDTO[],
-): { section: string; items: ServiceResponseDTO[] }[] {
+  services: ServiceResponse[],
+): { section: string; items: ServiceResponse[] }[] {
   return Array.from(
     Map.groupBy(services, (s) => s.category),
     ([section, items]) => ({ section, items }),
   );
 }
 
-export default function ServicesList({
-  services,
-  query = "",
-}: {
-  services: ServiceResponseDTO[];
-  query?: string;
-}) {
+export default function ServicesList({ services, query = "" }: { services: ServiceResponse[]; query?: string }) {
   const pathname = usePathname();
   const prettifyItems = groupByCategory(services);
   const q = query.trim().toLowerCase();
