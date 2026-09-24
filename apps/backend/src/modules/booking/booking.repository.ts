@@ -89,3 +89,7 @@ export async function patchStatusByBookingId(
   }
   return updatedBooking;
 }
+
+export async function findBookingsByUserId(db: DB, userId: string): Promise<BookingEntity[]> {
+  return await db.select().from(bookings).where(eq(bookings.clientId, userId));
+}

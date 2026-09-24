@@ -10,6 +10,7 @@ import {
 import {
   findBookingById,
   findBookingsByFacilityId,
+  findBookingsByUserId,
   findBusyRangesForStaff,
   insertBooking,
   patchStatusByBookingId,
@@ -172,4 +173,8 @@ export async function changeBookingStatus(
     default:
       throw new ConflictError("Not allowed");
   }
+}
+
+export async function getMineBookings(db: DB, userId: string): Promise<BookingResponse[]> {
+  return mapBookingToContractFormat(await findBookingsByUserId(db, userId));
 }

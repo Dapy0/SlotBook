@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { UserResponse } from "@slotbook/shared";
 import { ArrowUp } from "lucide-react";
+import Link from "next/link";
 
 function ProfileMenu({
   user,
@@ -38,8 +39,13 @@ function ProfileMenu({
         />
         <DropdownMenuContent className="w-32">
           <DropdownMenuGroup>
-            <DropdownMenuItem>My bookings</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={"/account/appointments"}>My bookings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              {" "}
+              <Link href={"/account/settings"}>Settings</Link>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>

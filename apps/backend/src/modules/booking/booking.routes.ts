@@ -11,6 +11,7 @@ import {
   changeBookingStatus,
   createBookingForFacility,
   getFacilityBookingsForOwner,
+  getMineBookings,
 } from "./booking.service";
 import { createReviewForBooking } from "../review/review.service";
 
@@ -30,7 +31,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const bookings = await getFacilityBookingsForOwner(
         request.server.drizzle,
         request.user.id,
-        request.params.id
+        request.params.id,
       );
       return response.send(bookings);
     },
@@ -50,7 +51,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.server.drizzle,
         request.user.id,
         request.params.id,
-        request.body
+        request.body,
       );
       return response.send(booking);
     },
@@ -71,7 +72,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.user.id,
         request.params.bookingId,
         request.params.id,
-        request.body
+        request.body,
       );
       return response.code(201).send();
     },
@@ -91,19 +92,27 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.user.id,
         request.params.id,
         request.params.bookingId,
-        request.body
+        request.body,
       );
       return response.send(patchedBooking);
     },
   );
 };
 
-export async function mineBookingsRoutes() {
-  // fastify.get(
-  //   '/mine',
-  //   {
-  //     onRequest: [fastify.authenticate],
-  //   },
-  //   // getMineBookings,
-  // );
-}
+export const mineBookingsRoutes: FastifyPluginAsyncZod = async (fastify) => {
+  fastify.get(
+    "/mine",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        response: {
+          200: bookingResponseSchema.array(),
+        },
+      },
+    },
+    async (request, response) => {
+      const myBookings = await getMineBookings(request.server.drizzle, request.user.id);
+      return response.send(myBookings);
+    },
+  );
+};

@@ -4,21 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CameraIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Route } from 'next';
+import type { Route } from "next";
+import { useAuth } from "@/lib/authContext";
 
 const navItems = [
   { href: "/account/appointments", label: "Bookings" },
-  { href: "/account/gift-cards", label: "Gift Cards" },
-  { href: "/account/loyalty", label: "Loyalty Cards" },
-  { href: "/account/favorites", label: "Favorites" },
-  { href: "/account/settings", label: "Account Settings" },
   { href: "/account/reviews", label: "Reviews" },
   { href: "/account/payments", label: "Payments" },
+  { href: "/account/settings", label: "Settings" },
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
+  const { user } = useAuth();
   return (
     <div className="mx-auto flex w-full gap-10 px-6 py-8">
       <aside className="w-64 shrink-0 border-r border-gray-100 pr-6">
@@ -33,8 +31,8 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             </span>
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">Daniel Pyzinski</p>
-            <p className="text-xs text-gray-500">+48 572 527 627</p>
+            <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+            <p className="text-xs text-gray-500">{user?.email}</p>
           </div>
         </div>
 
