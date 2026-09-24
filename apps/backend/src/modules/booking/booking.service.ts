@@ -79,7 +79,6 @@ export async function createBookingForFacility(
   const tz = facility.timezone;
   const window = getBookingWindow(tz, now);
 
-  // 1. В какой ЛОКАЛЬНЫЙ день заведения попадает startsAt
   const date = formatInTimeZone(data.startsAt, tz, "yyyy-MM-dd");
   if (date < window.firstDate || date > window.lastDate) {
     throw new BadRequestError("Date is outside the booking window");
@@ -109,6 +108,8 @@ export async function createBookingForFacility(
     serviceId: service.id,
     startDatetime: slot.start,
     endDatetime: slot.end,
+    priceCents: service.priceCents,
+    currency: facility.currency,
   }).catch((e: unknown) => {
     if (e) {
       throw new ConflictError("This time slot is already booked");

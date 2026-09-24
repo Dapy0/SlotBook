@@ -58,25 +58,33 @@ export async function createServer() {
     if (hasZodFastifySchemaValidationErrors(error)) {
       return reply.status(400).send({
         code: "BAD_REQUEST",
-        message: "Data validation Error.",
-        issues: error.validation,
+        message: "Validation Error.",
+        details: error.validation,
       });
     }
-    if (error instanceof AppError) {
-      return reply.status(error.statusCode).send({ code: error.code, message: error.message });
-    }
     if (isResponseSerializationError(error)) {
-      request.log.error(error.cause.issues);
-      // return reply.status(500).send({
-      //   code: "INTERNAL_SERVER_ERROR",
-      //   message: "Internal server error.",
-      // });
+      request.log.error(
+        { issues: error.cause.issues, url: request.url },
+        "Response contract violated",
+      );
+      return reply
+        .status(500)
+        .send({ code: "INTERNAL_SERVER_ERROR", message: "Internal server error" });
+    }
+    if (error instanceof AppError) {
+      return reply
+        .status(error.statusCode)
+        .send({ code: error.code, message: error.message, details: error.details });
     }
 
-    return reply.status(500).send({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Internal server error.",
-    });
+    const status = (error as { statusCode?: number }).statusCode;
+    if (status && status >= 400 && status < 500) {
+      return reply.status(status).send({ code: "BAD_REQUEST", message: error.message });
+    }
+    request.log.error(error);
+    return reply
+      .status(500)
+      .send({ code: "INTERNAL_SERVER_ERROR", message: "Internal server error" });
   });
 
   // Plugins

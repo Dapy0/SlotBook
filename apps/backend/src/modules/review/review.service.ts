@@ -4,6 +4,7 @@ import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import { findReviewsByFacilityId, insertReview } from "./review.repository.ts";
 import { updateFacilityScore } from "../facility/facility.repository.ts";
+import { getPgErrorCode, PG } from '../../lib/pgErrors';
 
 export async function createReviewForBooking(
   db: DB,
@@ -29,7 +30,7 @@ export async function createReviewForBooking(
   //   throw new ConflictError("Service has not happened yet");
   // }
   await insertReview(db, bookingId, reviewData).catch((e) => {
-    if (e.code === "23505") {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("You already reviewed this booking");
     }
 

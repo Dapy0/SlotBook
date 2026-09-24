@@ -10,6 +10,7 @@ import {
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../lib/errors.ts";
 import type { FastifyInstance } from "fastify";
 import type { AuthResponse, LoginRequest, RegisterRequest } from "@slotbook/shared";
+import { getPgErrorCode, PG } from "../../lib/pgErrors";
 
 type JWT = FastifyInstance["jwt"];
 export async function signUpUser(
@@ -23,7 +24,7 @@ export async function signUpUser(
     ...data,
     passwordHash,
   }).catch((e) => {
-    if (e.code === "23505") {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("Email already exists");
     }
 

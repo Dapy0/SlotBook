@@ -71,7 +71,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
     async (request, response) => {
       await deleteUser(request.server.drizzle, request.user.id);
-      return response.send(204);
+      return response.send(204).send();
     },
   );
   fastify.get("/logout", async (request, response) => {

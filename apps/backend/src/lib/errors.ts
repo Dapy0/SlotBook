@@ -1,45 +1,40 @@
-import type { ApiErrorCode as ApiErrorCodeShared } from "@slotbook/shared";
-export class AppError<TCode extends ApiErrorCodeShared = ApiErrorCodeShared> extends Error {
+import type { ApiErrorCode } from "@slotbook/shared";
+
+export class AppError extends Error {
   constructor(
     public statusCode: number,
-    public code: TCode,
+    public code: ApiErrorCode,
     message: string,
+    public details?: unknown,
   ) {
     super(message);
     this.name = this.constructor.name;
   }
 }
 
-export class UnauthorizedError extends AppError<"UNAUTHORIZED"> {
+export class UnauthorizedError extends AppError {
   constructor(message = "Unauthorized user") {
     super(401, "UNAUTHORIZED", message);
   }
 }
-export class NotFoundError extends AppError<"NOT_FOUND"> {
+export class NotFoundError extends AppError {
   constructor(message = "Resource not found") {
     super(404, "NOT_FOUND", message);
   }
 }
-export class ForbiddenError extends AppError<"FORBIDDEN"> {
+export class ForbiddenError extends AppError {
   constructor(message = "Access denied") {
     super(403, "FORBIDDEN", message);
   }
 }
 
-export class ConflictError extends AppError<"CONFLICT"> {
+export class ConflictError extends AppError {
   constructor(message = "Conflict") {
     super(409, "CONFLICT", message);
   }
 }
-export class BadRequestError extends AppError<"BAD_REQUEST"> {
+export class BadRequestError extends AppError {
   constructor(message = "Bad request") {
     super(400, "BAD_REQUEST", message);
   }
 }
-
-export type ApiErrorCode =
-  | InstanceType<typeof NotFoundError>["code"]
-  | InstanceType<typeof ConflictError>["code"]
-  | InstanceType<typeof ForbiddenError>["code"]
-  | InstanceType<typeof BadRequestError>["code"]
-  | InstanceType<typeof UnauthorizedError>["code"];

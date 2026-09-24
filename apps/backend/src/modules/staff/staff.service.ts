@@ -9,6 +9,7 @@ import {
   insertStaffMemberById,
 } from "./staff.repository.ts";
 import type { StaffBody } from "./staff.schema.ts";
+import { getPgErrorCode, PG } from "../../lib/pgErrors";
 
 export async function addNewStaffMembersToFacilityById(
   db: DB,
@@ -24,7 +25,7 @@ export async function addNewStaffMembersToFacilityById(
   }
 
   const newStaff = await insertStaffMemberById(db, user.id, facilityId).catch((e) => {
-    if (e.code === "23505") {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("User already working here");
     }
     throw e;

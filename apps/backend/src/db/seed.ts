@@ -729,8 +729,8 @@ function buildSeedData() {
         timeRange: range,
         status: plan.status,
         // после миграции снимка цены (S1):
-        // priceCents: service.priceCents,
-        // currency: facility.currency!,
+        priceCents: service.priceCents,
+        currency: facility.currency!,
       });
 
       if (plan.review) {

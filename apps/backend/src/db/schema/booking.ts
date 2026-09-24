@@ -1,4 +1,4 @@
-import { customType, index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { customType, index, integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { users } from "./user.ts";
 import { facilities } from "./facility.ts";
 import { staffMembers } from "./staffMember.ts";
@@ -60,6 +60,8 @@ export const bookings = pgTable(
       .notNull()
       .references(() => services.id),
     timeRange: tstzrange("time_range").notNull(),
+    priceCents: integer("price_cents").notNull(),
+    currency: varchar({ length: 3 }).notNull(),
     status: text("status", { enum: ["pending", "confirmed", "canceled"] })
       .notNull()
       .default("pending"),

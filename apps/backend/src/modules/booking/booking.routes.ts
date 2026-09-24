@@ -44,6 +44,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
       schema: {
         params: paramsSchema,
         body: createBookingRequestSchema,
+        response: { 201: bookingResponseSchema },
       },
     },
     async (request, response) => {
@@ -53,7 +54,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.params.id,
         request.body,
       );
-      return response.send(booking);
+      return response.code(201).send(booking);
     },
   );
 

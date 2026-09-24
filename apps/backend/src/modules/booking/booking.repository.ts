@@ -35,7 +35,10 @@ export async function findBusyRangesForStaff(
 
   return rows.map((r) => r.timeRange);
 }
-export async function findBookingById(db: DB, bookingId: string): Promise<BookingEntity> {
+export async function findBookingById(
+  db: DB,
+  bookingId: string,
+): Promise<BookingEntity | undefined> {
   const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
   return booking;
 }
@@ -47,6 +50,8 @@ export async function insertBooking(
     facilityId: string;
     staffMemberId: string;
     serviceId: string;
+    priceCents: number;
+    currency: string;
     startDatetime: Date;
     endDatetime: Date;
   },
@@ -61,7 +66,9 @@ export async function insertBooking(
       timeRange: {
         start: data.startDatetime,
         end: data.endDatetime,
-      }, // ключ как в схеме
+      },
+      priceCents: data.priceCents,
+      currency: data.currency,
     })
     .returning();
 

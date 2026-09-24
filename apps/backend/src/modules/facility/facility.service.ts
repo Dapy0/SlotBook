@@ -24,6 +24,7 @@ import {
 } from "./facilitySchedule.repository.ts";
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
+import { getPgErrorCode, PG } from "../../lib/pgErrors";
 export async function getFacilityBySlugOrThrow(
   db: DB,
   facilityId: string,
@@ -73,7 +74,7 @@ export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest
       ownerId: userId,
     });
   } catch (e: unknown) {
-    if (e != null && typeof e === "object" && "code" in e && e.code === "23505") {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("Slug already exists");
     }
 
