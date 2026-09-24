@@ -5,41 +5,11 @@ import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import type { AvailabilityResponse } from "@slotbook/shared";
 import { findBusyRangesForStaff } from "../booking/booking.repository.ts";
 import { getServiceForStaffMember } from "../service/service.service.ts";
-import {
-  intersectIntervals,
-  scheduleRowsToIntervals,
-  sliceIntoSlots,
-  type Interval,
-  type ScheduleRow,
-} from "./availability.utils.ts";
-import { fromZonedTime } from "date-fns-tz";
-import { addDaysToIso, getIsoWeekDay, todayInTimeZone } from "../../lib/utils.ts";
+import { addDaysToIso } from "../../lib/utils.ts";
+import { NotFoundError } from "../../lib/errors";
+import { computeDaySlots, getBookingWindow } from "./slotEngine";
+import { BOOKING_RULES } from "./booking.rules";
 
-function getAvailableSlotsForDay(
-  date: string,
-  weekday: number,
-  facilitySchedule: ScheduleRow[],
-  staffSchedule: ScheduleRow[],
-  bookedThisDay: Interval[],
-  serviceDurationMinutes: number,
-  earliestStart: string,
-  timeZone: string,
-) {
-  const dayFacilitySchedule = scheduleRowsToIntervals(facilitySchedule, date, weekday, timeZone);
-  const dayStaffSchedule = scheduleRowsToIntervals(staffSchedule, date, weekday, timeZone);
-
-  const workingIntervals = intersectIntervals(dayFacilitySchedule, dayStaffSchedule);
-  const freeIntervals = intersectIntervals(workingIntervals, bookedThisDay);
-  const slots = freeIntervals
-    .flatMap((interval) => sliceIntoSlots(interval, serviceDurationMinutes))
-    .filter((slot) => slot.start >= new Date(earliestStart))
-    .map((slot) => ({
-      startsAt: slot.start,
-      endsAt: slot.end,
-    }));
-
-  return { date, slots };
-}
 export async function getAvailableSlotsFor30days(
   db: DB,
   facilityId: string,
@@ -47,37 +17,34 @@ export async function getAvailableSlotsFor30days(
   serviceId: string,
 ): Promise<AvailabilityResponse> {
   const facility = await getFacilityByIdOrThrow(db, facilityId);
-  const tz = facility.timezone;
   const [service, facilitySchedule, staffSchedule] = await Promise.all([
     getServiceForStaffMember(db, serviceId, staffId),
     findFacilitySchedule(db, facilityId),
     receiveStaffSchedule(db, facilityId, staffId),
   ]);
+  if (service.facilityId !== facilityId || !service.isActive) {
+    throw new NotFoundError("No such service found");
+  }
 
   const now = new Date();
-  const firstDate = todayInTimeZone(tz, now);
-  const lastDate = addDaysToIso(firstDate, 30);
-  const windowEnd = fromZonedTime(`${lastDate}T00:00:00`, tz);
+  const tz = facility.timezone;
+  const window = getBookingWindow(tz, now);
 
-  const earliestStart = new Date(now.getTime() + 60 * 60_000);
+  const busy = await findBusyRangesForStaff(db, facility.id, staffId, now, window.windowEnd);
 
-  const busy = await findBusyRangesForStaff(db, facility.id, staffId, now, windowEnd);
-
-  const days = Array.from({ length: 30 }, (_, i) => {
-    const date = addDaysToIso(firstDate, i);
-    const weekday = getIsoWeekDay(date);
-
-    // const thisDayBooked = busy.filter((booking)=> booking.)
-    return getAvailableSlotsForDay(
-      date,
-      weekday,
-      facilitySchedule,
-      staffSchedule,
+  const days = Array.from({ length: BOOKING_RULES.horizonDays }, (_, i) => {
+    const date = addDaysToIso(window.firstDate, i);
+    const slots = computeDaySlots({
+      localDate: date,
+      timeZone: tz,
+      facilityRows: facilitySchedule,
+      staffRows: staffSchedule,
       busy,
-      service.durationMinutes,
-      earliestStart.toISOString(),
-      tz,
-    );
+      durationMinutes: service.durationMinutes,
+      earliestStart: window.earliestStart,
+    });
+    return { date, slots: slots.map((s) => ({ startsAt: s.start, endsAt: s.end })) };
   });
+
   return { days };
 }

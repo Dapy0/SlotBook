@@ -1,4 +1,4 @@
-import type { BookingStatus } from '@slotbook/shared';
+import type { BookingStatus } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { bookings, type BookingEntity } from "../../db/schema/booking.ts";
 import { eq, and, sql, inArray } from "drizzle-orm";
@@ -20,21 +20,20 @@ export async function findBusyRangesForStaff(
   windowStart: Date,
   windowEnd: Date,
 ): Promise<{ start: Date; end: Date }[]> {
-  return await db
-    .select({
-      start: sql<Date>`lower(${bookings.timeRange})`,
-      end: sql<Date>`upper(${bookings.timeRange})`,
-    })
+  const rows = await db
+    .select({ timeRange: bookings.timeRange })
     .from(bookings)
     .where(
       and(
         eq(bookings.facilityId, facilityId),
         eq(bookings.staffMemberId, staffId),
         inArray(bookings.status, ["pending", "confirmed"]),
-        sql`${bookings.timeRange} && tstzrange(${windowStart}, ${windowEnd})`,
+        sql`${bookings.timeRange} && tstzrange(${windowStart.toISOString()}, ${windowEnd.toISOString()})`,
       ),
     )
     .orderBy(sql`lower(${bookings.timeRange})`);
+
+  return rows.map((r) => r.timeRange);
 }
 export async function findBookingById(db: DB, bookingId: string): Promise<BookingEntity> {
   const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));

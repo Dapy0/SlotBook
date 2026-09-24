@@ -1,7 +1,6 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
-import type { StaffScheduleEntryResponse, Weekday } from "@slotbook/shared";
-import type { FacilityScheduleEntryResponse } from "@slotbook/shared";
+import type { Weekday } from "@slotbook/shared";
 
 export const WEEKDAY_BY_NAME = {
   Mon: 1,
@@ -49,47 +48,8 @@ export function checkStaffScheduleFitsFacility(
     }
   }
 }
-function normalizeTime(time: string): string {
-  return time.length === 5 ? `${time}:00` : time;
-}
-export async function checkIfBookingFitsAllSchedules(
-  startTime: string,
-  endTime: string,
-  dayOfTheWeek: number,
-  staffSchedule: StaffScheduleEntryResponse[],
-  facilitySchedule: FacilityScheduleEntryResponse[],
-) {
-  const facilityDaySchedules = facilitySchedule.filter((f) => f.dayOfTheWeek === dayOfTheWeek);
-  const staffDaySchedules = staffSchedule.filter((s) => s.dayOfTheWeek === dayOfTheWeek);
 
-  if (facilityDaySchedules.length === 0) {
-    throw new ConflictError(`Facility is closed on day ${dayOfTheWeek}`);
-  }
-  if (staffDaySchedules.length === 0) {
-    throw new ConflictError(`Staff does not work on day ${dayOfTheWeek}`);
-  }
 
-  const fitsFacility = facilityDaySchedules.some(
-    (s) =>
-      normalizeTime(startTime) >= normalizeTime(s.startTime) &&
-      normalizeTime(endTime) <= normalizeTime(s.endTime),
-  );
-  
-
-  if (!fitsFacility) {
-    throw new ConflictError(`Booking is outside facility working hours on day ${dayOfTheWeek}`);
-  }
-  const fitsStaff = staffDaySchedules.some((s) => {
-
-    return (
-      normalizeTime(startTime) >= normalizeTime(s.startTime) &&
-      normalizeTime(endTime) <= normalizeTime(s.endTime)
-    );
-  });
-  if (!fitsStaff) {
-    throw new ConflictError(`Booking is outside staff working hours on day ${dayOfTheWeek}`);
-  }
-}
 
 export function convertShortDayNameToDayNumber(dayName: WeekdayByName): Weekday {
   return WEEKDAY_BY_NAME[dayName];

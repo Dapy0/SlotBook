@@ -16,7 +16,7 @@ export async function findStaffByFacilityIdPublic(
     .select({
       id: staffMembers.id,
       name: users.name,
-      score: sql<number | null>`avg(${reviews.rating})`,
+      score: sql<number | null>`round(avg(${reviews.rating}), 1)::float8`,
       reviewsCount: count(reviews.id),
     })
     .from(staffMembers)

@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "@/components/ui/toast";
+import { ApiError } from "@/lib/api";
 import { durationFormatter, moneyFormatter } from "@/lib/format";
 import { convertMinutesToTime, convertToSelectFormat, isoStringToWallTime } from "@/lib/utils";
 import { getAvailability } from "@/services/availability";
@@ -16,9 +18,32 @@ import { Button } from "@base-ui/react";
 import type { AvailabilityResponse } from "@slotbook/shared";
 import type { FacilityDataForBookingResponse } from "@slotbook/shared";
 import { MapPinIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 const weekdayShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+type Slot = AvailabilityResponse["days"][number]["slots"][number];
+type Selection = {
+  staff: string | null;
+  service: string | null;
+  date: string | null;
+  slot: Slot | null;
+};
+function parseCalendarDate(isoDate: string) {
+  const d = new Date(`${isoDate}T00:00:00Z`);
+  return { day: d.getUTCDate(), weekday: d.getUTCDay() };
+}
 
+function formatCalendarDate(isoDate: string) {
+  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString(undefined, { timeZone: "UTC" });
+}
+function formatWallTime(date: Date, timeZone: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone,
+  }).format(date);
+}
 function BookForm({
   bookingData,
   initialService,
@@ -32,101 +57,112 @@ function BookForm({
   initialDate: string | null;
   initialTime: string | null;
 }) {
-  const [slots, setSlots] = useState<AvailabilityResponse | null>();
+  const router = useRouter();
+  const pathName = usePathname();
+  const { id, name, services, staff, reviewsCount, city, address, score, timezone } = bookingData;
 
-  const [selection, setSelection] = useState({
+  const [selection, setSelection] = useState<Selection>({
     staff: initialStaff,
     service: initialService,
     date: initialDate,
-    slot: initialTime ? { start: initialTime, end: "" } : null,
+    slot: null,
   });
-  const [error, setError] = useState<string | null>(null);
-  const handleReset = () => {
-    setSelection({
-      staff: null,
-      date: null,
-      slot: null,
-      service: null,
-    });
-  };
-  const handleSelectStaff = (staffId: string | null) => {
-    setSelection({
-      ...selection,
-      staff: staffId,
-      date: null,
-      slot: null,
-    });
-  };
-  const handleSelectService = (serviceId: string | null) => {
-    setSelection({
-      ...selection,
-      service: serviceId,
-      date: null,
-      slot: null,
-    });
-  };
-  const handleSelectDate = (date: string) => {
-    setSelection({
-      ...selection,
 
-      date: date,
-      slot: null,
-    });
-  };
-  const handleSelectSlotTime = (start: string, end: string) => {
-    setSelection({
-      ...selection,
-      slot: { start, end },
-    });
-  };
-  const { id, name, services, staff, reviewsCount, city, address, score , timezone} = bookingData;
-  const selectedServiceData = services.find((service) => service.id === selection.service);
+  const [availability, setAvailability] = useState<{
+    key: string;
+    data: AvailabilityResponse;
+  } | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBooked, setIsBooked] = useState(false);
+  const pendingInitialTime = useRef(initialTime);
+
+  const requestKey =
+    selection.staff && selection.service ? `${selection.staff}:${selection.service}` : null;
+  const slots = availability?.key === requestKey ? availability.data : null;
+  const isLoadingSlots = requestKey !== null && slots === null;
+  const selectedDaySlots = slots?.days.find((d) => d.date === selection.date);
+  console.log(selectedDaySlots);
+  const hasAnySlots = slots?.days.some((d) => d.slots.length > 0) ?? false;
+  const selectedServiceData = services.find((s) => s.id === selection.service);
   useEffect(() => {
-    if (!selection.staff || !selection.service) {
-      setSlots(null);
-      return;
-    }
+    if (!selection.staff || !selection.service) return;
+    const key = `${selection.staff}:${selection.service}`;
     let ignore = false;
 
     getAvailability(id, { staffId: selection.staff, serviceId: selection.service })
-      .then((res) => {
-        if (!ignore) setSlots(res);
+      .then((data) => {
+        if (ignore) return;
+        setAvailability({ key, data });
+
+        const time = pendingInitialTime.current;
+        if (time) {
+          pendingInitialTime.current = null;
+          setSelection((prev: any) => {
+            const day = data.days.find((d) => d.date === prev.date);
+            const slot = day?.slots.find((s) => formatWallTime(s.startsAt, timezone) === time);
+            return { ...prev, slot: slot ?? null };
+          });
+        }
       })
-      .finally(() => {
-        // if (!ignore) setIsLoadingSlots(false);
+      .catch(() => {
+        if (!ignore) setError("Could not load available time");
       });
+
     return () => {
       ignore = true;
     };
-  }, [id, selection.staff, selection.service]);
+  }, [id, selection.staff, selection.service, reloadToken, timezone]);
+  const handleSelectStaff = (staffId: string | null) =>
+    setSelection((prev) => ({ ...prev, staff: staffId, date: null, slot: null }));
 
-  async function handleBookSlot(startTime: Date, staffId: string, serviceId: string) {
+  const handleSelectService = (serviceId: string | null) =>
+    setSelection((prev) => ({ ...prev, service: serviceId, date: null, slot: null }));
+
+  const handleSelectDate = (date: string) =>
+    setSelection((prev) => ({ ...prev, date, slot: null }));
+
+  const handleSelectSlot = (slot: Slot) => setSelection((prev: Selection) => ({ ...prev, slot }));
+
+  async function handleConfirm() {
+    const { staff: staffId, service: serviceId, slot } = selection;
+    if (!staffId || !serviceId || !slot || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setError(null);
     try {
-      await createBooking(id, {
+      const booking = await createBooking(id, {
         staffMemberId: staffId,
-        serviceId: serviceId,
-        startsAt: startTime,
+        serviceId,
+        startsAt: slot.startsAt,
       });
-      handleReset();
+      toast.add({ title: "Booking created! Waiting for confirmation." });
+      router.push(`/account/appointments?booked=${booking.id}`);
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push(`/login?next=${encodeURIComponent(pathName)}`);
+        return;
+      }
+      if (err instanceof ApiError && err.status === 409) {
+        setError("This time was just taken. Please choose another one.");
+        setSelection((prev) => ({ ...prev, slot: null }));
+        setReloadToken((t) => t + 1);
+        return;
+      }
       setError(err instanceof Error ? err.message : "Failed to create booking");
-      console.log(err instanceof Error ? err.message : "Failed to create booking");
     } finally {
+      setIsSubmitting(false);
     }
   }
   const allowedServiceIds = useMemo(() => {
-    const staffId = selection.staff;
-    if (!staffId) return null;
-
-    const ids = new Set<string>();
-    for (const service of services) {
-      if (service.staffMemberIds.includes(staffId)) {
-        ids.add(service.id);
-      }
-    }
-
-    return ids;
+    if (!selection.staff) return null;
+    return new Set(
+      services.filter((s) => s.staffMemberIds.includes(selection.staff!)).map((s) => s.id),
+    );
   }, [selection.staff, services]);
+
   const allowedStaffIds = useMemo(() => {
     if (!selection.service) return null;
     const service = services.find((s) => s.id === selection.service);
@@ -144,7 +180,7 @@ function BookForm({
     () => [{ label: "Any service", value: null }, ...convertToSelectFormat(services, "name", "id")],
     [services],
   );
-  const selectedDaySlots = slots?.days.find((d) => d.date === selection.date)?.slots ?? [];
+
   return (
     <div className="">
       <BreadCrumbs />
@@ -157,7 +193,6 @@ function BookForm({
                 <MapPinIcon size={13} />
                 {city} · {address}
               </span>
-              {/* <span className="text-sm text-gray-600">4.7 km</span> */}
             </div>
           </header>
           {/* Staff select */}
@@ -168,17 +203,17 @@ function BookForm({
                 <SelectValue></SelectValue>
               </SelectTrigger>
               <SelectContent alignItemWithTrigger={false}>
-                {staffOptions.map((staffMember) => (
+                {staffOptions.map((option) => (
                   <SelectItem
-                    key={staffMember.label}
-                    value={staffMember.value}
+                    key={option.value ?? "any"}
+                    value={option.value}
                     disabled={
-                      staffMember.value !== null &&
+                      option.value !== null &&
                       allowedStaffIds !== null &&
-                      !allowedStaffIds.has(staffMember.value)
+                      !allowedStaffIds.has(option.value)
                     }
                   >
-                    {staffMember.label}
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -196,41 +231,43 @@ function BookForm({
                 <SelectValue></SelectValue>
               </SelectTrigger>
               <SelectContent alignItemWithTrigger={false}>
-                {serviceOptions.map((service) => (
+                {serviceOptions.map((option) => (
                   <SelectItem
-                    key={service.label}
-                    value={service.value}
+                    key={option.value ?? "any"}
+                    value={option.value}
                     disabled={
-                      service.value !== null &&
+                      option.value !== null &&
                       allowedServiceIds !== null &&
-                      !allowedServiceIds.has(service.value)
+                      !allowedServiceIds.has(option.value)
                     }
                   >
-                    {service.label}
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           {/* Date picker */}
-          {!slots ? (
-            <h1>Select staff and service first</h1>
+          {requestKey === null ? (
+            <p className="text-sm text-gray-500">Select staff and service first</p>
+          ) : isLoadingSlots ? (
+            <p className="text-sm text-gray-500">Loading available time…</p>
+          ) : !hasAnySlots ? (
+            <p className="text-sm text-gray-500">No free time in the next 30 days</p>
           ) : (
             <>
               <div>
                 <p className="mb-2 text-sm font-medium text-gray-900">Select Date</p>
-
-                <div className="flex max-w-2xl gap-2 overflow-x-scroll pb-1">
-                  {slots.days.map((day) => {
+                <div className="flex max-w-2xl gap-2 overflow-x-auto pb-1">
+                  {slots!.days.map((day) => {
+                    const { day: dayOfMonth, weekday } = parseCalendarDate(day.date);
                     const isSelected = day.date === selection.date;
                     const isDisabled = day.slots.length === 0;
                     return (
                       <Button
                         key={day.date}
                         disabled={isDisabled}
-                        onClick={() => {
-                          handleSelectDate(day.date);
-                        }}
+                        onClick={() => handleSelectDate(day.date)}
                         className={`flex size-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-lg border text-sm transition ${
                           isSelected
                             ? "border-primary bg-primary text-white"
@@ -240,54 +277,53 @@ function BookForm({
                         <span
                           className={`text-[11px] font-medium uppercase ${
                             isSelected ? "text-orange-100" : "text-gray-400"
-                          } `}
+                          }`}
                         >
-                          {new Date(day.date).getDate()}
+                          {dayOfMonth}
                         </span>
-                        <span className="text-md font-medium">
-                          {weekdayShort[new Date(day.date).getDay()]}
-                        </span>
+                        <span className="text-md font-medium">{weekdayShort[weekday]}</span>
                       </Button>
                     );
                   })}
                 </div>
                 <p className="mt-2 text-xs font-light tracking-wide text-gray-400 uppercase">
-                  Booking open for the next 30 days
+                  Booking open for the next 30 days · times in {timezone}
                 </p>
               </div>
 
-              <div>
-                {selectedDaySlots.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDaySlots.map((slot) => {
-                      const startTimeIso = slot.startsAt.toISOString();
-                      const endTimeIso = slot.endsAt.toISOString();
-                      const isSelected = startTimeIso === selection.slot?.start;
-                      return (
-                        <button
-                          key={startTimeIso}
-
-                          onClick={() => {
-                            handleSelectSlotTime(startTimeIso, endTimeIso);
-                          }}
-                          className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                            isSelected
-                              ? "border-primary bg-primary text-white"
-                              : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
-                          }`}
-                        >
-                          {`${isoStringToWallTime(startTimeIso, timezone)} - ${isoStringToWallTime(endTimeIso, timezone)}`}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              {selectedDaySlots && (
+                <div className="flex flex-wrap gap-2">
+                  {selectedDaySlots.slots.map((slot) => {
+                    const key = selectedDaySlots.date + slot.startsAt.toISOString();
+                    const isSelected =
+                      selection.slot?.startsAt.getTime() === slot.startsAt.getTime();
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => handleSelectSlot(slot)}
+                        className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                          isSelected
+                            ? "border-primary bg-primary text-white"
+                            : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
+                        }`}
+                      >
+                        {formatWallTime(slot.startsAt, timezone)} –{" "}
+                        {formatWallTime(slot.endsAt, timezone)}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </>
           )}
 
-          {error && <div className="text-red-400">Error happen: {error}</div>}
+          {isBooked && (
+            <div className="text-green-600">Booking created! Waiting for confirmation.</div>
+          )}
+          {error && <div className="text-red-500">{error}</div>}
         </div>
+
         <div className="w-72 shrink-0">
           <BookingSummaryCard
             businessName={name}
@@ -295,34 +331,27 @@ function BookForm({
             address={address}
             score={score}
             reviewsCount={reviewsCount}
-            service={selectedServiceData ? selectedServiceData.name : "Select something"}
+            service={selectedServiceData?.name ?? "Select something"}
             duration={
               selectedServiceData
                 ? durationFormatter.format({
-                    hours: convertMinutesToTime(selectedServiceData?.durationMinutes)[0],
-                    minutes: convertMinutesToTime(selectedServiceData?.durationMinutes)[1],
+                    hours: convertMinutesToTime(selectedServiceData.durationMinutes)[0],
+                    minutes: convertMinutesToTime(selectedServiceData.durationMinutes)[1],
                   })
                 : "Select something"
             }
-            date={
-              selection.date ? new Date(selection.date).toLocaleDateString() : "Select something"
-            }
+            date={selection.date ? formatCalendarDate(selection.date) : "Select something"}
             time={
-              // selection.slot
-              //   ? `${isoStringToWallTime(selection.slot.start)} - ${isoStringToWallTime(selection.slot.end)}`
-              //   :
-                 "Select something"
+              selection.slot
+                ? `${formatWallTime(selection.slot.startsAt, timezone)} – ${formatWallTime(selection.slot.endsAt, timezone)}`
+                : "Select something"
             }
             price={
               selectedServiceData
                 ? moneyFormatter(selectedServiceData.priceCents, selectedServiceData.currency)
                 : "-"
             }
-            onConfirm={() => {
-              if (selection.slot && selection.staff && selection.service) {
-                // handleBookSlot(selection.slot.start, selection.staff, selection.service);
-              }
-            }}
+            onConfirm={handleConfirm}
           />
         </div>
       </div>

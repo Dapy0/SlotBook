@@ -2,6 +2,11 @@ import { fromZonedTime } from "date-fns-tz";
 
 export type Interval = { start: Date; end: Date };
 export type ScheduleRow = { dayOfTheWeek: number; startTime: string; endTime: string };
+  // [
+  //   { start: "11:10", end: "12:10" },
+  //   { start: "12:20", end: "12:40" },
+  // ];
+  // {start: "12:00", end: "12:30"}
 
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.start < b.end && b.start < a.end;
@@ -17,6 +22,17 @@ export function intersectIntervals(a: Interval[], b: Interval[]): Interval[] {
     }
   }
   return res;
+}
+export function deleteIntersectedIntervals(a: Interval[], b: Interval[]): Interval[] {
+
+  const newIntervals = [];
+  for (const x of a) {
+    for (const y of b) {
+      const isOverlapping = x.start >= y.start;
+      if (!isOverlapping) newIntervals.push(x);
+    }
+  }
+  return newIntervals;
 }
 export function scheduleRowsToIntervals(
   rows: ScheduleRow[],
@@ -35,31 +51,15 @@ export function scheduleRowsToIntervals(
 export function sliceIntoSlots(
   interval: Interval,
   durationMinutes: number,
-  stepMinutes = 30,
-  anchor?: Date,
+  stepMinutes: number,
 ): Interval[] {
   const slots: Interval[] = [];
 
   const durationMs = durationMinutes * 60_000;
   const stepMs = stepMinutes * 60_000;
-
-  const start = interval.start.getTime();
   const end = interval.end.getTime();
-
-  const anchorMs = anchor?.getTime() ?? start;
-
-  const offset = Math.max(0, Math.ceil((start - anchorMs) / stepMs));
-
-  let t = anchorMs + offset * stepMs;
-
-  while (t + durationMs <= end) {
-    slots.push({
-      start: new Date(t),
-      end: new Date(t + durationMs),
-    });
-
-    t += stepMs;
+  for (let t = interval.start.getTime(); t + durationMs <= end; t += stepMs) {
+    slots.push({ start: new Date(t), end: new Date(t + durationMs) });
   }
-
   return slots;
 }

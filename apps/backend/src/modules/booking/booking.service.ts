@@ -1,5 +1,5 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { BadRequestError, ConflictError, NotFoundError } from "../../lib/errors.ts";
 import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
@@ -10,18 +10,19 @@ import {
 import {
   findBookingById,
   findBookingsByFacilityId,
+  findBusyRangesForStaff,
   insertBooking,
   patchStatusByBookingId,
 } from "./booking.repository.ts";
-import { checkIfBookingFitsAllSchedules } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import { getLocalDayOfWeek, getLocalWallTime } from "../../lib/utils.ts";
 import type {
   BookingResponse,
   ChangeBookingStatusRequest,
   CreateBookingRequest,
 } from "@slotbook/shared";
 import type { BookingEntity } from "../../db/schema";
+import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
+import { formatInTimeZone } from "date-fns-tz";
 function mapBookingToContractFormat(booking: BookingEntity): BookingResponse;
 
 function mapBookingToContractFormat(bookings: BookingEntity[]): BookingResponse[];
@@ -62,8 +63,8 @@ export async function createBookingForFacility(
   userId: string,
   facilityId: string,
   data: CreateBookingRequest,
+  now = new Date(),
 ): Promise<BookingResponse> {
-  
   const [facility, staff, service, staffSchedule, facilitySchedule] = await Promise.all([
     getFacilityByIdOrThrow(db, facilityId),
     checkIfStaffIsFacilityWorker(db, facilityId, data.staffMemberId),
@@ -74,38 +75,41 @@ export async function createBookingForFacility(
 
   await checkIfStaffMemberIsDoingService(db, staff.id, service.id);
 
-  // if (userId === facility.ownerId) {
-  //   throw new ForbiddenError("No self bookings allowed");
-  // }
-  if (data.startsAt.getTime() <= Date.now()) {
-    throw new ConflictError("Start time is in the past");
+  const tz = facility.timezone;
+  const window = getBookingWindow(tz, now);
+
+  // 1. В какой ЛОКАЛЬНЫЙ день заведения попадает startsAt
+  const date = formatInTimeZone(data.startsAt, tz, "yyyy-MM-dd");
+  if (date < window.firstDate || date > window.lastDate) {
+    throw new BadRequestError("Date is outside the booking window");
   }
+  const day = dayBounds(date, tz);
+  const busy = await findBusyRangesForStaff(db, facilityId, staff.id, day.start, day.end);
 
-  const startDatetime = data.startsAt;
-  const endDatetime = new Date(startDatetime.getTime() + service.durationMinutes * 60_000);
+  const slots = computeDaySlots({
+    localDate: date,
+    timeZone: tz,
+    facilityRows: facilitySchedule,
+    staffRows: staffSchedule,
+    busy,
+    durationMinutes: service.durationMinutes,
+    earliestStart: window.earliestStart,
+  });
 
-  const localDay = getLocalDayOfWeek(startDatetime, facility.timezone);
-  const localStartTime = getLocalWallTime(startDatetime, facility.timezone);
-  const localEndTime = getLocalWallTime(endDatetime, facility.timezone);
-
-  await checkIfBookingFitsAllSchedules(
-    localStartTime,
-    localEndTime,
-    localDay,
-    staffSchedule,
-    facilitySchedule,
-  );
+  const slot = slots.find((s) => s.start.getTime() === data.startsAt.getTime());
+  if (!slot) {
+    throw new ConflictError("This time slot is not available");
+  }
 
   const booking = await insertBooking(db, {
     clientId: userId,
     facilityId,
     staffMemberId: staff.id,
     serviceId: service.id,
-    startDatetime,
-    endDatetime,
-  }).catch((e) => {
-
-    if (e.code === "23P01") {
+    startDatetime: slot.start,
+    endDatetime: slot.end,
+  }).catch((e: unknown) => {
+    if (e) {
       throw new ConflictError("This time slot is already booked");
     }
     throw e;
