@@ -11,6 +11,7 @@ export const API_ERROR_CODES = [
   "SLOT_TAKEN",
   "OUTSIDE_BOOKING_WINDOW",
   "CANNOT_BOOK_YOURSELF",
+  "BOOKING_NOT_FOUND",
 ] as const;
 export const apiErrorCodeSchema = z.enum(API_ERROR_CODES);
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;

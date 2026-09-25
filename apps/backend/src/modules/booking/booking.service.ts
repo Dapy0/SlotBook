@@ -1,5 +1,5 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { BadRequestError, ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
@@ -13,17 +13,32 @@ import {
   findBookingsByUserId,
   findBusyRangesForStaff,
   insertBooking,
-  patchStatusByBookingId,
+  updateBookingStatusIfCurrent,
 } from "./booking.repository.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type {
-  BookingResponse,
-  ChangeBookingStatusRequest,
-  CreateBookingRequest,
-} from "@slotbook/shared";
+import type { BookingResponse, CreateBookingRequest } from "@slotbook/shared";
 import type { BookingEntity } from "../../db/schema";
 import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
 import { formatInTimeZone } from "date-fns-tz";
+import { findFacilityById } from "../facility/facility.repository";
+import { findStaffMemberById } from "../staff/staff.repository";
+import { checkTransition, type Actors } from "./booking.status";
+async function resolveBookingActors(
+  db: DB,
+  booking: BookingEntity,
+  userId: string,
+): Promise<Actors[]> {
+  const [facility, staff] = await Promise.all([
+    findFacilityById(db, booking.facilityId),
+    findStaffMemberById(db, booking.staffMemberId),
+  ]);
+  const actors: Actors[] = [];
+  if (booking.clientId === userId) actors.push("client");
+  if (staff?.userId === userId) actors.push("staff");
+  if (facility?.ownerId === userId) actors.push("owner");
+  return actors;
+}
+
 function mapBookingToContractFormat(booking: BookingEntity): BookingResponse;
 
 function mapBookingToContractFormat(bookings: BookingEntity[]): BookingResponse[];
@@ -123,57 +138,27 @@ export async function createBookingForFacility(
 export async function changeBookingStatus(
   db: DB,
   userId: string,
-  facilityId: string,
   bookingId: string,
-  data: ChangeBookingStatusRequest,
+  to: "confirmed" | "canceled",
+  now = new Date(),
 ): Promise<BookingResponse> {
   const booking = await findBookingById(db, bookingId);
   if (!booking) {
-    throw new NotFoundError("No such booking found");
+    throw new NotFoundError("Booking not found");
   }
-  switch (booking.status) {
-    case "pending":
-      switch (data.status) {
-        case "confirmed":
-          // console.log(userId, booking.clientId);
-          await checkFacilityOwnership(db, facilityId, userId);
-          return mapBookingToContractFormat(
-            await patchStatusByBookingId(db, booking.id, data.status),
-          );
-        case "canceled":
-          if (booking.clientId === userId) {
-            return mapBookingToContractFormat(
-              await patchStatusByBookingId(db, booking.id, data.status),
-            );
-          }
-          await checkFacilityOwnership(db, facilityId, userId);
-          return mapBookingToContractFormat(
-            await patchStatusByBookingId(db, booking.id, data.status),
-          );
-      }
-      break;
-
-    case "confirmed":
-      switch (data.status) {
-        case "confirmed":
-          throw new ConflictError("Not allowed same state");
-          break;
-        case "canceled":
-          if (booking.clientId === userId) {
-            return mapBookingToContractFormat(
-              await patchStatusByBookingId(db, booking.id, data.status),
-            );
-          }
-          await checkFacilityOwnership(db, facilityId, userId);
-          return mapBookingToContractFormat(
-            await patchStatusByBookingId(db, booking.id, data.status),
-          );
-      }
-      break;
-
-    default:
-      throw new ConflictError("Not allowed");
+  const actors = await resolveBookingActors(db, booking, userId);
+  if (actors.length === 0) {
+    throw new NotFoundError("Booking not found.");
   }
+  if (booking.timeRange.start <= now) {
+    throw new ConflictError("Booking already started");
+  }
+  const check = checkTransition(booking.status, to, actors);
+  if (check === "invalid") throw new ConflictError(`Cannot change ${booking.status} → ${to}`);
+  if (check === "forbidden") throw new ForbiddenError("You cannot perform this action");
+  const updated = await updateBookingStatusIfCurrent(db, booking.id, booking.status, to);
+  if (!updated) throw new ConflictError("Booking was changed, reload and try again");
+  return mapBookingToContractFormat(updated);
 }
 
 export async function getMineBookings(db: DB, userId: string): Promise<BookingResponse[]> {

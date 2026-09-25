@@ -321,6 +321,6 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
   );
   fastify.register(staffRoutes, { prefix: "/" });
-  fastify.register(bookingRoutes, { prefix: "/" });
+  fastify.register(bookingRoutes, { prefix: "/:id/bookings" });
   fastify.register(availabilityRoutes, { prefix: "/" });
 };

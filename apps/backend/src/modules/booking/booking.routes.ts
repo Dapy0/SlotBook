@@ -14,10 +14,11 @@ import {
   getMineBookings,
 } from "./booking.service";
 import { createReviewForBooking } from "../review/review.service";
+import z from "zod";
 
 export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
-    "/:id/bookings",
+    "/",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -38,7 +39,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 
   fastify.post(
-    "/:id/bookings",
+    "/",
     {
       onRequest: [fastify.authenticate],
       schema: {
@@ -59,11 +60,11 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
   );
 
   fastify.post(
-    "/:id/bookings/:bookingId/reviews",
+    "/:bookingId/reviews",
     {
       onRequest: [fastify.authenticate],
       schema: {
-        params: paramsPatchSchema,
+        params: paramsSchema.extend({ bookingId: z.uuid() }),
         body: createReviewRequestSchema,
       },
     },
@@ -76,26 +77,6 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.body,
       );
       return response.code(201).send();
-    },
-  );
-  fastify.patch(
-    "/:id/bookings/:bookingId",
-    {
-      onRequest: [fastify.authenticate],
-      schema: {
-        params: paramsPatchSchema,
-        body: changeBookingStatusRequestSchema,
-      },
-    },
-    async (request, response) => {
-      const patchedBooking = await changeBookingStatus(
-        request.server.drizzle,
-        request.user.id,
-        request.params.id,
-        request.params.bookingId,
-        request.body,
-      );
-      return response.send(patchedBooking);
     },
   );
 };
@@ -114,6 +95,25 @@ export const mineBookingsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, response) => {
       const myBookings = await getMineBookings(request.server.drizzle, request.user.id);
       return response.send(myBookings);
+    },
+  );
+  fastify.patch(
+    "/:bookingId",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: paramsPatchSchema,
+        body: changeBookingStatusRequestSchema,
+      },
+    },
+    async (request, response) => {
+      const patchedBooking = await changeBookingStatus(
+        request.server.drizzle,
+        request.user.id,
+        request.params.bookingId,
+        request.body.status,
+      );
+      return response.send(patchedBooking);
     },
   );
 };

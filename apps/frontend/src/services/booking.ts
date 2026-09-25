@@ -18,3 +18,9 @@ export async function getMineBookings(cookie: string) {
     },
   });
 }
+export async function updateBookingStatus(bookingId: string, status: "confirmed" | "canceled") {
+  return api(`/bookings/${bookingId}`, bookingResponseSchema, {
+    method: "PATCH",
+    body: JSON.stringify({ status: status }),
+  });
+}

@@ -78,22 +78,20 @@ export async function insertBooking(
   return booking;
 }
 
-export async function patchStatusByBookingId(
+export async function updateBookingStatusIfCurrent(
   db: DB,
   bookingId: string,
-  status: BookingStatus,
+  from: BookingStatus,
+  to: BookingStatus,
 ): Promise<BookingEntity> {
   const [updatedBooking] = await db
     .update(bookings)
     .set({
-      status,
+      status: to,
     })
-    .where(eq(bookings.id, bookingId))
+    .where(and(eq(bookings.id, bookingId), eq(bookings.status, from)))
     .returning();
 
-  if (!updatedBooking) {
-    throw new Error("Failed to update booking");
-  }
   return updatedBooking;
 }
 

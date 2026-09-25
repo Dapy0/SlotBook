@@ -1,8 +1,19 @@
-import { customType, index, integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  check,
+  customType,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { users } from "./user.ts";
 import { facilities } from "./facility.ts";
 import { staffMembers } from "./staffMember.ts";
 import { services } from "./service.ts";
+import { sql } from "drizzle-orm";
 
 type TimeRange = {
   start: Date;
@@ -71,6 +82,7 @@ export const bookings = pgTable(
     index("bookings_facilities_idx").on(table.facilityId),
     index("bookings_clients_idx").on(table.clientId),
     index("bookings_staff_members_idx").on(table.staffMemberId),
+    check("booking_status_check", sql`${table.status} IN ('pending','confirmed', 'canceled')`),
   ],
 );
 
