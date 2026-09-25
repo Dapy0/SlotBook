@@ -1,6 +1,7 @@
+import AppointmentItem from "@/app/(main)/account/appointments/_components/AppointmentItem";
 import { BookedBanner } from "@/app/(main)/account/appointments/_components/BookedBanner";
 import { getMineBookings } from "@/services/booking";
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 
 export default async function AppointmentsPage({
   searchParams,
@@ -11,11 +12,13 @@ export default async function AppointmentsPage({
   const cookieStore = await cookies();
   const myBookings = await getMineBookings(cookieStore.toString());
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       {booked && <BookedBanner />}
-      {myBookings.map((booking) => {
-        return <div className="border p-3">{booking.status}</div>;
-      })}
+      <div className="rounded-lg border divide-y">
+        {myBookings.map((booking) => {
+          return <AppointmentItem />;
+        })}
+      </div>
     </div>
   );
 }
