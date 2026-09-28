@@ -14,3 +14,9 @@ export function formatTimeToTimezone(date: string | Date, timeZone: string): str
     hour12: false,
   }).format(new Date(date));
 }
+export function formatDateToTimezone(date: string | Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone,
+    dateStyle: "long",
+  }).format(new Date(date));
+}

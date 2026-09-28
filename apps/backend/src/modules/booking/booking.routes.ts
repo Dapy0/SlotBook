@@ -3,9 +3,11 @@ import { paramsPatchSchema, paramsSchema } from "./booking.schema.ts";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import {
   bookingResponseSchema,
+  bookingWithDetailsResponseSchema,
   changeBookingStatusRequestSchema,
   createBookingRequestSchema,
   createReviewRequestSchema,
+  myBookingsQuerySchema,
 } from "@slotbook/shared";
 import {
   changeBookingStatus,
@@ -87,13 +89,18 @@ export const mineBookingsRoutes: FastifyPluginAsyncZod = async (fastify) => {
     {
       onRequest: [fastify.authenticate],
       schema: {
+        querystring: myBookingsQuerySchema,
         response: {
-          200: bookingResponseSchema.array(),
+          200: bookingWithDetailsResponseSchema.array(),
         },
       },
     },
     async (request, response) => {
-      const myBookings = await getMineBookings(request.server.drizzle, request.user.id);
+      const myBookings = await getMineBookings(
+        request.server.drizzle,
+        request.user.id,
+        request.query.scope,
+      );
       return response.send(myBookings);
     },
   );

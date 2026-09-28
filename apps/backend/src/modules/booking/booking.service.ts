@@ -10,19 +10,26 @@ import {
 import {
   findBookingById,
   findBookingsByFacilityId,
-  findBookingsByUserId,
+  findBookingsWithDetails,
   findBusyRangesForStaff,
   insertBooking,
   updateBookingStatusIfCurrent,
 } from "./booking.repository.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type { BookingResponse, CreateBookingRequest } from "@slotbook/shared";
-import type { BookingEntity } from "../../db/schema";
+import type {
+  BookingResponse,
+  BookingWithDetailsResponse,
+  CreateBookingRequest,
+  MyBookingsQuery,
+} from "@slotbook/shared";
+import { bookings, type BookingEntity } from "../../db/schema";
 import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
 import { formatInTimeZone } from "date-fns-tz";
 import { findFacilityById } from "../facility/facility.repository";
 import { findStaffMemberById } from "../staff/staff.repository";
 import { checkTransition, type Actors } from "./booking.status";
+import type { BookingsFilter } from "./booking.schema";
+import { sql } from "drizzle-orm";
 async function resolveBookingActors(
   db: DB,
   booking: BookingEntity,
@@ -39,28 +46,11 @@ async function resolveBookingActors(
   return actors;
 }
 
-function mapBookingToContractFormat(booking: BookingEntity): BookingResponse;
-
-function mapBookingToContractFormat(bookings: BookingEntity[]): BookingResponse[];
-
-function mapBookingToContractFormat(
-  bookings: BookingEntity | BookingEntity[],
-): BookingResponse | BookingResponse[] {
-  if (Array.isArray(bookings)) {
-    return bookings.map(({ timeRange, ...booking }) => ({
-      ...booking,
-      startsAt: timeRange.start,
-      endsAt: timeRange.end,
-    }));
-  }
-
-  const { timeRange, ...booking } = bookings;
-
-  return {
-    ...booking,
-    startsAt: timeRange.start,
-    endsAt: timeRange.end,
-  };
+function mapBookingToContractFormat<T extends { timeRange: { start: Date; end: Date } }>({
+  timeRange,
+  ...rest
+}: T): Omit<T, "timeRange"> & { startsAt: Date; endsAt: Date } {
+  return { ...rest, startsAt: timeRange.start, endsAt: timeRange.end };
 }
 
 export async function getFacilityBookingsForOwner(
@@ -72,7 +62,8 @@ export async function getFacilityBookingsForOwner(
 
   const facilityBookings = await findBookingsByFacilityId(db, facilityId);
 
-  return mapBookingToContractFormat(facilityBookings);
+  return facilityBookings.map(mapBookingToContractFormat);
+;
 }
 export async function createBookingForFacility(
   db: DB,
@@ -161,6 +152,25 @@ export async function changeBookingStatus(
   return mapBookingToContractFormat(updated);
 }
 
-export async function getMineBookings(db: DB, userId: string): Promise<BookingResponse[]> {
-  return mapBookingToContractFormat(await findBookingsByUserId(db, userId));
+export async function getMineBookings(
+  db: DB,
+  userId: string,
+  scope: MyBookingsQuery["scope"],
+  now = new Date(),
+): Promise<BookingWithDetailsResponse[]> {
+  const filters: BookingsFilter =
+    scope === "upcoming"
+      ? {
+          order: "asc",
+          clientId: userId,
+          where: sql`(upper(${bookings.timeRange}) > ${now.toISOString()})`,
+          statuses: ["pending", "confirmed"],
+        }
+      : {
+          order: "desc",
+          clientId: userId,
+          where: sql`(upper(${bookings.timeRange}) <= ${now.toISOString()} OR ${bookings.status} = 'canceled')`,
+        };
+  const res = await findBookingsWithDetails(db, filters);
+  return res.map(mapBookingToContractFormat);
 }

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
-import { currencyCodeSchema } from './common/primitives';
+import { currencyCodeSchema } from "./common/primitives";
 
 export const BOOKING_STATUSES = ["pending", "confirmed", "canceled"] as const;
 export const bookingStatusSchema = z.enum(BOOKING_STATUSES);
@@ -32,16 +32,21 @@ export const bookingResponseSchema = z.object({
   endsAt: instantSchema,
   status: bookingStatusSchema,
   createdAt: instantSchema,
-});
-export type BookingResponse = z.infer<typeof bookingResponseSchema>;
-
-
-export const bookingWithDetailsResponseSchema = bookingResponseSchema.extend({
-  facilityName: z.string().trim(),
-  facilitySlug: z.string().trim(), 
-  serviceName: z.string().trim(),
-  staffMemberName: z.string().trim(),
   priceCents: z.int().nonnegative(),
   currency: currencyCodeSchema,
 });
+export type BookingResponse = z.infer<typeof bookingResponseSchema>;
+
+export const bookingWithDetailsResponseSchema = bookingResponseSchema.extend({
+  facilityName: z.string().trim(),
+  facilitySlug: z.string().trim(),
+  facilityTimezone: z.string().trim(),
+  serviceName: z.string().trim(),
+  staffMemberName: z.string().trim(),
+});
 export type BookingWithDetailsResponse = z.infer<typeof bookingWithDetailsResponseSchema>;
+
+export const myBookingsQuerySchema = z.object({
+  scope: z.literal(["upcoming", "past"]).default("upcoming"),
+});
+export type MyBookingsQuery = z.infer<typeof myBookingsQuerySchema>;
