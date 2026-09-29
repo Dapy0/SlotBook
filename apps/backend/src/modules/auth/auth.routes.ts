@@ -1,4 +1,9 @@
-import { authResponseSchema, loginRequestSchema, registerRequestSchema } from "@slotbook/shared";
+import {
+  authMeResponseSchema,
+  authResponseSchema,
+  loginRequestSchema,
+  registerRequestSchema,
+} from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { authorizeUser, deleteUser, signInUser, signUpUser } from "./auth.service";
 import { setAuthCookie } from "./auth.utils";
@@ -51,14 +56,14 @@ export const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
       onRequest: [fastify.authenticate],
       schema: {
         response: {
-          200: authResponseSchema,
+          200: authMeResponseSchema,
         },
       },
     },
     async (request, response) => {
-      const { user } = await authorizeUser(request.server.drizzle, request.user.id);
+      const res = await authorizeUser(request.server.drizzle, request.user.id);
       response.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-      return response.send({ user: user });
+      return response.send(res);
     },
   );
   fastify.delete(

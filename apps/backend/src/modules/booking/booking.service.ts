@@ -1,6 +1,6 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
-import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
+import { getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import { receiveStaffSchedule } from "../schedule/schedule.service.ts";
 import { getFacilityServiceById } from "../service/service.service.ts";
 import {
@@ -30,6 +30,7 @@ import { findStaffMemberById } from "../staff/staff.repository";
 import { checkTransition, type Actors } from "./booking.status";
 import type { BookingsFilter } from "./booking.schema";
 import { sql } from "drizzle-orm";
+import { assertFacilityOwner } from '../../lib/authz';
 async function resolveBookingActors(
   db: DB,
   booking: BookingEntity,
@@ -58,7 +59,7 @@ export async function getFacilityBookingsForOwner(
   userId: string,
   facilityId: string,
 ): Promise<BookingResponse[]> {
-  await checkFacilityOwnership(db, facilityId, userId);
+  await assertFacilityOwner(db, facilityId, userId);
 
   const facilityBookings = await findBookingsByFacilityId(db, facilityId);
 

@@ -6,7 +6,8 @@ import { services } from "../../db/schema/service.ts";
 import { users } from "../../db/schema/user.ts";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import type { StaffMemberPublicResponse } from "@slotbook/shared";
+import type { StaffMemberPublicResponse, StaffMembership } from "@slotbook/shared";
+import { facilities } from "../../db/schema";
 
 export async function findStaffByFacilityIdPublic(
   db: DB,
@@ -36,6 +37,23 @@ export async function findStaffMemberById(
     .from(staffMembers)
 
     .where(eq(staffMembers.id, staffMemberId));
+  return member ?? null;
+}
+export async function findStaffMemberByUserIdWithFacilityData(
+  db: DB,
+  userId: string,
+): Promise<StaffMembership | null> {
+  const [member] = await db
+    .select({
+      staffMemberId: staffMembers.id,
+      facilityId: facilities.id,
+      facilitySlug: facilities.slug,
+      facilityName: facilities.name,
+      isActive: staffMembers.isActive,
+    })
+    .from(staffMembers)
+    .innerJoin(facilities, eq(facilities.id, staffMembers.facilityId))
+    .where(eq(staffMembers.userId, userId));
   return member ?? null;
 }
 

@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { Suspense, use, useEffect, useState, useTransition } from "react";
 import { setCountry } from "@/app/actions/setCountry";
 import type { Route } from "next";
-import type { CountryOption } from '@/lib/sharedSchemas';
+import type { CountryOption } from "@/lib/sharedSchemas";
 
 type NavButton<M extends string> = VariantProps<typeof buttonVariants> & {
   linkHref: Route<M> | URL;
@@ -54,7 +54,7 @@ export function Header<T extends string>({
   countries?: CountryOption[];
   country?: string;
 }) {
-  const { user, isLoading, logout } = useAuth();
+  const { user, me, isLoading, logout } = useAuth();
   const [isPending, startTransition] = useTransition();
 
   const items = countries
@@ -105,8 +105,8 @@ export function Header<T extends string>({
               </SelectContent>
             </Select>
           )}
-          {!isLoading && user ? (
-            <ProfileMenu user={user} profilePicture={""} onLogout={logout} />
+          {!isLoading && me ? (
+            <ProfileMenu me={me} profilePicture={""} onLogout={logout} />
           ) : (
             rightBtns?.map((btn) => (
               <Button key={btn.linkHref as Route<T>} variant={btn.variant}>

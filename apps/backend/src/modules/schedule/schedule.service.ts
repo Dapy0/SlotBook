@@ -8,7 +8,6 @@ import {
   insertScheduleByStaffId,
 } from "./schedule.repository.ts";
 import type { ScheduleBody } from "./schedule.schema.ts";
-import { checkFacilityOwnership } from "../facility/facility.service.ts";
 import { findStaffMemberById } from "../staff/staff.repository.ts";
 import {
   checkNoOverlapWithinSchedule,
@@ -16,6 +15,7 @@ import {
 } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import type { StaffScheduleEntryResponse } from "@slotbook/shared";
+import { assertFacilityOwner } from '../../lib/authz';
 
 export async function receiveStaffSchedule(
   db: DB,
@@ -40,7 +40,7 @@ export async function changeWeekSchedule(
   staffId: string,
   data: ScheduleBody,
 ): Promise<StaffScheduleEntryResponse[]> {
-  await checkFacilityOwnership(db, facilityID, requestedUserId);
+  await assertFacilityOwner(db, facilityID, requestedUserId);
 
   const facility = await findFacilityById(db, facilityID);
   if (!facility) {

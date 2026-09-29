@@ -8,22 +8,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { UserResponse } from "@slotbook/shared";
+import type { AuthMeResponse, UserResponse } from "@slotbook/shared";
 import { ArrowUp } from "lucide-react";
 import Link from "next/link";
 
 function ProfileMenu({
-  user,
+  me,
   profilePicture = "https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/",
   onLogout,
 }: {
-  user: UserResponse;
+  me: AuthMeResponse;
   profilePicture: string;
   onLogout: () => Promise<void>;
 }) {
   const logOut = () => {
     onLogout();
   };
+  if (me == null) {
+    return <></>;
+  }
   return (
     <div>
       <DropdownMenu>
@@ -32,7 +35,7 @@ function ProfileMenu({
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
                 <AvatarImage src={profilePicture} />
-                <AvatarFallback>{user.name[0].toUpperCase()}</AvatarFallback>
+                <AvatarFallback>{me.user.name[0].toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>
           }
@@ -42,10 +45,16 @@ function ProfileMenu({
             <DropdownMenuItem>
               <Link href={"/account/appointments"}>My bookings</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              {" "}
-              <Link href={"/account/settings"}>Settings</Link>
-            </DropdownMenuItem>
+            {me.ownedFacilities.length > 0 && (
+              <DropdownMenuItem>
+                <Link href={"/dashboard"}> My venues</Link>
+              </DropdownMenuItem>
+            )}
+            {me.staffMembership !== null && (
+              <DropdownMenuItem>
+                <Link href={"/work"}> Staff Panel</Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>

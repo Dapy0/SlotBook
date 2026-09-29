@@ -1,13 +1,14 @@
 import type { CreateServiceRequest, ServiceResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { NotFoundError } from "../../lib/errors.ts";
-import { checkFacilityOwnership, getFacilityByIdOrThrow } from "../facility/facility.service.ts";
+import { getFacilityByIdOrThrow } from "../facility/facility.service.ts";
 import {
   getServiceByFacilityIdAndServiceId,
   getServiceByServiceIdAndStaffMemberId,
   getServicesByFacilityId,
   insertService,
 } from "./service.repository.ts";
+import { assertFacilityOwner } from '../../lib/authz';
 
 export async function getFacilityServicesById(
   db: DB,
@@ -47,7 +48,7 @@ export async function createServiceByFacilityId(
   facilityId: string,
   userId: string,
 ): Promise<Omit<ServiceResponse, "currency">> {
-  await checkFacilityOwnership(db, facilityId, userId);
+  await assertFacilityOwner(db, facilityId, userId);
 
   const newServiceData = {
     ...data,

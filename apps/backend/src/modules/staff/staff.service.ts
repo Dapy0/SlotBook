@@ -2,7 +2,6 @@ import type { StaffMemberResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { ConflictError, NotFoundError } from "../../lib/errors.ts";
 import { findUserByEmail } from "../auth/auth.repository.ts";
-import { checkFacilityOwnership } from "../facility/facility.service.ts";
 import {
   findServiceByServiceIdAndMemberId,
   findStaffMemberById,
@@ -10,6 +9,7 @@ import {
 } from "./staff.repository.ts";
 import type { StaffBody } from "./staff.schema.ts";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
+import { assertFacilityOwner } from "../../lib/authz";
 
 export async function addNewStaffMembersToFacilityById(
   db: DB,
@@ -17,7 +17,7 @@ export async function addNewStaffMembersToFacilityById(
   facilityId: string,
   userId: string,
 ): Promise<StaffMemberResponse> {
-  await checkFacilityOwnership(db, facilityId, userId);
+  await assertFacilityOwner(db, facilityId, userId);
   const user = await findUserByEmail(db, data.email);
 
   if (!user) {

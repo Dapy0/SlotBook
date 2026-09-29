@@ -9,8 +9,10 @@ import {
 } from "./auth.repository.ts";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../lib/errors.ts";
 import type { FastifyInstance } from "fastify";
-import type { AuthResponse, LoginRequest, RegisterRequest } from "@slotbook/shared";
+import type { AuthMeResponse, AuthResponse, LoginRequest, RegisterRequest } from "@slotbook/shared";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
+import { findFacilitiesByOwnerId } from "../facility/facility.repository";
+import { findStaffMemberByUserIdWithFacilityData } from "../staff/staff.repository";
 
 type JWT = FastifyInstance["jwt"];
 export async function signUpUser(
@@ -63,16 +65,21 @@ export async function signInUser(
     token,
   };
 }
-export async function authorizeUser(db: DB, userId: string): Promise<AuthResponse> {
+export async function authorizeUser(db: DB, userId: string): Promise<AuthMeResponse> {
   const user = await findUserById(db, userId);
-
   if (!user) {
     throw new NotFoundError("User Not Found");
   }
+  const [ownedFacilities, staffMembership] = await Promise.all([
+    findFacilitiesByOwnerId(db, user.id),
+    findStaffMemberByUserIdWithFacilityData(db, user.id),
+  ]);
 
   const { passwordHash: _, deletedAt: __, ...newUser } = user;
   return {
     user: newUser,
+    ownedFacilities,
+    staffMembership,
   };
 }
 export async function deleteUser(db: DB, userId: string) {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FastifyInstance } from "fastify";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import "@fastify/jwt";

@@ -15,7 +15,7 @@ import {
   deleteFacilityById,
   findFacilityBySlug,
 } from "./facility.repository.ts";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
+import { ConflictError, NotFoundError } from "../../lib/errors.ts";
 import {
   deleteFacilityScheduleByFacilityId,
   findFacilitySchedule,
@@ -25,6 +25,7 @@ import {
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
+import { assertFacilityOwner } from '../../lib/authz';
 export async function getFacilityBySlugOrThrow(
   db: DB,
   facilityId: string,
@@ -42,18 +43,7 @@ export async function getFacilityByIdOrThrow(
   return facility;
 }
 
-export async function checkFacilityOwnership(
-  db: DB,
-  facilityId: string,
-  userId: string,
-): Promise<FacilityResponse> {
-  const facility = await getFacilityByIdOrThrow(db, facilityId);
 
-  if (userId !== facility.ownerId) {
-    throw new ForbiddenError("Not owned facility");
-  }
-  return facility;
-}
 export async function getAllPublicFacilities(
   db: DB,
   query: FacilityListQuery,
@@ -88,7 +78,7 @@ export async function updateOwnedFacility(
   userId: string,
   data: UpdateFacilityRequest,
 ): Promise<FacilityResponse> {
-  await checkFacilityOwnership(db, facilityId, userId);
+  await assertFacilityOwner(db, facilityId, userId);
 
   const updatedFacility = await updateFacilityById(db, facilityId, data);
 
@@ -103,7 +93,7 @@ export async function removeOwnedFacilityById(
   facilityId: string,
   userId: string,
 ): Promise<FacilityResponse> {
-  await checkFacilityOwnership(db, facilityId, userId);
+  await assertFacilityOwner(db, facilityId, userId);
 
   const deletedFacility = await deleteFacilityById(db, facilityId);
   if (!deletedFacility) {
@@ -137,7 +127,7 @@ export async function changeFacilityWeekSchedule(
   requestedUserId: string,
   newSchedule: ChangeWeekScheduleRequest,
 ): Promise<FacilityScheduleEntryResponse[]> {
-  await checkFacilityOwnership(db, facilityId, requestedUserId);
+  await assertFacilityOwner(db, facilityId, requestedUserId);
 
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
