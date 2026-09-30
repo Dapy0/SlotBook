@@ -2,11 +2,13 @@ import { paramsPatchSchema, paramsSchema } from "./booking.schema.ts";
 
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import {
+  bookingQuerySchema,
   bookingResponseSchema,
   bookingWithDetailsResponseSchema,
   changeBookingStatusRequestSchema,
   createBookingRequestSchema,
   createReviewRequestSchema,
+  facilityBookingResponseSchema,
   myBookingsQuerySchema,
 } from "@slotbook/shared";
 import {
@@ -25,8 +27,9 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
       onRequest: [fastify.authenticate],
       schema: {
         params: paramsSchema,
+        querystring: bookingQuerySchema,
         response: {
-          200: bookingResponseSchema.array(),
+          200: facilityBookingResponseSchema.array(),
         },
       },
     },
@@ -35,6 +38,7 @@ export const bookingRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.server.drizzle,
         request.user.id,
         request.params.id,
+        request.query,
       );
       return response.send(bookings);
     },

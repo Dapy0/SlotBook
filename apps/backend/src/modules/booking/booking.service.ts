@@ -9,7 +9,6 @@ import {
 } from "../staff/staff.service.ts";
 import {
   findBookingById,
-  findBookingsByFacilityId,
   findBookingsWithDetails,
   findBusyRangesForStaff,
   insertBooking,
@@ -17,20 +16,23 @@ import {
 } from "./booking.repository.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import type {
+  BookingQuery,
   BookingResponse,
   BookingWithDetailsResponse,
   CreateBookingRequest,
+  FacilityBookingResponse,
   MyBookingsQuery,
 } from "@slotbook/shared";
 import { bookings, type BookingEntity } from "../../db/schema";
 import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { findFacilityById } from "../facility/facility.repository";
 import { findStaffMemberById } from "../staff/staff.repository";
 import { checkTransition, type Actors } from "./booking.status";
 import type { BookingsFilter } from "./booking.schema";
 import { sql } from "drizzle-orm";
-import { assertFacilityOwner } from '../../lib/authz';
+import { assertFacilityOwner } from "../../lib/authz";
+import { addDaysToIso } from "../../lib/utils";
 async function resolveBookingActors(
   db: DB,
   booking: BookingEntity,
@@ -58,13 +60,31 @@ export async function getFacilityBookingsForOwner(
   db: DB,
   userId: string,
   facilityId: string,
-): Promise<BookingResponse[]> {
-  await assertFacilityOwner(db, facilityId, userId);
+  filters: BookingQuery,
+  now = new Date(),
+): Promise<FacilityBookingResponse[]> {
+  const facility = await assertFacilityOwner(db, facilityId, userId);
 
-  const facilityBookings = await findBookingsByFacilityId(db, facilityId);
+  const startDate = filters.from
+    ? fromZonedTime(`${filters.from}T00:00:00`, facility.timezone)
+    : fromZonedTime(now, facility.timezone);
+
+  const isoDate = now.toISOString().slice(0, 10);
+ 
+  const endDate = filters.to
+    ? fromZonedTime(`${filters.to}T23:59:59`, facility.timezone)
+    : fromZonedTime(addDaysToIso(isoDate, 6), facility.timezone);
+  if (endDate < startDate) {
+    throw new BadRequestError("To is before from ");
+  }
+  const facilityBookings = await findBookingsWithDetails(db, {
+    order: "asc",
+    facilityId: facilityId,
+    staffMemberId: filters.staffMemberId,
+    statuses: filters.status !== undefined ? [filters.status] : undefined,
+  });
 
   return facilityBookings.map(mapBookingToContractFormat);
-;
 }
 export async function createBookingForFacility(
   db: DB,

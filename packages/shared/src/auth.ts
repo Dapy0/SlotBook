@@ -29,7 +29,9 @@ const ownedFacility = facilityResponseSchema.pick({
   id: true,
   slug: true,
   name: true,
+  timezone: true,
   isPublished: true,
+  currency: true,
 });
 const staffMembershipSchema = z.object({
   staffMemberId: z.uuid(),

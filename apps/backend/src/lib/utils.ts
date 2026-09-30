@@ -12,6 +12,7 @@ export function getLocalWallTime(date: Date, timeZone: string): string {
   }).format(date);
 }
 export function addDaysToIso(isoDate: string, amount: number): string {
+
   const [year, month, day] = isoDate.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day + amount)).toISOString().slice(0, 10);
 }

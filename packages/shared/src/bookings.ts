@@ -46,6 +46,18 @@ export const bookingWithDetailsResponseSchema = bookingResponseSchema.extend({
 });
 export type BookingWithDetailsResponse = z.infer<typeof bookingWithDetailsResponseSchema>;
 
+export const facilityBookingResponseSchema = bookingWithDetailsResponseSchema.extend({
+  client: z.object({ clientName: z.string().trim(), clientEmail: z.email() }),
+});
+
+export type FacilityBookingResponse = z.infer<typeof facilityBookingResponseSchema>;
+export const bookingQuerySchema = z.object({
+  from: z.iso.date().optional(),
+  to: z.iso.date().optional(),
+  status: bookingStatusSchema.optional(),
+  staffMemberId: z.uuid().optional(),
+});
+export type BookingQuery = z.infer<typeof bookingQuerySchema>;
 export const myBookingsQuerySchema = z.object({
   scope: z.literal(["upcoming", "past"]).default("upcoming"),
 });

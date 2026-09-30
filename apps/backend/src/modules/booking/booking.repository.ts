@@ -108,7 +108,7 @@ type BookingEntityWithDetails = BookingEntity & {
   facilityTimezone: string;
   serviceName: string;
   staffMemberName: string;
-  clientName: string;
+  client: { clientName: string; clientEmail: string };
 };
 const clientUser = alias(users, "client_user");
 const staffUser = alias(users, "staff_user");
@@ -135,7 +135,10 @@ export async function findBookingsWithDetails(
       facilityTimezone: facilities.timezone,
       serviceName: services.name,
       staffMemberName: staffUser.name,
-      clientName: clientUser.name,
+      client: {
+        clientName: clientUser.name,
+        clientEmail: clientUser.email,
+      },
       ...getColumns(bookings),
     })
     .from(bookings)
