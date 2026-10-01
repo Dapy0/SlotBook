@@ -36,7 +36,8 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
 
   const time = `${formatInTimeZone(startsAt, timeZone, "HH:mm")}–${formatInTimeZone(endsAt, timeZone, "HH:mm")}`;
 
-  const isChangeable = TRANSITIONS[status]["confirmed"] || TRANSITIONS[status]["canceled"];
+  const isChangeable =
+    (TRANSITIONS[status]["confirmed"] || TRANSITIONS[status]["canceled"]) && startsAt > new Date();
 
   return (
     <div
