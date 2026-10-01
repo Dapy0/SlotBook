@@ -802,12 +802,14 @@ async function seed() {
     await pool.end();
   }
 
+  // eslint-disable-next-line no-console
   console.log(
     `Seeded: ${data.userRows.length} users, ${FACILITIES.length} facilities, ` +
       `${data.serviceRows.length} services, ${data.staffMemberRows.length} staff, ` +
       `${data.staffScheduleRows.length} staff schedule rows, ${data.bookingRows.length} bookings, ` +
       `${data.reviewRows.length} reviews`,
   );
+  // eslint-disable-next-line no-console
   console.table([
     { role: "owner", email: "owner@slotbook.test" },
     { role: "owner (Brooklyn)", email: "owner2@slotbook.test" },
@@ -817,6 +819,7 @@ async function seed() {
     { role: "staff (split)", email: "staff2@slotbook.test" },
     { role: "staff (no schedule)", email: "staff3@slotbook.test" },
   ]);
+  // eslint-disable-next-line no-console
   console.log(`Password for all: ${PASSWORD}`);
 }
 
