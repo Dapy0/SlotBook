@@ -156,3 +156,14 @@ export async function findBookingsWithDetails(
   }
   return await query;
 }
+
+export async function expireUnconfirmedBookings(db: DB, now: Date): Promise<number> {
+  const res = await db
+    .update(bookings)
+    .set({ status: "canceled" })
+    .where(
+      and(eq(bookings.status, "pending"), sql`lower(${bookings.timeRange})<= ${now.toISOString()}`),
+    )
+    .returning({ id: bookings.id });
+  return res.length;
+}
