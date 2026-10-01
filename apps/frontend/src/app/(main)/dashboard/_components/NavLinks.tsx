@@ -20,8 +20,7 @@ export function NavLinks({ items, orientation = "vertical" }: Props) {
   return (
     <nav className={orientation === "vertical" ? "flex flex-col gap-1" : "flex gap-1 border-b"}>
       {items.map((item) => {
-        console.log(pathname, item);
-        const isActive = item.exact ? pathname === item.href : pathname.includes(item.href);
+        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
 
         return (
           <Link

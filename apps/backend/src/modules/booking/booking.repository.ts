@@ -154,6 +154,5 @@ export async function findBookingsWithDetails(
   if (filter.limit !== undefined) {
     query.limit(filter.limit);
   }
-  console.log(query.toSQL());
   return await query;
 }

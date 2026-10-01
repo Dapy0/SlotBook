@@ -1,19 +1,13 @@
-import {
-  type BookingStatus,
-  type BookingWithDetailsResponse,
-} from "@slotbook/shared";
+import { type BookingStatus } from "@slotbook/shared";
 import type { SQL } from "drizzle-orm";
 import z from "zod";
 
 export const paramsSchema = z.object({
-  id: z.string().nonempty(),
+  id: z.uuid().nonempty(),
 });
-export type FacilityBookingResponse = BookingWithDetailsResponse & {
-  client: { name: string; email: string };
-};
 
 export const paramsPatchSchema = z.object({
-  bookingId: z.string().nonempty(),
+  bookingId: z.uuid().nonempty(),
 });
 
 export type BookingsFilter = {

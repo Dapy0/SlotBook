@@ -25,14 +25,15 @@ import type {
 } from "@slotbook/shared";
 import { bookings, type BookingEntity } from "../../db/schema";
 import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 import { findFacilityById } from "../facility/facility.repository";
 import { findStaffMemberById } from "../staff/staff.repository";
 import { checkTransition, type Actors } from "./booking.status";
 import type { BookingsFilter } from "./booking.schema";
 import { sql } from "drizzle-orm";
 import { assertFacilityOwner } from "../../lib/authz";
-import { addDaysToIso } from "../../lib/utils";
+import { addDaysToIso, todayInTimeZone } from "../../lib/utils";
+import { getPgErrorCode, PG } from "../../lib/pgErrors";
 async function resolveBookingActors(
   db: DB,
   booking: BookingEntity,
@@ -65,23 +66,22 @@ export async function getFacilityBookingsForOwner(
 ): Promise<FacilityBookingResponse[]> {
   const facility = await assertFacilityOwner(db, facilityId, userId);
 
-  const startDate = filters.from
-    ? fromZonedTime(`${filters.from}T00:00:00`, facility.timezone)
-    : fromZonedTime(now, facility.timezone);
-
-  const isoDate = now.toISOString().slice(0, 10);
- 
-  const endDate = filters.to
-    ? fromZonedTime(`${filters.to}T23:59:59`, facility.timezone)
-    : fromZonedTime(addDaysToIso(isoDate, 6), facility.timezone);
-  if (endDate < startDate) {
-    throw new BadRequestError("To is before from ");
+  const from = filters.from ?? todayInTimeZone(facility.timezone, now);
+  const to = filters.to ?? addDaysToIso(from, 6);
+  if (from > to) {
+    throw new BadRequestError("`to` must not be before `from`");
   }
+  const overlaps = {
+    from: dayBounds(from, facility.timezone).start,
+    to: dayBounds(to, facility.timezone).end,
+  };
+
   const facilityBookings = await findBookingsWithDetails(db, {
     order: "asc",
     facilityId: facilityId,
     staffMemberId: filters.staffMemberId,
-    statuses: filters.status !== undefined ? [filters.status] : undefined,
+    statuses: filters.status ? [filters.status] : undefined,
+    overlaps,
   });
 
   return facilityBookings.map(mapBookingToContractFormat);
@@ -138,7 +138,7 @@ export async function createBookingForFacility(
     priceCents: service.priceCents,
     currency: facility.currency,
   }).catch((e: unknown) => {
-    if (e) {
+    if (getPgErrorCode(e) === PG.EXCLUSION) {
       throw new ConflictError("This time slot is already booked");
     }
     throw e;

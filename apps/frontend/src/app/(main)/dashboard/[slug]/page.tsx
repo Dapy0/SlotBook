@@ -5,7 +5,7 @@ import type { FacilityBookingResponse } from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
 import { formatDateToTimezone, formatTimeToTimezone, moneyFormatter } from "../../../../lib/format";
-import { todayInTimeZone } from "../../../../../../backend/src/lib/utils";
+import { formatInTimeZone } from "date-fns-tz";
 
 export default async function FacilityOverviewPage({
   params,
@@ -15,18 +15,20 @@ export default async function FacilityOverviewPage({
   const { slug } = await params;
   const userAuth = await getMe();
   const facility = userAuth?.ownedFacilities.find((facility) => facility.slug == slug)!;
+  const today = formatInTimeZone(new Date(), facility.timezone, "yyyy-MM-dd");
 
   const [todayBookings, pendingBookings] = await Promise.all([
     getFacilityBookings(facility.id, {
-      to: todayInTimeZone(facility.timezone),
+      from: today,
+      to: today,
     }),
     getFacilityBookings(facility.id, {
+      from: today,
       status: "pending",
     }),
   ]);
   const todayConfirmed = todayBookings.filter((booking) => booking.status == "confirmed");
   const todayAllRevenue = todayConfirmed.reduce((prev, curr) => prev + curr.priceCents, 0);
-  // TODO 6: посчитать карточки из этих данных
   const stats = [
     { label: "Today", value: todayBookings.length, hint: "bookings" },
     { label: "Pending", value: pendingBookings.length, hint: "need confirmation" },
@@ -63,7 +65,6 @@ export default async function FacilityOverviewPage({
             </Link>
           </div>
           <div className="divide-y rounded-lg border border-amber-200 bg-white">
-           
             {pendingBookings.map((b) => (
               <BookingRow key={b.id} booking={b} timeZone={facility.timezone} />
             ))}
