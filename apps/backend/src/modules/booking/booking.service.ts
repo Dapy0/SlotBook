@@ -15,20 +15,21 @@ import {
   updateBookingStatusIfCurrent,
 } from "./booking.repository.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type {
-  BookingQuery,
-  BookingResponse,
-  BookingWithDetailsResponse,
-  CreateBookingRequest,
-  FacilityBookingResponse,
-  MyBookingsQuery,
+import {
+  checkTransition,
+  type Actors,
+  type BookingQuery,
+  type BookingResponse,
+  type BookingWithDetailsResponse,
+  type CreateBookingRequest,
+  type FacilityBookingResponse,
+  type MyBookingsQuery,
 } from "@slotbook/shared";
 import { bookings, type BookingEntity } from "../../db/schema";
 import { computeDaySlots, dayBounds, getBookingWindow } from "../availability/slotEngine";
 import { formatInTimeZone } from "date-fns-tz";
 import { findFacilityById } from "../facility/facility.repository";
 import { findStaffMemberById } from "../staff/staff.repository";
-import { checkTransition, type Actors } from "./booking.status";
 import type { BookingsFilter } from "./booking.schema";
 import { sql } from "drizzle-orm";
 import { assertFacilityOwner } from "../../lib/authz";

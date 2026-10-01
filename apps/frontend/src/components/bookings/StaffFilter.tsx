@@ -1,9 +1,19 @@
 "use client";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { convertToSelectFormat } from "@/lib/utils";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
   staff: { id: string; name: string }[];
-  value: string | null; // выбранный мастер из URL
+  value: string | null;
 };
 
 export function StaffFilter({ staff, value }: Props) {
@@ -11,23 +21,29 @@ export function StaffFilter({ staff, value }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  function onChange(staffId: string) {
-    // TODO 3: скопировать текущие searchParams, поставить или удалить "staff",
-    //         router.push(`${pathname}?${params}`)
+  function onChange(staffId: string | null) {
+    const params = new URLSearchParams(searchParams);
+    if (staffId) params.set("staff", staffId);
+    else params.delete("staff");
+    const qs = params.toString();
+    router.push(qs ? (`${pathname}?${qs}` as Route) : (pathname as Route));
   }
-
+  const formatted = convertToSelectFormat(staff, "name", "id");
   return (
-    <select
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-9 rounded-md border bg-white px-3 text-sm"
-    >
-      <option value="">All staff</option>
-      {staff.map((s) => (
-        <option key={s.id} value={s.id}>
-          {s.name}
-        </option>
-      ))}
-    </select>
+    <Select value={value ?? ""} onValueChange={(e) => onChange(e)} items={formatted}>
+      <SelectTrigger className="h-9 rounded-md border bg-white px-3 text-sm">
+        <SelectValue placeholder="Staff Name" />
+      </SelectTrigger>
+      <SelectContent alignItemWithTrigger={false}>
+        <SelectGroup>
+          <SelectItem value={null}>All staff</SelectItem>
+          {formatted.map((s) => (
+            <SelectItem key={s.value} value={s.value}>
+              {s.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 }

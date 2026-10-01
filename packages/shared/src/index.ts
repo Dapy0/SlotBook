@@ -12,3 +12,4 @@ export * from "./availability";
 export * from "./reviews";
 export * from "./errors";
 export * from "./geo";
+export * from "./utils/dates";

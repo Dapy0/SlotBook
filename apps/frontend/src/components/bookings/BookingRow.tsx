@@ -1,7 +1,13 @@
 import { formatInTimeZone } from "date-fns-tz";
-import type { BookingStatus, FacilityBookingResponse } from "@slotbook/shared";
+import {
+  checkTransition,
+  TRANSITIONS,
+  type BookingStatus,
+  type FacilityBookingResponse,
+} from "@slotbook/shared";
 import { Badge } from "@/components/ui/badge";
 import { moneyFormatter } from "@/lib/format";
+import { BookingActions } from "@/components/bookings/BookingActions";
 
 const STATUS: Record<BookingStatus, { label: string; className: string }> = {
   pending: { label: "Pending", className: "border-amber-200 bg-amber-50 text-amber-700" },
@@ -30,8 +36,7 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
 
   const time = `${formatInTimeZone(startsAt, timeZone, "HH:mm")}–${formatInTimeZone(endsAt, timeZone, "HH:mm")}`;
 
-  // TODO 1: можно ли ещё менять статус? (см. правило из S2)
-  const isChangeable = false;
+  const isChangeable = TRANSITIONS[status]["confirmed"] || TRANSITIONS[status]["canceled"];
 
   return (
     <div
@@ -61,7 +66,7 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
         <Badge variant="outline" className={STATUS[status].className}>
           {STATUS[status].label}
         </Badge>
-        {/* {isChangeable && <BookingActions bookingId={id} status={status} />} */}
+        {isChangeable && <BookingActions bookingId={id} status={status} />}
       </div>
     </div>
   );
