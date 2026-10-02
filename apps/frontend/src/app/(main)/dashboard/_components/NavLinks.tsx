@@ -19,8 +19,9 @@ export function NavLinks({ items, orientation = "vertical" }: Props) {
   return (
     <nav className={orientation === "vertical" ? "flex flex-col gap-1" : "flex gap-1 border-b"}>
       {items.map((item) => {
-        const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-
+       const isActive = item.exact
+         ? pathname === item.href
+         : pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}
