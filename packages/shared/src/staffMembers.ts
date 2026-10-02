@@ -1,14 +1,13 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
+import { weekdaySchema, type StaffScheduleEntryResponse } from "./schedule";
+import { emailInputSchema } from "./common/primitives";
 
 // Request
 
-export const createStaffMemberSchema = z.object({
-  userId: z.uuid(),
-  isActive: z.boolean().default(true),
-});
+export const addStaffMemberRequestSchema = z.object({ email: emailInputSchema });
 
-export type CreateStaffMemberRequest = z.infer<typeof createStaffMemberSchema>;
+export type CreateStaffMemberRequest = z.infer<typeof addStaffMemberRequestSchema>;
 export const updateStaffMemberRequestSchema = z.object({ isActive: z.boolean() });
 export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberRequestSchema>;
 
@@ -31,3 +30,20 @@ export const staffMemberPublicResponseSchema = z.object({
   reviewsCount: z.int().nonnegative(),
 });
 export type StaffMemberPublicResponse = z.infer<typeof staffMemberPublicResponseSchema>;
+
+//
+
+export const managedStaffMemberResponseSchema = staffMemberResponseSchema.extend({
+  userId: z.uuid(),
+  name: z.string().trim(),
+  email: z.email(),
+  serviceIds: z.array(z.uuid()),
+  workDays: weekdaySchema.array(),
+});
+
+export type ManagedStaffMemberResponse = z.infer<typeof managedStaffMemberResponseSchema>;
+
+export type StaffMemberDetailsResponse = ManagedStaffMemberResponse & {
+  schedule: StaffScheduleEntryResponse[];
+};
+export const staffMemberParamsSchema = z.object({ id: z.uuid(), staffId: z.uuid() });
