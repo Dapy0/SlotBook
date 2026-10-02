@@ -1,8 +1,7 @@
-
-import { CancelBookingButton } from '@/app/(main)/account/appointments/_components/CancelBookingButton';
+import { CancelBookingButton } from "@/app/(main)/account/appointments/_components/CancelBookingButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDateToTimezone, formatTimeToTimezone, moneyFormatter } from "@/lib/format";
+import { formatDateToTimezone, formatTimeToTimezone, moneyFormatterFromCents } from "@/lib/format";
 import type { BookingStatus, BookingWithDetailsResponse } from "@slotbook/shared";
 import Link from "next/link";
 const STATUS: Record<BookingStatus, { label: string; className: string }> = {
@@ -59,7 +58,7 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
 
       <div className="flex shrink-0 items-center gap-3">
         <span className="text-md font-bold whitespace-nowrap">
-          {moneyFormatter(priceCents, currency)}
+          {moneyFormatterFromCents(priceCents, currency)}
         </span>
         <Badge variant="outline" className={badge.className}>
           {badge.label}

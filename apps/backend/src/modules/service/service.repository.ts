@@ -1,8 +1,9 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { eq, and, getColumns, inArray, sql } from "drizzle-orm";
+import { eq, and, getColumns, inArray, sql, type SQL } from "drizzle-orm";
 import { services, type NewServiceEntity, type ServiceEntity } from "../../db/schema/service.ts";
 import { facilities } from "../../db/schema/facility.ts";
 import { staffServices } from "../../db/schema/staffService.ts";
+import type { UpdateServiceRequest } from "@slotbook/shared";
 export type ServiceWithCurrency = ServiceEntity & {
   currency: string;
 };
@@ -10,12 +11,13 @@ export type ServiceWithCurrency = ServiceEntity & {
 export async function getServicesByFacilityId(
   db: DB,
   facilityId: string,
+  where?: SQL,
 ): Promise<ServiceWithCurrency[]> {
   return db
     .select({ ...getColumns(services), currency: facilities.currency })
     .from(services)
     .innerJoin(facilities, eq(facilities.id, services.facilityId))
-    .where(eq(services.facilityId, facilityId));
+    .where(and(eq(services.facilityId, facilityId), where));
 }
 export async function getServiceByServiceIdAndStaffMemberId(
   db: DB,
@@ -107,6 +109,25 @@ export async function insertService(db: DB, data: NewServiceEntity): Promise<Ser
 
   if (!service) {
     throw new Error("Failed to insert service");
+  }
+
+  return service;
+}
+export async function updateServiceById(
+  db: DB,
+  serviceId: string,
+  data: UpdateServiceRequest,
+): Promise<ServiceEntity> {
+  const [service] = await db
+    .update(services)
+    .set({
+      ...data,
+    })
+    .where(eq(services.id, serviceId))
+    .returning();
+
+  if (!service) {
+    throw new Error("Failed to update service");
   }
 
   return service;

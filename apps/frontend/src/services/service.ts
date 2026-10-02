@@ -2,21 +2,34 @@ import { api } from "@/lib/api";
 import {
   serviceResponseSchema,
   type CreateServiceRequest,
+  type UpdateServiceRequest,
 } from "@slotbook/shared";
 
 export async function getServicesByFacilityId(id: string) {
   return await api(`/facilities/${id}/services`, serviceResponseSchema.array());
 }
 export async function getServiceByFacilityIdServiceId(facilityId: string, serviceId: string) {
-
-  return await api(
-    `/facilities/${facilityId}/services/${serviceId}`,
-    serviceResponseSchema
-  );
+  return await api(`/facilities/${facilityId}/services/${serviceId}`, serviceResponseSchema);
 }
 export async function createService(facilityId: string, payload: CreateServiceRequest) {
   return await api(`/facilities/${facilityId}/services`, serviceResponseSchema, {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function updateService(
+  facilityId: string,
+  serviceId: string,
+  payload: UpdateServiceRequest,
+) {
+  return await api(`/facilities/${facilityId}/services/${serviceId}`, serviceResponseSchema, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+export async function deleteService(facilityId: string, serviceId: string) {
+  return await api(`/facilities/${facilityId}/services/${serviceId}`, serviceResponseSchema, {
+    method: "DELETE",
   });
 }

@@ -1,10 +1,11 @@
 import { BookingRow } from "@/components/bookings/BookingRow";
 import { getMe } from "@/lib/session";
 import { getFacilityBookings } from "@/services/booking.server";
-import type { FacilityBookingResponse } from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
-import { formatDateToTimezone, formatTimeToTimezone, moneyFormatter } from "../../../../lib/format";
+import {
+  moneyFormatterFromCents,
+} from "../../../../lib/format";
 import { formatInTimeZone } from "date-fns-tz";
 
 export default async function FacilityOverviewPage({
@@ -34,7 +35,7 @@ export default async function FacilityOverviewPage({
     { label: "Pending", value: pendingBookings.length, hint: "need confirmation" },
     {
       label: "Today's revenue",
-      value: moneyFormatter(todayAllRevenue, facility.currency),
+      value: moneyFormatterFromCents(todayAllRevenue, facility.currency),
       hint: "confirmed only",
     },
   ];

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api";
-import { durationFormatter, moneyFormatter } from "@/lib/format";
+import { durationFormatter, moneyFormatterFromCents } from "@/lib/format";
 import { convertMinutesToTime, convertToSelectFormat, isoStringToWallTime } from "@/lib/utils";
 import { getAvailability } from "@/services/availability";
 import { createBooking } from "@/services/booking";
@@ -84,7 +84,6 @@ function BookForm({
   const slots = availability?.key === requestKey ? availability.data : null;
   const isLoadingSlots = requestKey !== null && slots === null;
   const selectedDaySlots = slots?.days.find((d) => d.date === selection.date);
-  console.log(selectedDaySlots);
   const hasAnySlots = slots?.days.some((d) => d.slots.length > 0) ?? false;
   const selectedServiceData = services.find((s) => s.id === selection.service);
   useEffect(() => {
@@ -348,7 +347,10 @@ function BookForm({
             }
             price={
               selectedServiceData
-                ? moneyFormatter(selectedServiceData.priceCents, selectedServiceData.currency)
+                ? moneyFormatterFromCents(
+                    selectedServiceData.priceCents,
+                    selectedServiceData.currency,
+                  )
                 : "-"
             }
             onConfirm={handleConfirm}

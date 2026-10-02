@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
-import { currencyCodeSchema } from './common/primitives';
+import { currencyCodeSchema } from "./common/primitives";
 
 const serviceBaseSchema = z.object({
   name: z.string().trim().min(2).max(255),
@@ -10,7 +10,9 @@ const serviceBaseSchema = z.object({
   durationMinutes: z
     .int()
     .positive()
-    .max(24 * 60),
+    .min(5)
+    .max(10 * 60)
+    .multipleOf(5, "Duration must be a multiple of 5 minutes"),
   priceCents: z.int().nonnegative(),
   isActive: z.boolean(),
 });
@@ -24,6 +26,7 @@ export type CreateServiceRequest = z.infer<typeof createServiceRequestSchema>;
 export const updateServiceRequestSchema = serviceBaseSchema
   .partial()
   .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
+
 export type UpdateServiceRequest = z.infer<typeof updateServiceRequestSchema>;
 
 // Response

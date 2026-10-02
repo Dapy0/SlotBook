@@ -5,6 +5,5 @@ import { availabilityResponseSchema } from "@slotbook/shared";
 
 export async function getAvailability(id: string, { staffId, serviceId }: AvailabilityQuery) {
   const query = createParams({ staffId, serviceId });
-  console.log(query)
   return await api(`/facilities/${id}/availability?${query}`, availabilityResponseSchema);
 }

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { durationFormatter, moneyFormatter } from "@/lib/format";
-import { convertMinutesToTime } from '@/lib/utils';
+import { durationFormatter, moneyFormatterFromCents } from "@/lib/format";
+import { convertMinutesToTime } from "@/lib/utils";
 import type { ServiceResponse } from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
@@ -16,7 +16,13 @@ function groupByCategory(
   );
 }
 
-export default function ServicesList({ services, query = "" }: { services: ServiceResponse[]; query?: string }) {
+export default function ServicesList({
+  services,
+  query = "",
+}: {
+  services: ServiceResponse[];
+  query?: string;
+}) {
   const pathname = usePathname();
   const prettifyItems = groupByCategory(services);
   const q = query.trim().toLowerCase();
@@ -69,7 +75,7 @@ export default function ServicesList({ services, query = "" }: { services: Servi
 
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-semibold text-gray-900">
-                        {moneyFormatter(service.priceCents, service.currency)}
+                        {moneyFormatterFromCents(service.priceCents, service.currency)}
                       </span>
                       <Link href={`${pathname}/book?${query}` as Route}>
                         <Button>Book</Button>

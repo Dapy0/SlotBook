@@ -6,7 +6,7 @@ import {
   type FacilityBookingResponse,
 } from "@slotbook/shared";
 import { Badge } from "@/components/ui/badge";
-import { moneyFormatter } from "@/lib/format";
+import { moneyFormatterFromCents } from "@/lib/format";
 import { BookingActions } from "@/components/bookings/BookingActions";
 
 const STATUS: Record<BookingStatus, { label: string; className: string }> = {
@@ -62,7 +62,7 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
 
       <div className="flex items-center gap-3 sm:justify-end">
         <span className="text-sm font-semibold whitespace-nowrap">
-          {moneyFormatter(priceCents, currency)}
+          {moneyFormatterFromCents(priceCents, currency)}
         </span>
         <Badge variant="outline" className={STATUS[status].className}>
           {STATUS[status].label}

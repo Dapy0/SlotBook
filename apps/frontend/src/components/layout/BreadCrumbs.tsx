@@ -28,7 +28,6 @@ function constructCrumbsList(path: string): { name: string; link: string }[] {
     }
     res.push({ name: formatSlug(split[i]), link: `${res[i - 1].link}/${split[i]}` });
   }
-  console.log(res);
   return res;
 }
 function BreadCrumbs() {

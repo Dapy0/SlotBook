@@ -1,7 +1,7 @@
 import ScoreBadge from "@/components/layout/ScoreBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { durationFormatter, moneyFormatter } from "@/lib/format";
+import { durationFormatter, moneyFormatterFromCents } from "@/lib/format";
 import { createParams } from "@/lib/queryStrings";
 import { convertMinutesToTime } from "@/lib/utils";
 import type { FacilityWithServicesResponse } from "@slotbook/shared";
@@ -77,7 +77,7 @@ function BigFacilityPreviewCard({
                 </span>
               </span>
               <span className="text-sm font-bold">
-                {moneyFormatter(service.priceCents, service.currency)}
+                {moneyFormatterFromCents(service.priceCents, service.currency)}
               </span>
             </Button>
           </Link>

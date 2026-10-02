@@ -13,6 +13,27 @@ export function getCookie(name: string) {
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()!.split(";").shift() || undefined;
 }
+function currencyDigits(currency: string) {
+  return (
+    new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions()
+      .maximumFractionDigits ?? 2
+  );
+}
+
+export function fromCents(cents: number, currency: string): string {
+  const digits = currencyDigits(currency);
+  return (cents / 10 ** digits).toFixed(digits);
+}
+export function toCents(input: string, currency: string): number {
+  const trimmed = input.trim().replace(",", ".");
+  if (trimmed === "") return NaN;
+  const value = Number(trimmed);
+  if (!Number.isFinite(value)) return NaN;
+  const digits =
+    new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions()
+      .maximumFractionDigits ?? 2;
+  return Math.round(value * 10 ** digits);
+}
 
 export function getMapLink(address: string, lat: number, lng: number) {
   if (lat && lng) {

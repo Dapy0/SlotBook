@@ -16,11 +16,10 @@ type Props = {
 
 export function NavLinks({ items, orientation = "vertical" }: Props) {
   const pathname = usePathname();
-
   return (
     <nav className={orientation === "vertical" ? "flex flex-col gap-1" : "flex gap-1 border-b"}>
       {items.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+        const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
 
         return (
           <Link

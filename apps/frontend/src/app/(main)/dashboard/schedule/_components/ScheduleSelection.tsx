@@ -80,7 +80,6 @@ function weekFromResponse(schedule: FacilityScheduleEntryResponse[]): Day[] {
 
 function ScheduleSelection({ schedule }: { schedule: FacilityScheduleEntryResponse[] }) {
   const [week, setWeek] = useState<Day[]>(() => weekFromResponse(schedule));
-  console.log(week);
   return (
     <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="divide-y divide-gray-100">

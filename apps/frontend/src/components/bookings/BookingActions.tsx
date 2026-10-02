@@ -13,7 +13,6 @@ type Props = {
 
 export function BookingActions({ bookingId, status }: Props) {
   const router = useRouter();
-  console.log(status);
   const [pendingAction, setPendingAction] = useState<"confirmed" | "canceled" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
