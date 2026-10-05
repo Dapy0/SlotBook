@@ -1,6 +1,5 @@
-import { BOOKING_STATUSES, type BookingStatus } from "@slotbook/shared";
+import { BOOKING_STATUSES, checkTransition, type Actors, type BookingStatus, type TransitionCheck } from "@slotbook/shared";
 import { describe, expect, test } from "vitest";
-import { checkTransition, type Actors, type TransitionCheck } from "./booking.status";
 const ACTORS = ["client", "staff", "owner"] as const;
 function subsets<T>(arr: readonly T[]): T[][] {
   return arr.reduce<T[][]>(

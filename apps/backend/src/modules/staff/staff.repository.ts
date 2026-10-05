@@ -1,4 +1,4 @@
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, getColumns, isNull, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
 import { staffServices, type StaffServiceEntity } from "../../db/schema/staffService.ts";
@@ -6,8 +6,13 @@ import { services } from "../../db/schema/service.ts";
 import { users } from "../../db/schema/user.ts";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
-import type { StaffMemberPublicResponse, StaffMembership } from "@slotbook/shared";
-import { facilities } from "../../db/schema";
+import type {
+  ManagedStaffMemberResponse,
+  StaffMemberPublicResponse,
+  StaffMembership,
+  Weekday,
+} from "@slotbook/shared";
+import { facilities, staffSchedules } from "../../db/schema";
 
 export async function findStaffByFacilityIdPublic(
   db: DB,
@@ -28,6 +33,38 @@ export async function findStaffByFacilityIdPublic(
     .groupBy(staffMembers.id, users.name);
 }
 
+export async function findStaffMembersForOwner(
+  db: DB,
+  facilityId: string,
+): Promise<ManagedStaffMemberResponse[]> {
+  const staff = await db
+    .select({
+      name: users.name,
+      email: users.email,
+      isActive: staffMembers.isActive,
+      facilityId: staffMembers.facilityId,
+      id: staffMembers.id,
+      userId: staffMembers.userId,
+      workDays: sql<
+        Weekday[]
+      >`coalesce(array_agg(DISTINCT ${staffSchedules.dayOfTheWeek} ORDER BY ${staffSchedules.dayOfTheWeek} ASC) FILTER (WHERE ${staffSchedules.dayOfTheWeek} IS NOT NULL), '{}')`,
+      serviceIds: sql<
+        string[]
+      >`coalesce(array_agg(DISTINCT ${staffServices.serviceId}) FILTER (WHERE ${staffServices.serviceId} IS NOT NULL), '{}')`,
+      createdAt: staffMembers.createdAt,
+      updatedAt: staffMembers.updatedAt,
+    })
+    .from(staffMembers)
+    .innerJoin(users, eq(users.id, staffMembers.userId))
+    .leftJoin(staffSchedules, eq(staffSchedules.staffMemberId, staffMembers.id))
+    .leftJoin(staffServices, eq(staffServices.staffMemberId, staffMembers.id))
+    .where(and(eq(staffMembers.facilityId, facilityId)))
+    .groupBy(staffMembers.id, users.id)
+    .orderBy(desc(staffMembers.isActive));
+
+
+  return staff;
+}
 export async function findStaffMemberById(
   db: DB,
   staffMemberId: string,

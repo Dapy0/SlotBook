@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createStaffMemberSchema } from "./staffMembers";
+import { createStaffMemberRequestSchema } from './staffMembers';
 
 describe("StaffMemberResponse DTO", () => {
   test("accepts staff member", () => {
@@ -12,7 +12,7 @@ describe("StaffMemberResponse DTO", () => {
       isActive: true,
     };
 
-    expect(createStaffMemberSchema.safeParse(fixture).success).toBe(true);
+    expect(createStaffMemberRequestSchema.safeParse(fixture).success).toBe(true);
   });
   test("accepts staff member without isActive", () => {
     const fixture = {
@@ -23,6 +23,6 @@ describe("StaffMemberResponse DTO", () => {
       updatedAt: "2026-08-12T12:29:59.998Z",
     };
 
-    expect(createStaffMemberSchema.safeParse(fixture).success).toBe(true);
+    expect(createStaffMemberRequestSchema.safeParse(fixture).success).toBe(true);
   });
 });

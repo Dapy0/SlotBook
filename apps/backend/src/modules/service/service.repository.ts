@@ -1,8 +1,8 @@
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { eq, and, getColumns, inArray, sql, type SQL } from "drizzle-orm";
-import { services, type NewServiceEntity, type ServiceEntity } from "../../db/schema/service.ts";
-import { facilities } from "../../db/schema/facility.ts";
-import { staffServices } from "../../db/schema/staffService.ts";
+import { services, type NewServiceEntity, type ServiceEntity } from "../../db/schema";
+import { facilities } from "../../db/schema";
+import { staffServices } from "../../db/schema";
 import type { UpdateServiceRequest } from "@slotbook/shared";
 export type ServiceWithCurrency = ServiceEntity & {
   currency: string;
