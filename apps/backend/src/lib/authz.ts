@@ -1,8 +1,9 @@
-import type { FacilityResponse } from "@slotbook/shared";
+import type { FacilityResponse, StaffMemberResponse } from "@slotbook/shared";
 import type { DB } from "../db/drizzlePlugin";
 import { ForbiddenError } from "./errors";
 import { assertFound } from "../modules/utils";
 import { findFacilityById } from "../modules/facility/facility.repository";
+import { findStaffMemberById } from "../modules/staff/staff.repository";
 
 export async function assertFacilityOwner(
   db: DB,
@@ -15,4 +16,17 @@ export async function assertFacilityOwner(
     throw new ForbiddenError("Not owned facility");
   }
   return facility;
+}
+
+export async function assertFacilityStaffMember(
+  db: DB,
+  facilityId: string,
+  staffMemberId: string,
+): Promise<StaffMemberResponse> {
+  const staffMember = await findStaffMemberById(db, staffMemberId);
+  assertFound(staffMember, "Staff Member not found");
+  if (staffMember.facilityId !== facilityId) {
+    throw new ForbiddenError("Not member of facility");
+  }
+  return staffMember;
 }

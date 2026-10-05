@@ -1,4 +1,4 @@
-import { and, count, desc, eq, getColumns, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
 import { staffServices, type StaffServiceEntity } from "../../db/schema/staffService.ts";
@@ -10,6 +10,7 @@ import type {
   ManagedStaffMemberResponse,
   StaffMemberPublicResponse,
   StaffMembership,
+  UpdateStaffMemberRequest,
   Weekday,
 } from "@slotbook/shared";
 import { facilities, staffSchedules } from "../../db/schema";
@@ -61,7 +62,6 @@ export async function findStaffMembersForOwner(
     .where(and(eq(staffMembers.facilityId, facilityId)))
     .groupBy(staffMembers.id, users.id)
     .orderBy(desc(staffMembers.isActive));
-
 
   return staff;
 }
@@ -152,4 +152,14 @@ export async function findServiceByServiceIdAndMemberId(
       and(eq(staffServices.serviceId, serviceId), eq(staffServices.staffMemberId, staffMemberId)),
     );
   return service;
+}
+export async function updateActiveStatusByStaffId(
+  db: DB,
+  staffMemberId: string,
+  data: UpdateStaffMemberRequest,
+) {
+  return await db
+    .update(staffMembers)
+    .set({ isActive: data.isActive })
+    .where(eq(staffMembers.id, staffMemberId));
 }
