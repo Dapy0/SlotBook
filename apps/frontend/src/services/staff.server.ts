@@ -1,7 +1,8 @@
 import { apiWithAuth } from "@/lib/api.server";
 import {
   managedStaffMemberResponseSchema,
-
+  type CreateStaffMemberRequest,
+  type UpdateStaffMemberRequest,
 } from "@slotbook/shared";
 
 export async function getStaffMembersForOwner(facilityId: string) {
@@ -10,3 +11,4 @@ export async function getStaffMembersForOwner(facilityId: string) {
     managedStaffMemberResponseSchema.array(),
   );
 }
+

@@ -7,6 +7,7 @@ import { users } from "../../db/schema/user.ts";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
 import type {
+  AddServiceToStaffMemberRequest,
   ManagedStaffMemberResponse,
   StaffMemberPublicResponse,
   StaffMembership,
@@ -37,6 +38,7 @@ export async function findStaffByFacilityIdPublic(
 export async function findStaffMembersForOwner(
   db: DB,
   facilityId: string,
+  staffId?: string,
 ): Promise<ManagedStaffMemberResponse[]> {
   const staff = await db
     .select({
@@ -59,7 +61,12 @@ export async function findStaffMembersForOwner(
     .innerJoin(users, eq(users.id, staffMembers.userId))
     .leftJoin(staffSchedules, eq(staffSchedules.staffMemberId, staffMembers.id))
     .leftJoin(staffServices, eq(staffServices.staffMemberId, staffMembers.id))
-    .where(and(eq(staffMembers.facilityId, facilityId)))
+    .where(
+      and(
+        eq(staffMembers.facilityId, facilityId),
+        staffId ? eq(staffMembers.id, staffId) : undefined,
+      ),
+    )
     .groupBy(staffMembers.id, users.id)
     .orderBy(desc(staffMembers.isActive));
 
@@ -162,4 +169,21 @@ export async function updateActiveStatusByStaffId(
     .update(staffMembers)
     .set({ isActive: data.isActive })
     .where(eq(staffMembers.id, staffMemberId));
+}
+export async function deleteAllServicesByStaffMemberId(db: DB, staffMemberId: string) {
+  return await db.delete(staffServices).where(eq(staffServices.staffMemberId, staffMemberId));
+}
+export async function insertServicesByStaffMemberId(
+  db: DB,
+  staffMemberId: string,
+  data: AddServiceToStaffMemberRequest,
+) {
+  return await db
+    .insert(staffServices)
+    .values(
+      data.serviceIds.map((serviceId) => ({
+        staffMemberId,
+        serviceId: serviceId,
+      })),
+    )
 }

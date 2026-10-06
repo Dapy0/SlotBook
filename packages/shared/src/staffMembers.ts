@@ -6,11 +6,15 @@ import { emailInputSchema } from "./common/primitives";
 // Request
 
 export const createStaffMemberRequestSchema = z.object({ email: emailInputSchema });
-
 export type CreateStaffMemberRequest = z.infer<typeof createStaffMemberRequestSchema>;
+
 export const updateStaffMemberRequestSchema = z.object({ isActive: z.boolean() });
 export type UpdateStaffMemberRequest = z.infer<typeof updateStaffMemberRequestSchema>;
 
+export const addServiceToStaffMemberRequestSchema = z.object({
+  serviceIds: z.array(z.string().trim()),
+});
+export type AddServiceToStaffMemberRequest = z.infer<typeof addServiceToStaffMemberRequestSchema>;
 // Response
 
 export const staffMemberResponseSchema = z.object({
@@ -31,7 +35,6 @@ export const staffMemberPublicResponseSchema = z.object({
 });
 export type StaffMemberPublicResponse = z.infer<typeof staffMemberPublicResponseSchema>;
 
-
 export const managedStaffMemberResponseSchema = staffMemberResponseSchema.extend({
   userId: z.uuid(),
   name: z.string().trim(),
@@ -47,3 +50,4 @@ export const staffMemberDetailsResponseSchema = managedStaffMemberResponseSchema
 });
 export type StaffMemberDetailsResponse = z.infer<typeof staffMemberDetailsResponseSchema>;
 export const staffMemberParamsSchema = z.object({ id: z.uuid(), staffId: z.uuid() });
+export type StaffMemberParams = z.infer<typeof staffMemberParamsSchema>;

@@ -1,5 +1,6 @@
 import type { ManagedStaffMemberResponse, Weekday } from "@slotbook/shared";
 import { Badge } from "@/components/ui/badge";
+import { StaffActions } from "./StaffActions";
 
 const WEEKDAYS: { value: Weekday; label: string }[] = [
   { value: 1, label: "Mo" },
@@ -12,12 +13,21 @@ const WEEKDAYS: { value: Weekday; label: string }[] = [
 ];
 
 type Props = {
+  facilityId: string;
   member: ManagedStaffMemberResponse;
   serviceNames: string[];
+  onOpenServices: () => void;
+  onOpenSchedule: () => void;
 };
 
-export function StaffRow({ member, serviceNames }: Props) {
-  const { name, email, isActive, workDays } = member;
+export function StaffRow({
+  facilityId,
+  member,
+  serviceNames,
+  onOpenServices,
+  onOpenSchedule,
+}: Props) {
+  const { id, name, email, isActive, workDays } = member;
   const workDaySet = new Set(workDays);
 
   return (
@@ -45,24 +55,32 @@ export function StaffRow({ member, serviceNames }: Props) {
             serviceNames.join(" · ")
           )}
         </p>
+        <div className="mt-1 flex gap-1" aria-label="Work days">
+          {WEEKDAYS.map((day) => {
+            const works = workDaySet.has(day.value);
+            return (
+              <span
+                key={day.value}
+                title={works ? "Working day" : "Day off"}
+                className={`flex size-7 items-center justify-center rounded-md text-xs font-medium ${
+                  works ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-400"
+                }`}
+              >
+                {day.label}
+              </span>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="flex gap-1" aria-label="Work days">
-        {WEEKDAYS.map((day) => {
-          const works = workDaySet.has(day.value);
-          return (
-            <span
-              key={day.value}
-              title={works ? "Working day" : "Day off"}
-              className={`flex size-7 items-center justify-center rounded-md text-xs font-medium ${
-                works ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-400"
-              }`}
-            >
-              {day.label}
-            </span>
-          );
-        })}
-      </div>
+      <StaffActions
+        facilityId={facilityId}
+        staffId={id}
+        name={name}
+        isActive={isActive}
+        onOpenServices={onOpenServices}
+        onOpenSchedule={onOpenSchedule}
+      />
     </div>
   );
 }

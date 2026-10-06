@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import type { ManagedStaffMemberResponse } from "@slotbook/shared";
 import { getMe } from "@/lib/session";
 import { getFacilityServicesForOwner } from "@/services/service.server";
-import { StaffRow } from "./_components/StaffRow";
-import { getStaffMembersForOwner } from "@/services/staff.server";
+import { StaffManager } from "./_components/StaffManager";
+import { getStaffMembersForOwner } from '@/services/staff.server';
 
 const STATUS_FILTERS = [
   { value: "active", label: "Active" },
@@ -44,7 +44,6 @@ export default async function FacilityStaffPage({
     getFacilityServicesForOwner(facility.id),
   ]);
 
-  const serviceNameById = new Map(services.map((s) => [s.id, s.name]));
   const visible = staff.filter((member) => matchesStatus(member, status));
   const activeCount = staff.filter((member) => member.isActive).length;
 
@@ -74,29 +73,17 @@ export default async function FacilityStaffPage({
         })}
       </nav>
 
-      {visible.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-12 text-center">
-          <p className="font-medium text-gray-900">
-            {staff.length === 0 ? "No staff yet" : "Nobody here"}
-          </p>
-          <p className="text-sm text-gray-500">
-            {staff.length === 0
-              ? "Add your first staff member by email so clients can book them"
-              : "Try another filter"}
-          </p>
-        </div>
-      ) : (
-        <ul className="divide-y overflow-clip rounded-lg border bg-white">
-          {visible.map((member) => (
-            <li key={member.id}>
-              <StaffRow
-                member={member}
-                serviceNames={member.serviceIds.map((id) => serviceNameById.get(id) ?? "Unknown")}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <StaffManager
+        facilityId={facility.id}
+        staff={visible}
+        services={services}
+        emptyTitle={staff.length === 0 ? "No staff yet" : "Nobody here"}
+        emptyText={
+          staff.length === 0
+            ? "Add your first staff member by email so clients can book them"
+            : "Try another filter"
+        }
+      />
     </div>
   );
 }

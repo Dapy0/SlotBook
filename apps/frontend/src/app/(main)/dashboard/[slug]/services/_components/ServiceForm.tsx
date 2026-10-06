@@ -29,7 +29,7 @@ type FormValues = {
   description: string;
   category: string;
   durationMinutes: number;
-  price: string; // в поле — всегда строка в основных единицах: "80.00"
+  price: string;
   isActive: boolean;
 };
 type FieldErrors = Partial<Record<keyof FormValues, string>>;
@@ -111,7 +111,7 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
         }
       }
       if (Object.keys(changes).length === 0) {
-        onDone(); 
+        onDone();
         return;
       }
       const checkedChanges = updateServiceRequestSchema.safeParse(changes);
