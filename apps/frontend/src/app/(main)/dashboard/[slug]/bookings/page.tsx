@@ -80,7 +80,7 @@ export default async function FacilityBookingsPage({
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
-          <p className="nums text-muted-foreground">{rangeLabel}</p>
+          <p className="text-muted-foreground nums">{rangeLabel}</p>
         </div>
 
         <div className="flex items-center gap-2" role="group" aria-label="Week">
@@ -142,7 +142,7 @@ export default async function FacilityBookingsPage({
             <section key={day.date} className="flex flex-col gap-2">
               <h2 className="flex items-baseline gap-2 font-sans text-base font-semibold">
                 {formatCalendarDate(day.date, "EEEE, d MMM")}
-                <span className="nums text-sm font-normal text-muted-foreground">
+                <span className="text-sm font-normal text-muted-foreground nums">
                   {day.bookings.length} {day.bookings.length === 1 ? "booking" : "bookings"}
                 </span>
               </h2>

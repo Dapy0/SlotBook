@@ -51,12 +51,17 @@ function WorkingHours({ hours }: { hours: FacilityScheduleEntryResponse[] }) {
       ) : (
         <dl className="mt-2 flex flex-col divide-y divide-border">
           {schedule.map((row) => (
-            <div key={row.dayOfTheWeek} className="flex items-start justify-between gap-3 py-2 text-sm">
+            <div
+              key={row.dayOfTheWeek}
+              className="flex items-start justify-between gap-3 py-2 text-sm"
+            >
               <dt className="text-muted-foreground">{row.dayOfTheWeek}</dt>
-              <dd className="nums flex flex-col items-end gap-0.5 font-medium">
-                {row.timeIntervals.length === 0
-                  ? <span className="text-muted-foreground">Closed</span>
-                  : row.timeIntervals.map((interval) => <span key={interval}>{interval}</span>)}
+              <dd className="flex flex-col items-end gap-0.5 font-medium nums">
+                {row.timeIntervals.length === 0 ? (
+                  <span className="text-muted-foreground">Closed</span>
+                ) : (
+                  row.timeIntervals.map((interval) => <span key={interval}>{interval}</span>)
+                )}
               </dd>
             </div>
           ))}

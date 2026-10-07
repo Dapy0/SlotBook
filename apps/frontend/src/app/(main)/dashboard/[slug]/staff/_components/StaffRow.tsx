@@ -38,11 +38,16 @@ export function StaffRow({
     >
       <div className="flex min-w-0 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+          <p
+            className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+          >
             {name}
           </p>
           {!isActive && (
-            <Badge variant="outline" className="border-border bg-muted text-xs text-muted-foreground">
+            <Badge
+              variant="outline"
+              className="border-border bg-muted text-xs text-muted-foreground"
+            >
               Former staff
             </Badge>
           )}
@@ -63,7 +68,9 @@ export function StaffRow({
                 key={day.value}
                 title={works ? "Working day" : "Day off"}
                 className={`flex size-7 items-center justify-center rounded-md text-xs font-medium ${
-                  works ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
+                  works
+                    ? "bg-secondary text-secondary-foreground"
+                    : "bg-muted text-muted-foreground"
                 }`}
               >
                 {day.label}

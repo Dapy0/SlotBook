@@ -43,7 +43,7 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
       <BreadCrumbs />
       <div className="mb-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
-        <span className="nums text-muted-foreground">
+        <span className="text-muted-foreground nums">
           {found >= Number(limit) ? `${found}+` : found} {found === 1 ? "venue" : "venues"}
           {city ? ` in ${city}` : ""}
         </span>
@@ -69,7 +69,9 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
               ))}
               {canShowMore && (
                 <Link
-                  href={`/venues?${createParams({ category, rating, q, city, sort, limit: Number(limit) + PAGE_SIZE })}` as Route}
+                  href={
+                    `/venues?${createParams({ category, rating, q, city, sort, limit: Number(limit) + PAGE_SIZE })}` as Route
+                  }
                   scroll={false}
                   className={cn(buttonVariants({ variant: "outline", size: "lg" }), "self-center")}
                 >

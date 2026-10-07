@@ -25,9 +25,7 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       .then((res) => {
         setInitial(res);
       })
-      .catch(() =>
-        setLoadError("Couldn't load the schedule. Close this panel and try again."),
-      );
+      .catch(() => setLoadError("Couldn't load the schedule. Close this panel and try again."));
   }, []);
 
   async function handleSubmit(entries: ChangeWeekScheduleRequest) {

@@ -29,19 +29,26 @@ export function ServiceRow({ facilityId, service, onEdit }: Props) {
     >
       <div className="flex min-w-0 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
+          <p
+            className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+          >
             {name}
           </p>
           <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
             {category}
           </Badge>
           {!isActive && (
-            <Badge variant="outline" className="border-border bg-muted text-xs text-muted-foreground">
+            <Badge
+              variant="outline"
+              className="border-border bg-muted text-xs text-muted-foreground"
+            >
               Hidden
             </Badge>
           )}
         </div>
-        {description && <p className="m-0 line-clamp-1 text-sm text-muted-foreground">{description}</p>}
+        {description && (
+          <p className="m-0 line-clamp-1 text-sm text-muted-foreground">{description}</p>
+        )}
         <p className="m-0 text-sm text-muted-foreground">
           {duration} ·{" "}
           <span className="font-semibold">{moneyFormatterFromCents(priceCents, currency)}</span>
@@ -49,7 +56,12 @@ export function ServiceRow({ facilityId, service, onEdit }: Props) {
       </div>
 
       <div className="flex items-center gap-3 sm:justify-end">
-        <ActiveToggle facilityId={facilityId} serviceId={id} isActive={isActive} serviceName={name} />
+        <ActiveToggle
+          facilityId={facilityId}
+          serviceId={id}
+          isActive={isActive}
+          serviceName={name}
+        />
         <Button size="sm" variant="outline" onClick={onEdit}>
           Edit
         </Button>

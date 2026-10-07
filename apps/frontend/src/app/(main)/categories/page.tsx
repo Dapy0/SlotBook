@@ -34,7 +34,7 @@ function CategoryCard({
         >
           <Icon aria-hidden className="size-5" style={{ color }} />
         </span>
-        <span className="nums text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground nums">
           {count} {count === 1 ? "venue" : "venues"}
         </span>
       </div>

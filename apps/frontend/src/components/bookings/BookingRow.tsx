@@ -34,7 +34,7 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
         status === "canceled" && "bg-muted/40",
       )}
     >
-      <div className="nums flex flex-col leading-tight">
+      <div className="flex flex-col leading-tight nums">
         <span className="font-semibold">{formatInTimeZone(startsAt, timeZone, "HH:mm")}</span>
         <span className="text-sm text-muted-foreground">
           {formatInTimeZone(endsAt, timeZone, "HH:mm")}
@@ -58,14 +58,17 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
         </p>
         <p className="truncate text-sm text-muted-foreground">
           {client.clientName} ·{" "}
-          <a href={`mailto:${client.clientEmail}`} className="hover:text-foreground hover:underline">
+          <a
+            href={`mailto:${client.clientEmail}`}
+            className="hover:text-foreground hover:underline"
+          >
             {client.clientEmail}
           </a>
         </p>
       </div>
 
       <div className="col-span-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:justify-end">
-        <span className="nums text-sm font-semibold whitespace-nowrap">
+        <span className="text-sm font-semibold whitespace-nowrap nums">
           {moneyFormatterFromCents(priceCents, currency)}
         </span>
         <StatusBadge status={status} short />

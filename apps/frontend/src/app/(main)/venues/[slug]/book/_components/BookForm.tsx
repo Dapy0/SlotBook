@@ -288,7 +288,11 @@ function BookForm({
               <StepLabel step={2} htmlFor="book-staff">
                 Staff member
               </StepLabel>
-              <Select items={staffOptions} value={selection.staff} onValueChange={handleSelectStaff}>
+              <Select
+                items={staffOptions}
+                value={selection.staff}
+                onValueChange={handleSelectStaff}
+              >
                 <SelectTrigger id="book-staff" className="h-11 w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -396,7 +400,7 @@ function BookForm({
                           >
                             {weekdayShort[weekday]}
                           </span>
-                          <span className="nums font-heading text-xl leading-none font-bold">
+                          <span className="font-heading text-xl leading-none font-bold nums">
                             {dayOfMonth}
                           </span>
                         </button>
@@ -428,7 +432,7 @@ function BookForm({
                                 aria-label={`${start} to ${end}`}
                                 onClick={() => handleSelectSlot(slot)}
                                 className={cn(
-                                  "nums h-11 min-w-20 rounded-full border px-4 text-sm font-semibold transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                                  "h-11 min-w-20 rounded-full border px-4 text-sm font-semibold nums transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                                   isSelected
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-border bg-card hover:border-[color-mix(in_oklch,var(--primary),var(--border)_30%)] hover:bg-accent",
@@ -486,7 +490,7 @@ function BookForm({
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <div className="min-w-0 text-sm">
             <p className="truncate font-medium">{selectedServiceData?.name ?? "No service yet"}</p>
-            <p className="nums truncate text-muted-foreground">
+            <p className="truncate text-muted-foreground nums">
               {selection.date && summaryTime
                 ? `${formatCalendarDate(selection.date)} · ${summaryTime}`
                 : "Pick a date and time"}
@@ -521,7 +525,7 @@ function StepLabel({
     <>
       <span
         aria-hidden
-        className="nums flex size-5 items-center justify-center rounded-full bg-secondary text-xs text-secondary-foreground"
+        className="flex size-5 items-center justify-center rounded-full bg-secondary text-xs text-secondary-foreground nums"
       >
         {step}
       </span>

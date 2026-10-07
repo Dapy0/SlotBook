@@ -88,7 +88,7 @@ async function Page() {
                   >
                     <CategoryDot color={meta.color} />
                     <span className="font-medium">{meta.label}</span>
-                    <span className="nums ml-auto text-sm text-muted-foreground">
+                    <span className="ml-auto text-sm text-muted-foreground nums">
                       {category.count} {category.count === 1 ? "venue" : "venues"}
                     </span>
                     <ArrowRight
@@ -164,7 +164,7 @@ async function Page() {
               key={step.title}
               className="grid grid-cols-[3rem_1fr] gap-4 border-t border-secondary-foreground/15 py-5 first:border-t-0 first:pt-0 last:pb-0"
             >
-              <span className="nums font-heading text-2xl font-bold text-primary">{i + 1}</span>
+              <span className="font-heading text-2xl font-bold text-primary nums">{i + 1}</span>
               <div className="flex flex-col gap-1">
                 <h3 className="text-lg font-semibold">{step.title}</h3>
                 <p className="text-secondary-foreground/75">{step.text}</p>

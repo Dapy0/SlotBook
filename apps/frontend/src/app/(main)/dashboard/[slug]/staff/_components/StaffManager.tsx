@@ -28,10 +28,12 @@ export function StaffManager({ facilityId, staff, services, emptyTitle, emptyTex
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        {!isAdding && <Button onClick={() => setIsAdding(true)}>
+        {!isAdding && (
+          <Button onClick={() => setIsAdding(true)}>
             <Plus aria-hidden />
             Add staff
-          </Button>}
+          </Button>
+        )}
       </div>
 
       {isAdding && (

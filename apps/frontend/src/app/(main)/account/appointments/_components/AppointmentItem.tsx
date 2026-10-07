@@ -46,13 +46,15 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
       <div
         className={cn(
           "flex w-16 shrink-0 flex-col items-center justify-center self-start rounded-lg border py-2",
-          status === "canceled" ? "border-border text-muted-foreground" : "border-primary/60 bg-accent",
+          status === "canceled"
+            ? "border-border text-muted-foreground"
+            : "border-primary/60 bg-accent",
         )}
       >
         <span className="text-xs font-semibold uppercase">
           {datePart(startsAt, facilityTimezone, { month: "short" })}
         </span>
-        <span className="nums font-heading text-2xl leading-none font-bold">
+        <span className="font-heading text-2xl leading-none font-bold nums">
           {datePart(startsAt, facilityTimezone, { day: "numeric" })}
         </span>
         <span className="text-xs text-muted-foreground">
@@ -73,7 +75,7 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
             </p>
             <StatusBadge status={isCompleted ? "completed" : status} />
           </div>
-          <p className="nums text-sm font-medium">{time}</p>
+          <p className="text-sm font-medium nums">{time}</p>
           <p className="text-sm text-muted-foreground">
             <Link
               href={`/venues/${facilitySlug}` as Route}
@@ -87,7 +89,7 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
         </div>
 
         <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end">
-          <span className="nums font-semibold whitespace-nowrap">
+          <span className="font-semibold whitespace-nowrap nums">
             {moneyFormatterFromCents(priceCents, currency)}
           </span>
           {isCancelable && <CancelBookingButton bookingId={id} />}

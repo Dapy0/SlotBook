@@ -8,7 +8,15 @@ import { formatInTimeZone } from "date-fns-tz";
 import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
-function SectionHeader({ title, href, linkLabel }: { title: string; href: string; linkLabel: string }) {
+function SectionHeader({
+  title,
+  href,
+  linkLabel,
+}: {
+  title: string;
+  href: string;
+  linkLabel: string;
+}) {
   return (
     <div className="flex items-center justify-between gap-4">
       <h2 className="text-xl font-semibold">{title}</h2>
@@ -64,7 +72,7 @@ export default async function FacilityOverviewPage({
         {stats.map((stat) => (
           <div key={stat.label} className="flex flex-col gap-1 px-5 py-4">
             <dt className="text-sm text-muted-foreground">{stat.label}</dt>
-            <dd className="nums font-heading text-2xl font-bold">{stat.value}</dd>
+            <dd className="font-heading text-2xl font-bold nums">{stat.value}</dd>
           </div>
         ))}
       </dl>
@@ -88,7 +96,11 @@ export default async function FacilityOverviewPage({
       )}
 
       <section className="flex flex-col gap-3">
-        <SectionHeader title="Today" href={`/dashboard/${slug}/bookings`} linkLabel="All bookings" />
+        <SectionHeader
+          title="Today"
+          href={`/dashboard/${slug}/bookings`}
+          linkLabel="All bookings"
+        />
         {todayBookings.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border bg-card px-5 py-8 text-center text-sm text-muted-foreground">
             No bookings today.

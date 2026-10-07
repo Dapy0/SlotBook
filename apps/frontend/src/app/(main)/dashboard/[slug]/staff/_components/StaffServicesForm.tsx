@@ -80,7 +80,9 @@ export function StaffServicesForm({
                 <span className={service.isActive ? "text-foreground" : "text-muted-foreground"}>
                   {service.name}
                 </span>
-                {!service.isActive && <span className="ml-auto text-xs text-muted-foreground">Hidden</span>}
+                {!service.isActive && (
+                  <span className="ml-auto text-xs text-muted-foreground">Hidden</span>
+                )}
               </label>
             </li>
           ))}

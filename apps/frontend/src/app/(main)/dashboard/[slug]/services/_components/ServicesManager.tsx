@@ -32,10 +32,12 @@ export function ServicesManager({ facilityId, currency, services }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        {!isCreating && <Button onClick={startCreate}>
+        {!isCreating && (
+          <Button onClick={startCreate}>
             <Plus aria-hidden />
             New service
-          </Button>}
+          </Button>
+        )}
       </div>
 
       {isCreating && (
@@ -48,7 +50,9 @@ export function ServicesManager({ facilityId, currency, services }: Props) {
       {services.length === 0 && !isCreating ? (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-card py-12 text-center">
           <p className="font-medium text-foreground">No services yet</p>
-          <p className="text-sm text-muted-foreground">Add your first service so clients can book it</p>
+          <p className="text-sm text-muted-foreground">
+            Add your first service so clients can book it
+          </p>
         </div>
       ) : (
         <ul className="divide-y divide-border overflow-clip rounded-xl border border-border bg-card">

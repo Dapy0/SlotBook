@@ -19,7 +19,7 @@ function ScoreBadge({ styles = "", score }: { styles?: string; score: number | n
   return (
     <span
       className={cn(
-        "nums inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground",
+        "inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground nums",
         styles,
       )}
     >

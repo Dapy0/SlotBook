@@ -43,7 +43,7 @@ export default function StaffList({
                     {hasScore ? (
                       <>
                         <StarIcon aria-hidden className="size-3.5 fill-primary stroke-primary" />
-                        <span className="nums font-medium text-foreground">
+                        <span className="font-medium text-foreground nums">
                           {Number(member.score).toFixed(1)}
                         </span>
                         <span className="nums">

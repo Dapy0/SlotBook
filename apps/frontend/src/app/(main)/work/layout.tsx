@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getMe } from "@/lib/session";
-import { NavLinks, type NavItem } from '@/app/(main)/dashboard/_components/NavLinks';
+import { NavLinks, type NavItem } from "@/app/(main)/dashboard/_components/NavLinks";
 
 export default async function WorkLayout({ children }: { children: React.ReactNode }) {
   const userAuth = await getMe();
@@ -13,9 +13,7 @@ export default async function WorkLayout({ children }: { children: React.ReactNo
   const membership = userAuth.staffMembership;
 
   const base = `/work`;
-  const navItems: NavItem[] = [
-    { href: `${base}`, label: "Today", exact: true },
-  ];
+  const navItems: NavItem[] = [{ href: `${base}`, label: "Today", exact: true }];
 
   return (
     <div className="flex w-full flex-col gap-6">

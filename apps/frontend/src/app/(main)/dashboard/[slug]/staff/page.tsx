@@ -5,7 +5,7 @@ import type { ManagedStaffMemberResponse } from "@slotbook/shared";
 import { getMe } from "@/lib/session";
 import { getFacilityServicesForOwner } from "@/services/service.server";
 import { StaffManager } from "./_components/StaffManager";
-import { getStaffMembersForOwner } from '@/services/staff.server';
+import { getStaffMembersForOwner } from "@/services/staff.server";
 
 const STATUS_FILTERS = [
   { value: "active", label: "Active" },
@@ -65,7 +65,9 @@ export default async function FacilityStaffPage({
               href={`?status=${f.value}` as Route}
               aria-current={isActive ? "page" : undefined}
               className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
-                isActive ? "border-secondary bg-secondary text-secondary-foreground" : "border-border bg-card text-muted-foreground hover:text-foreground"
+                isActive
+                  ? "border-secondary bg-secondary text-secondary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               {f.label}

@@ -162,7 +162,9 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           placeholder="Classic cut with styling"
           className="rounded-md border border-input bg-card px-3 py-2 text-base shadow-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
         />
-        {errors.description && <span className="text-sm text-destructive">{errors.description}</span>}
+        {errors.description && (
+          <span className="text-sm text-destructive">{errors.description}</span>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">

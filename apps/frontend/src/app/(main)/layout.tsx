@@ -14,8 +14,7 @@ export default async function RootLayout({
     getCountries(),
     saved ? Promise.resolve(saved) : getCountryByIp(),
   ]);
-  const country =
-    detected && countries.some((c) => c.country === detected) ? detected : "PL";
+  const country = detected && countries.some((c) => c.country === detected) ? detected : "PL";
 
   return (
     <div className="flex h-dvh flex-col">

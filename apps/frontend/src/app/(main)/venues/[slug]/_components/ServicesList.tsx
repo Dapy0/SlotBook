@@ -60,13 +60,13 @@ export default function ServicesList({
                         {service.description}
                       </p>
                     )}
-                    <p className="nums mt-0.5 text-sm text-muted-foreground">
+                    <p className="mt-0.5 text-sm text-muted-foreground nums">
                       {durationFormatter.format({ hours, minutes })}
                     </p>
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-                    <span className="nums font-semibold">
+                    <span className="font-semibold nums">
                       {moneyFormatterFromCents(service.priceCents, service.currency)}
                     </span>
                     <Link

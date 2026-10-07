@@ -9,7 +9,9 @@ function Stars({ rating }: { rating: number }) {
           key={i}
           aria-hidden
           className={
-            i < rating ? "size-3.5 fill-primary stroke-primary" : "size-3.5 fill-muted stroke-border"
+            i < rating
+              ? "size-3.5 fill-primary stroke-primary"
+              : "size-3.5 fill-muted stroke-border"
           }
         />
       ))}
@@ -48,9 +50,9 @@ export default function ReviewsList({
   return (
     <div className="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">
       <div className="flex flex-col items-start gap-1 self-start rounded-xl border border-border bg-card p-5 sm:items-center sm:text-center">
-        <span className="nums font-heading text-4xl font-bold">{avgRating.toFixed(1)}</span>
+        <span className="font-heading text-4xl font-bold nums">{avgRating.toFixed(1)}</span>
         <Stars rating={Math.round(avgRating)} />
-        <span className="nums text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground nums">
           {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
         </span>
       </div>
@@ -66,7 +68,7 @@ export default function ReviewsList({
               <li key={review.id} className="flex flex-col gap-1.5 px-5 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                   <Stars rating={review.rating} />
-                  <span className="nums text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground nums">
                     {dateFormatter.format(new Date(review.createdAt))}
                   </span>
                 </div>

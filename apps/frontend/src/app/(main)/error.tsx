@@ -24,7 +24,7 @@ export default function MainError({
         again, or go back to the home page.
       </p>
       {error.digest && (
-        <p className="nums text-sm text-muted-foreground">Error code: {error.digest}</p>
+        <p className="text-sm text-muted-foreground nums">Error code: {error.digest}</p>
       )}
       <div className="flex flex-wrap gap-3">
         <Button onClick={() => retry()}>

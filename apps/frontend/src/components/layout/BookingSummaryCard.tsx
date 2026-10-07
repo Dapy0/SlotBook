@@ -41,7 +41,7 @@ function Row({
       <dt className="text-muted-foreground">{label}</dt>
       <dd
         className={cn(
-          "nums text-right font-medium",
+          "text-right font-medium nums",
           !value && "font-normal text-muted-foreground",
           highlight && value && "rounded-sm bg-primary px-1.5 text-primary-foreground",
         )}
@@ -80,7 +80,7 @@ export default function BookingSummaryCard({
           <div className="mt-2 flex items-center gap-2">
             <ScoreBadge score={score} />
             {score != null && (
-              <span className="nums text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground nums">
                 {reviewsCount} {reviewsCount === 1 ? "review" : "reviews"}
               </span>
             )}
@@ -96,7 +96,7 @@ export default function BookingSummaryCard({
 
         <div className="flex items-center justify-between border-t border-border bg-muted/60 px-5 py-4">
           <span className="text-sm font-medium">Pay at the venue</span>
-          <span className="nums font-heading text-xl font-bold">{price ?? "–"}</span>
+          <span className="font-heading text-xl font-bold nums">{price ?? "–"}</span>
         </div>
       </div>
 

@@ -9,7 +9,7 @@ import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
 function TabCount({ value }: { value: number }) {
-  return <span className="nums text-xs font-normal text-muted-foreground">{value}</span>;
+  return <span className="text-xs font-normal text-muted-foreground nums">{value}</span>;
 }
 
 function FacilityDetailsTab({

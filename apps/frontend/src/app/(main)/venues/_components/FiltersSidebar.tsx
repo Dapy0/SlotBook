@@ -62,7 +62,7 @@ function FiltersSidebar({
           <SlidersHorizontal aria-hidden />
           Filters
         </span>
-        {activeCount > 0 && <span className="nums text-muted-foreground">{activeCount} on</span>}
+        {activeCount > 0 && <span className="text-muted-foreground nums">{activeCount} on</span>}
       </Button>
 
       <div
@@ -85,7 +85,7 @@ function FiltersSidebar({
                   <CategoryDot color="var(--foreground)" />
                   All
                 </span>
-                <span className="nums text-muted-foreground">
+                <span className="text-muted-foreground nums">
                   {counts.reduce((sum, c) => sum + c.count, 0)}
                 </span>
               </Link>
@@ -106,7 +106,7 @@ function FiltersSidebar({
                       <CategoryDot color={color} />
                       {label}
                     </span>
-                    <span className="nums text-muted-foreground">{count}</span>
+                    <span className="text-muted-foreground nums">{count}</span>
                   </Link>
                 </li>
               );
@@ -147,7 +147,7 @@ function FiltersSidebar({
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
                     buttonVariants({ size: "sm", variant: isActive ? "default" : "outline" }),
-                    "nums rounded-full px-3",
+                    "rounded-full px-3 nums",
                   )}
                 >
                   {value ? `${value}+` : "Any"}

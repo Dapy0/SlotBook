@@ -58,7 +58,7 @@ function BigFacilityPreviewCard({
           <Link href={venueHref} className={buttonVariants({ variant: "outline" })}>
             View venue
           </Link>
-          <span className="nums text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground nums">
             {services.length} {services.length === 1 ? "service" : "services"} in the price list
           </span>
         </div>
@@ -76,11 +76,11 @@ function BigFacilityPreviewCard({
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-medium">{service.name}</span>
-                    <span className="nums text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground nums">
                       {durationFormatter.format({ hours, minutes })}
                     </span>
                   </span>
-                  <span className="nums flex shrink-0 items-center gap-1 text-sm font-semibold">
+                  <span className="flex shrink-0 items-center gap-1 text-sm font-semibold nums">
                     {moneyFormatterFromCents(service.priceCents, service.currency)}
                     <ChevronRight
                       aria-hidden

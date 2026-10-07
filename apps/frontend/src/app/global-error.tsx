@@ -19,7 +19,7 @@ export default function GlobalError({
             minutes.
           </p>
           {error.digest && (
-            <p className="nums text-sm text-muted-foreground">Error code: {error.digest}</p>
+            <p className="text-sm text-muted-foreground nums">Error code: {error.digest}</p>
           )}
           <Button onClick={retry}>Try again</Button>
         </main>

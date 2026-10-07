@@ -7,7 +7,7 @@ export default function NotFound() {
       <Link href="/" className="font-heading text-xl font-bold tracking-tight">
         slot<span className="text-brand-ink">book</span>
       </Link>
-      <p className="nums font-heading text-6xl font-bold text-brand-ink">404</p>
+      <p className="font-heading text-6xl font-bold text-brand-ink nums">404</p>
       <h1 className="text-3xl font-bold tracking-tight">This page doesn&apos;t exist</h1>
       <p className="text-muted-foreground">
         The link may be broken or the page was moved. Start again from venues near you.
