@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { BookingStatus } from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
 import { updateBookingStatus } from "@/services/booking";
-import { ApiError } from '@/lib/api';
+import { ApiError } from "@/lib/api";
 
 type Props = {
   bookingId: string;
@@ -14,6 +14,7 @@ type Props = {
 export function BookingActions({ bookingId, status }: Props) {
   const router = useRouter();
   const [pendingAction, setPendingAction] = useState<"confirmed" | "canceled" | null>(null);
+  const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function change(to: "confirmed" | "canceled") {
@@ -23,9 +24,12 @@ export function BookingActions({ bookingId, status }: Props) {
     try {
       await updateBookingStatus(bookingId, to);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong");
+      setError(
+        err instanceof ApiError ? err.message : "Couldn't update the booking. Try again.",
+      );
     } finally {
       setPendingAction(null);
+      setIsConfirmingCancel(false);
       router.refresh();
     }
   }
@@ -34,23 +38,48 @@ export function BookingActions({ bookingId, status }: Props) {
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <div className="flex gap-2">
-        {status === "pending" && (
-          <Button size="sm" disabled={isBusy} onClick={() => change("confirmed")}>
-            {pendingAction === "confirmed" ? "Confirming…" : "Confirm"}
+      {isConfirmingCancel ? (
+        <div className="flex items-center gap-2" role="group" aria-label="Confirm cancellation">
+          <span className="text-sm font-medium">Cancel for the client?</span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={isBusy}
+            onClick={() => setIsConfirmingCancel(false)}
+          >
+            Keep
           </Button>
-        )}
-        <Button
-          size="sm"
-          variant="outline"
-          className="text-red-500"
-          disabled={isBusy}
-          onClick={() => change("canceled")}
-        >
-          {pendingAction === "canceled" ? "Canceling…" : "Cancel"}
-        </Button>
-      </div>
-      {error && <span className="text-xs text-red-500">{error}</span>}
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={isBusy}
+            onClick={() => change("canceled")}
+          >
+            {pendingAction === "canceled" ? "Canceling…" : "Yes, cancel"}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={isBusy}
+            onClick={() => setIsConfirmingCancel(true)}
+          >
+            Cancel
+          </Button>
+          {status === "pending" && (
+            <Button size="sm" disabled={isBusy} onClick={() => change("confirmed")}>
+              {pendingAction === "confirmed" ? "Confirming…" : "Confirm"}
+            </Button>
+          )}
+        </div>
+      )}
+      {error && (
+        <span role="alert" className="text-sm text-destructive">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

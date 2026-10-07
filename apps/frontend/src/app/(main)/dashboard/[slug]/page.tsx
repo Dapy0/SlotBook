@@ -3,10 +3,22 @@ import { getMe } from "@/lib/session";
 import { getFacilityBookings } from "@/services/booking.server";
 import type { Route } from "next";
 import Link from "next/link";
-import {
-  moneyFormatterFromCents,
-} from "../../../../lib/format";
+import { moneyFormatterFromCents } from "../../../../lib/format";
 import { formatInTimeZone } from "date-fns-tz";
+import { ArrowRight } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+
+function SectionHeader({ title, href, linkLabel }: { title: string; href: string; linkLabel: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <h2 className="text-xl font-semibold">{title}</h2>
+      <Link href={href as Route} className={buttonVariants({ variant: "link", size: "sm" })}>
+        {linkLabel}
+        <ArrowRight aria-hidden />
+      </Link>
+    </div>
+  );
+}
 
 export default async function FacilityOverviewPage({
   params,
@@ -31,41 +43,43 @@ export default async function FacilityOverviewPage({
   const todayConfirmed = todayBookings.filter((booking) => booking.status == "confirmed");
   const todayAllRevenue = todayConfirmed.reduce((prev, curr) => prev + curr.priceCents, 0);
   const stats = [
-    { label: "Today", value: todayBookings.length, hint: "bookings" },
-    { label: "Pending", value: pendingBookings.length, hint: "need confirmation" },
+    { label: "Bookings today", value: todayBookings.length },
+    { label: "Need confirmation", value: pendingBookings.length },
     {
-      label: "Today's revenue",
+      label: "Revenue today (confirmed)",
       value: moneyFormatterFromCents(todayAllRevenue, facility.currency),
-      hint: "confirmed only",
     },
   ];
 
   return (
-    <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
+    <div className="flex flex-col gap-10">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
+        <p className="text-muted-foreground">
+          {formatInTimeZone(new Date(), facility.timezone, "EEEE, d MMMM")}
+        </p>
+      </header>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <dl className="grid divide-y divide-border rounded-xl border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {stats.map((stat) => (
-          <div key={stat.label} className="flex flex-col gap-1 rounded-lg border bg-white p-4">
-            <span className="text-sm text-gray-500">{stat.label}</span>
-            <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
-            <span className="text-xs text-gray-400">{stat.hint}</span>
+          <div key={stat.label} className="flex flex-col gap-1 px-5 py-4">
+            <dt className="text-sm text-muted-foreground">{stat.label}</dt>
+            <dd className="nums font-heading text-2xl font-bold">{stat.value}</dd>
           </div>
         ))}
-      </div>
+      </dl>
 
       {pendingBookings.length > 0 && (
         <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900">Waiting for confirmation</h2>
-            <Link
-              href={`/dashboard/${slug}/bookings?status=pending` as Route}
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              View all →
-            </Link>
-          </div>
-          <div className="divide-y rounded-lg border border-amber-200 bg-white">
+          <SectionHeader
+            title="Waiting for your confirmation"
+            href={`/dashboard/${slug}/bookings?status=pending`}
+            linkLabel="All pending"
+          />
+          <p className="-mt-1 text-sm text-muted-foreground">
+            Clients see these as reserved until you confirm or cancel.
+          </p>
+          <div className="divide-y divide-border overflow-hidden rounded-xl border border-warning/40 bg-card">
             {pendingBookings.map((b) => (
               <BookingRow key={b.id} booking={b} timeZone={facility.timezone} />
             ))}
@@ -74,21 +88,13 @@ export default async function FacilityOverviewPage({
       )}
 
       <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900">Today</h2>
-          <Link
-            href={`/dashboard/${slug}/bookings` as Route}
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            All bookings →
-          </Link>
-        </div>
+        <SectionHeader title="Today" href={`/dashboard/${slug}/bookings`} linkLabel="All bookings" />
         {todayBookings.length === 0 ? (
-          <div className="rounded-lg border border-dashed py-8 text-center text-sm text-gray-500">
-            No bookings today
-          </div>
+          <p className="rounded-xl border border-dashed border-border bg-card px-5 py-8 text-center text-sm text-muted-foreground">
+            No bookings today.
+          </p>
         ) : (
-          <div className="divide-y rounded-lg border bg-white">
+          <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
             {todayBookings.map((b) => (
               <BookingRow key={b.id} booking={b} timeZone={facility.timezone} />
             ))}

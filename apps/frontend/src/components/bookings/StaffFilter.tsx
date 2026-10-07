@@ -31,8 +31,8 @@ export function StaffFilter({ staff, value }: Props) {
   const formatted = convertToSelectFormat(staff, "name", "id");
   return (
     <Select value={value ?? ""} onValueChange={(e) => onChange(e)} items={formatted}>
-      <SelectTrigger className="h-9 rounded-md border bg-white px-3 text-sm">
-        <SelectValue placeholder="Staff Name" />
+      <SelectTrigger aria-label="Staff member" className="w-48">
+        <SelectValue placeholder="All staff" />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false}>
         <SelectGroup>

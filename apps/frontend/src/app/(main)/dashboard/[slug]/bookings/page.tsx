@@ -17,7 +17,8 @@ import { getFacilityBookings } from "@/services/booking.server";
 import { getStaffMembersByFacilityId } from "@/services/staff";
 import { notFound } from "next/navigation";
 import { groupByLocalDate } from "@/lib/dates";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const STATUS_FILTERS: { value: BookingStatus | null; label: string }[] = [
@@ -78,34 +79,36 @@ export default async function FacilityBookingsPage({
     <div className="flex flex-col gap-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
-          <p className="text-sm text-gray-500">{rangeLabel}</p>
+          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
+          <p className="nums text-muted-foreground">{rangeLabel}</p>
         </div>
 
-        <div className="flex flex-col items-center gap-1">
-          <div>
-            <Button variant={"outline"}>
-              <Link href={hrefWith({ from: prevFrom }) as Route}>
-                <ArrowLeft className="inline size-4 text-center text-gray-400" />
-                Prev
-              </Link>
-            </Button>
-            <Button variant={"default"}>
-              <Link href={hrefWith({ from: undefined }) as Route}>This week</Link>
-            </Button>
-
-            <Button variant={"outline"}>
-              <Link href={hrefWith({ from: nextFrom }) as Route}>
-                Next
-                <ArrowRight className="inline size-4 text-center text-gray-400" />
-              </Link>
-            </Button>
-          </div>
+        <div className="flex items-center gap-2" role="group" aria-label="Week">
+          <Link
+            href={hrefWith({ from: prevFrom }) as Route}
+            aria-label="Previous week"
+            className={buttonVariants({ variant: "outline", size: "icon" })}
+          >
+            <ArrowLeft aria-hidden />
+          </Link>
+          <Link
+            href={hrefWith({ from: undefined }) as Route}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            This week
+          </Link>
+          <Link
+            href={hrefWith({ from: nextFrom }) as Route}
+            aria-label="Next week"
+            className={buttonVariants({ variant: "outline", size: "icon" })}
+          >
+            <ArrowRight aria-hidden />
+          </Link>
         </div>
       </header>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <nav className="flex w-fit gap-1 rounded-lg bg-gray-100 p-1">
+        <nav aria-label="Status" className="flex gap-1 overflow-x-auto">
           {STATUS_FILTERS.map((f) => {
             const isActive = (f.value ?? undefined) === status;
 
@@ -113,11 +116,13 @@ export default async function FacilityBookingsPage({
               <Link
                 key={f.label}
                 href={hrefWith({ status: f.value ?? undefined }) as Route}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors duration-150",
                   isActive
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
-                }`}
+                    ? "border-secondary bg-secondary text-secondary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground",
+                )}
               >
                 {f.label}
               </Link>
@@ -128,18 +133,20 @@ export default async function FacilityBookingsPage({
       </div>
 
       {days.length === 0 ? (
-        <div className="rounded-lg border border-dashed py-12 text-center text-sm text-gray-500">
-          No bookings for this week
-        </div>
+        <p className="rounded-xl border border-dashed border-border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+          No bookings this week{status ? ` with status “${status}”` : ""}.
+        </p>
       ) : (
         <div className="flex flex-col gap-6">
           {days.map((day) => (
             <section key={day.date} className="flex flex-col gap-2">
-              {/* TODO 15: заголовок дня, например "Monday, 5 Oct" + число броней */}
-              <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase">
-                {formatCalendarDate(day.date, "EEEE, d MMM")} · {day.bookings.length}
+              <h2 className="flex items-baseline gap-2 font-sans text-base font-semibold">
+                {formatCalendarDate(day.date, "EEEE, d MMM")}
+                <span className="nums text-sm font-normal text-muted-foreground">
+                  {day.bookings.length} {day.bookings.length === 1 ? "booking" : "bookings"}
+                </span>
               </h2>
-              <div className="divide-y rounded-lg border bg-white">
+              <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
                 {day.bookings.map((b) => (
                   <BookingRow key={b.id} booking={b} timeZone={facility.timezone} />
                 ))}
