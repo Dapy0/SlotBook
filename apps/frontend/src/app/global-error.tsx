@@ -1,4 +1,5 @@
 "use client";
+import "./globals.css";
 import { Button } from "@/components/ui/button";
 
 export default function GlobalError({
@@ -9,13 +10,19 @@ export default function GlobalError({
   retry: () => void;
 }) {
   return (
-    <html>
-      <body>
-        <div className="flex flex-col items-center gap-4 py-20 text-center">
-          <h2 className="text-xl font-bold">Something went wrong!</h2>
-          <p className="text-sm text-muted-foreground">{error.message}</p>
+    <html lang="en">
+      <body className="font-sans">
+        <main className="mx-auto flex min-h-dvh max-w-md flex-col items-start justify-center gap-4 px-4">
+          <h1 className="text-3xl font-bold tracking-tight">Something went wrong</h1>
+          <p className="text-muted-foreground">
+            The page couldn&apos;t load. Try again, and if it keeps happening, come back in a few
+            minutes.
+          </p>
+          {error.digest && (
+            <p className="nums text-sm text-muted-foreground">Error code: {error.digest}</p>
+          )}
           <Button onClick={retry}>Try again</Button>
-        </div>
+        </main>
       </body>
     </html>
   );
