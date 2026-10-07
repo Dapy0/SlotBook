@@ -51,7 +51,7 @@ export function StaffServicesForm({
       router.refresh();
     } catch (err) {
       void err;
-      setError("TODO");
+      setError("Couldn't save the services. Check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -63,29 +63,29 @@ export function StaffServicesForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {services.length === 0 ? (
-        <p className="text-sm text-gray-500">This venue has no services yet.</p>
+        <p className="text-sm text-muted-foreground">This venue has no services yet.</p>
       ) : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {services.map((service) => (
             <li key={service.id}>
-              <label className="flex cursor-pointer items-center gap-3 rounded-md border bg-white px-3 py-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-3 rounded-md border bg-card px-3 py-2 text-sm">
                 <input
                   type="checkbox"
                   className="size-4"
                   checked={selected.has(service.id)}
                   onChange={() => toggle(service.id)}
                 />
-                <span className={service.isActive ? "text-gray-900" : "text-gray-400"}>
+                <span className={service.isActive ? "text-foreground" : "text-muted-foreground"}>
                   {service.name}
                 </span>
-                {!service.isActive && <span className="ml-auto text-xs text-gray-400">Hidden</span>}
+                {!service.isActive && <span className="ml-auto text-xs text-muted-foreground">Hidden</span>}
               </label>
             </li>
           ))}
         </ul>
       )}
 
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-sm text-destructive">{error}</span>}
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onDone}>

@@ -9,7 +9,7 @@ import { getStaffMembersForOwner } from '@/services/staff.server';
 
 const STATUS_FILTERS = [
   { value: "active", label: "Active" },
-  { value: "fired", label: "Fired" },
+  { value: "fired", label: "Former" },
   { value: "all", label: "All" },
 ] as const;
 
@@ -50,21 +50,22 @@ export default async function FacilityStaffPage({
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-gray-900">Staff</h1>
-        <p className="text-sm text-gray-500">
-          {activeCount} active · {staff.length - activeCount} fired
+        <h1 className="text-3xl font-bold tracking-tight">Staff</h1>
+        <p className="text-sm text-muted-foreground">
+          {activeCount} active · {staff.length - activeCount} former
         </p>
       </header>
 
-      <nav className="flex w-fit gap-1 rounded-lg bg-gray-100 p-1">
+      <nav aria-label="Staff status" className="flex gap-1">
         {STATUS_FILTERS.map((f) => {
           const isActive = f.value === status;
           return (
             <Link
               key={f.value}
               href={`?status=${f.value}` as Route}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-                isActive ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-900"
+              aria-current={isActive ? "page" : undefined}
+              className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 ${
+                isActive ? "border-secondary bg-secondary text-secondary-foreground" : "border-border bg-card text-muted-foreground hover:text-foreground"
               }`}
             >
               {f.label}

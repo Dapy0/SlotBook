@@ -33,24 +33,24 @@ export function StaffRow({
   return (
     <div
       className={`grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-[1fr_auto] sm:items-center ${
-        isActive ? "" : "bg-gray-50"
+        isActive ? "" : "bg-muted/50"
       }`}
     >
       <div className="flex min-w-0 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className={`m-0 font-medium ${isActive ? "text-gray-900" : "text-gray-400"}`}>
+          <p className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
             {name}
           </p>
           {!isActive && (
-            <Badge variant="outline" className="border-gray-200 bg-gray-100 text-xs text-gray-500">
-              Fired
+            <Badge variant="outline" className="border-border bg-muted text-xs text-muted-foreground">
+              Former staff
             </Badge>
           )}
         </div>
-        <p className="m-0 truncate text-sm text-gray-500">{email}</p>
-        <p className="m-0 line-clamp-1 text-sm text-gray-600">
+        <p className="m-0 truncate text-sm text-muted-foreground">{email}</p>
+        <p className="m-0 line-clamp-1 text-sm text-muted-foreground">
           {serviceNames.length === 0 ? (
-            <span className="text-gray-400">No services assigned</span>
+            <span className="text-muted-foreground">No services assigned</span>
           ) : (
             serviceNames.join(" · ")
           )}
@@ -63,7 +63,7 @@ export function StaffRow({
                 key={day.value}
                 title={works ? "Working day" : "Day off"}
                 className={`flex size-7 items-center justify-center rounded-md text-xs font-medium ${
-                  works ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-400"
+                  works ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"
                 }`}
               >
                 {day.label}

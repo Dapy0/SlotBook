@@ -59,7 +59,7 @@ export function AddStaffForm({ facilityId, onDone }: Props) {
           placeholder="anna@example.com"
           aria-invalid={error ? true : undefined}
         />
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-sm text-destructive">{error}</span>}
       </div>
       <div className="flex gap-2">
         <Button type="button" variant="outline" onClick={onDone}>

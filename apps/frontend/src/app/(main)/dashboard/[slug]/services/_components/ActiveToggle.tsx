@@ -21,7 +21,6 @@ export function ActiveToggle({ facilityId, serviceId, isActive }: Props) {
     setIsPending(true);
     updateService(facilityId, serviceId, { isActive: !isActive })
       .catch((err) => {
-        console.log(err);
         setError(err instanceof ApiError ? err.message : "Failed to update service");
       })
       .finally(() => {
@@ -34,17 +33,13 @@ export function ActiveToggle({ facilityId, serviceId, isActive }: Props) {
       <Switch
         role="switch"
         checked={isActive}
-        id="service-status"
         aria-label={isActive ? "Hide service" : "Show service"}
         disabled={isPending}
         size={"default"}
         aria-invalid={error == null ? "false" : true}
         onClick={toggle}
-        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition disabled:opacity-50 ${
-          isActive ? "bg-primary" : "bg-gray-300"
-        }`}
       ></Switch>
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-sm text-destructive">{error}</span>}
     </div>
   );
 }

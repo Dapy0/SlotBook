@@ -43,9 +43,9 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {loadError ? (
-        <p className="text-sm text-red-500">{loadError}</p>
+        <p className="text-sm text-destructive">{loadError}</p>
       ) : initial === null ? (
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner /> Loading schedule…
         </div>
       ) : (
