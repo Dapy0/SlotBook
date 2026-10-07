@@ -1,23 +1,27 @@
 "use client";
 import ProfileMenu from "@/components/layout/ProfileMenu";
-import { Button, type buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Spinner } from "@/components/ui/spinner";
-import { toast } from "@/components/ui/toast";
-import { api } from "@/lib/api";
 import { useAuth } from "@/lib/authContext";
+import { cn } from "@/lib/utils";
 import type { VariantProps } from "class-variance-authority";
+import { Menu } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Suspense, use, useEffect, useState, useTransition } from "react";
+import { useTransition } from "react";
 import { setCountry } from "@/app/actions/setCountry";
 import type { Route } from "next";
 import type { CountryOption } from "@/lib/sharedSchemas";
@@ -43,6 +47,22 @@ export function countryName(code: string, locale = "en"): string {
   }
   return dn.of(code.toUpperCase()) ?? code;
 }
+
+export function Logo({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/"
+      aria-label="SlotBook home"
+      className={cn(
+        "rounded-md font-heading text-xl font-bold tracking-tight outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        className,
+      )}
+    >
+      slot<span className="text-brand-ink">book</span>
+    </Link>
+  );
+}
+
 export function Header<T extends string>({
   navBtns,
   rightBtns,
@@ -54,7 +74,7 @@ export function Header<T extends string>({
   countries?: CountryOption[];
   country?: string;
 }) {
-  const { user, me, isLoading, logout } = useAuth();
+  const { me, isLoading, logout } = useAuth();
   const [isPending, startTransition] = useTransition();
 
   const items = countries
@@ -63,27 +83,29 @@ export function Header<T extends string>({
         label: `${countryFlag(option.country)} ${countryName(option.country)}`,
       }))
     : null;
+
+  const isSignedIn = !isLoading && me;
+  const mobileLinks = [...(navBtns ?? []), ...(isSignedIn ? [] : (rightBtns ?? []))];
+
   return (
-    <header className="shrink-0 border-b border-border bg-background">
-      <div className="align-center mx-auto my-0 flex max-w-7xl justify-between gap-4 p-4">
-        <button className="text- cursor-pointer border-0 bg-none p-0 font-sans text-xl font-bold tracking-tight">
-          <Link href={"/"}>
-            slot
-            <span className="text-primary">book</span>
-          </Link>
-        </button>
-        <nav className="ml-auto flex gap-4">
+    <header className="sticky top-0 z-30 shrink-0 border-b border-border bg-background/90 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 md:px-6 lg:px-8">
+        <Logo />
+        <nav aria-label="Main" className="ml-6 hidden items-center gap-1 sm:flex">
           {navBtns?.map((btn) => (
-            <Button key={btn.linkHref as Route<T>} variant={btn.variant}>
-              {" "}
-              <Link href={btn.linkHref as Route<T>}>{btn.value}</Link>
-            </Button>
+            <Link
+              key={btn.linkHref.toString()}
+              href={btn.linkHref as Route<T>}
+              className={buttonVariants({ variant: "ghost" })}
+            >
+              {btn.value}
+            </Link>
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          {countries && (
+          {countries && items && (
             <Select
-              items={items!}
+              items={items}
               value={country}
               disabled={isPending}
               onValueChange={(value) => {
@@ -91,12 +113,12 @@ export function Header<T extends string>({
                 startTransition(() => setCountry(value));
               }}
             >
-              <SelectTrigger className="w-full max-w-48 [&_svg]:hidden!">
+              <SelectTrigger aria-label="Country" className="w-auto max-w-48 [&_svg]:hidden!">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent alignItemWithTrigger={false}>
                 <SelectGroup>
-                  {items!.map((item) => (
+                  {items.map((item) => (
                     <SelectItem key={item.value} value={item.value}>
                       {item.label}
                     </SelectItem>
@@ -105,15 +127,42 @@ export function Header<T extends string>({
               </SelectContent>
             </Select>
           )}
-          {!isLoading && me ? (
+          {isSignedIn ? (
             <ProfileMenu me={me} profilePicture={""} onLogout={logout} />
           ) : (
-            rightBtns?.map((btn) => (
-              <Button key={btn.linkHref as Route<T>} variant={btn.variant}>
-                {" "}
-                <Link href={btn.linkHref as Route<T>}>{btn.value}</Link>
-              </Button>
-            ))
+            <div className="hidden items-center gap-2 sm:flex">
+              {rightBtns?.map((btn) => (
+                <Link
+                  key={btn.linkHref.toString()}
+                  href={btn.linkHref as Route<T>}
+                  className={buttonVariants({ variant: btn.variant })}
+                >
+                  {btn.value}
+                </Link>
+              ))}
+            </div>
+          )}
+          {mobileLinks.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="Open menu"
+                className={cn(buttonVariants({ variant: "outline", size: "icon" }), "sm:hidden")}
+              >
+                <Menu />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuGroup>
+                  {mobileLinks.map((btn) => (
+                    <DropdownMenuItem
+                      key={btn.linkHref.toString()}
+                      render={<Link href={btn.linkHref as Route<T>} />}
+                    >
+                      {btn.value}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

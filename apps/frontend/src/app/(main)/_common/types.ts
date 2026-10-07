@@ -5,6 +5,7 @@ type CategoryMetadata = {
   label: string;
   description: string;
   icon: string;
+  /** Muted dot color. Categories never color whole surfaces (see DESIGN.md). */
   color: string;
   badgeClassName: string;
   slug: string;
@@ -15,48 +16,48 @@ export const CATEGORY_METADATA = {
     label: "Beauty & Wellness",
     description: "Salons, barbers, nails, spa and massage",
     icon: "Sparkles",
-    color: "oklch(59.2% 0.249 0.584)",
-    badgeClassName: "text-pink-500 rounded-md bg-pink-100 shadow-s",
+    color: "oklch(0.62 0.11 10)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
   SPORT_FITNESS: {
     slug: "sport-fitness",
     label: "Sport & Fitness",
     description: "Gyms, personal training and fitness studios",
     icon: "Dumbbell",
-    color: "oklch(64.6% 0.222 41.116)",
-    badgeClassName: "text-orange-500 rounded-md bg-orange-100 shadow-s",
+    color: "oklch(0.64 0.12 55)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
   MEDICAL: {
     slug: "medical",
     label: "Medical & Health",
     description: "Clinics, dentists and health specialists",
     icon: "Stethoscope",
-    color: "oklch(58.8% 0.158 241.966)",
-    badgeClassName: "text-sky-500 rounded-md bg-sky-100 shadow-s",
+    color: "oklch(0.6 0.09 230)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
   AUTO: {
     slug: "auto",
     label: "Auto Services",
     description: "Car service, detailing and repair shops",
     icon: "Car",
-    color: "oklch(44.6% 0.03 256.802)",
-    badgeClassName: "text-slate-500 rounded-md bg-slate-100 shadow-s",
+    color: "oklch(0.5 0.03 260)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
   EDUCATION: {
     slug: "education",
     label: "Education & Tutoring",
     description: "Private lessons, courses and tutors",
     icon: "GraduationCap",
-    color: "oklch(51.1% 0.262 276.966)",
-    badgeClassName: "text-indigo-500 rounded-md bg-indigo-100 shadow-s",
+    color: "oklch(0.55 0.1 285)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
   OTHER: {
     slug: "other",
     label: "Other",
     description: "Everything else",
     icon: "Shapes",
-    color: "oklch(44.2% 0.017 285.786)",
-    badgeClassName: "text-zinc-500 rounded-md bg-zinc-100 shadow-s",
+    color: "oklch(0.55 0.02 85)",
+    badgeClassName: "rounded-full border-border bg-card text-foreground",
   },
 } satisfies Record<FacilityCategory, CategoryMetadata>;
 export const CATEGORY_BY_SLUG = Object.fromEntries(

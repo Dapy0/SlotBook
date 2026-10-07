@@ -1,35 +1,31 @@
-const COLORS = [
-  { from: 0, to: 2.9, color: "oklch(57.7% 0.245 27.325)", tier: "low" }, // red-600
-  { from: 3, to: 3.9, color: "oklch(64.6% 0.222 41.116)", tier: "mid" }, // orange-600
-  { from: 4, to: 4.4, color: "oklch(68.1% 0.162 75.834)", tier: "good" }, // yellow-600
-  { from: 4.5, to: 5, color: "oklch(62.7% 0.194 149.214)", tier: "high" }, // green-600
-];
+import { cn } from "@/lib/utils";
+import { Star } from "lucide-react";
 
-function getScoreColor(score: number) {
-  return COLORS.find((tier) => score >= tier.from && score <= tier.to) ?? COLORS[0];
-}
-
+// One quiet style for every score: the number matters, not a traffic-light color.
 function ScoreBadge({ styles = "", score }: { styles?: string; score: number | null }) {
   if (score == null) {
     return (
       <span
-        className={`rounded-sm px-2 py-1 text-sm font-medium text-white ${styles}`}
-        style={{ backgroundColor: "purple" }}
+        className={cn(
+          "inline-flex items-center rounded-full border border-border bg-card px-2 py-0.5 text-xs font-medium text-muted-foreground",
+          styles,
+        )}
       >
-        <span className="sb-score__n">{"NEW"}</span>
+        New
       </span>
     );
   }
-  const { color, tier } = getScoreColor(score);
 
   return (
     <span
-      className={`rounded-sm px-2 py-1 text-sm font-medium text-white ${styles}`}
-      style={{ backgroundColor: color }}
+      className={cn(
+        "nums inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground",
+        styles,
+      )}
+      aria-label={`Rated ${score.toFixed(1)} out of 5`}
     >
-      <span className="sb-score__n" data-tier={tier}>
-        {score.toFixed(1)}
-      </span>
+      <Star aria-hidden className="size-3 fill-primary stroke-primary" />
+      {score.toFixed(1)}
     </span>
   );
 }
