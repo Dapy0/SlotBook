@@ -23,7 +23,8 @@ export function Map({ latitude, longitude }: { longitude: number; latitude: numb
       logoPosition: "bottom-right",
     });
 
-    new mapboxgl.Marker({ color: "oklch(0.555 0.163 48.998)" })
+    // Brand gold from DESIGN.md (--primary); mapbox needs a literal color.
+    new mapboxgl.Marker({ color: "oklch(0.81 0.13 82)" })
       .setLngLat([longitude, latitude])
       .addTo(mapRef.current);
 

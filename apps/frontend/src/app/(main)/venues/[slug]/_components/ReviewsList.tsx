@@ -3,12 +3,14 @@ import { StarIcon } from "lucide-react";
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5" role="img" aria-label={`${rating} out of 5`}>
       {Array.from({ length: 5 }).map((_, i) => (
         <StarIcon
           key={i}
-          size={13}
-          className={i < rating ? "fill-amber-400 text-amber-400" : "fill-gray-200 text-gray-200"}
+          aria-hidden
+          className={
+            i < rating ? "size-3.5 fill-primary stroke-primary" : "size-3.5 fill-muted stroke-border"
+          }
         />
       ))}
     </div>
@@ -30,8 +32,8 @@ export default function ReviewsList({
 }) {
   if (reviews.length === 0) {
     return (
-      <div className="w-full rounded-sm border border-gray-200 bg-white shadow-sm">
-        <p className="px-6 py-8 text-center text-sm text-gray-400">No reviews yet.</p>
+      <div className="rounded-xl border border-border bg-card px-5 py-8 text-center text-sm text-muted-foreground">
+        No reviews yet. Reviews appear here after clients visit.
       </div>
     );
   }
@@ -44,37 +46,37 @@ export default function ReviewsList({
   const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
   return (
-    <div className="flex w-full flex-col items-start gap-4">
-      <div className="flex w-full shrink-0 flex-col items-center justify-center gap-1 rounded-sm border border-gray-200 bg-white py-4 shadow-sm">
-        <span className="text-4xl font-bold text-gray-900">{avgRating.toFixed(1)}</span>
+    <div className="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">
+      <div className="flex flex-col items-start gap-1 self-start rounded-xl border border-border bg-card p-5 sm:items-center sm:text-center">
+        <span className="nums font-heading text-4xl font-bold">{avgRating.toFixed(1)}</span>
         <Stars rating={Math.round(avgRating)} />
-        <span className="text-xs text-gray-400">{reviews.length} reviews</span>
+        <span className="nums text-sm text-muted-foreground">
+          {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
+        </span>
       </div>
 
-      <div className="w-full flex-1 rounded-sm border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         {filtered.length === 0 ? (
-          <p className="px-6 py-8 text-center text-sm text-gray-400">
+          <p className="px-5 py-8 text-center text-sm text-muted-foreground">
             No reviews match your search.
           </p>
         ) : (
-          <div className="w-full divide-y divide-gray-100">
+          <ul className="divide-y divide-border">
             {filtered.map((review) => (
-              <div key={review.id} className="flex items-start justify-between px-6 py-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Stars rating={review.rating} />
-                    <span className="text-xs text-gray-400">
-                      {review.serviceName} · {review.staffMemberName}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-sm text-gray-800">{review.comment}</p>
+              <li key={review.id} className="flex flex-col gap-1.5 px-5 py-4">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <Stars rating={review.rating} />
+                  <span className="nums text-sm text-muted-foreground">
+                    {dateFormatter.format(new Date(review.createdAt))}
+                  </span>
                 </div>
-                <span className="ml-4 shrink-0 text-xs text-gray-400">
-                  {dateFormatter.format(new Date(review.createdAt))}
-                </span>
-              </div>
+                {review.comment && <p className="max-w-prose break-words">{review.comment}</p>}
+                <p className="text-sm text-muted-foreground">
+                  {review.serviceName} · {review.staffMemberName}
+                </p>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>
