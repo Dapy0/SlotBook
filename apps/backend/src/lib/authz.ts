@@ -1,9 +1,14 @@
-import type { FacilityResponse, StaffMemberResponse } from "@slotbook/shared";
+import type {
+  AddServiceToStaffMemberRequest,
+  FacilityResponse,
+  StaffMemberResponse,
+} from "@slotbook/shared";
 import type { DB } from "../db/drizzlePlugin";
-import { ForbiddenError } from "./errors";
+import { BadRequestError, ForbiddenError } from "./errors";
 import { assertFound } from "../modules/utils";
 import { findFacilityById } from "../modules/facility/facility.repository";
 import { findStaffMemberById } from "../modules/staff/staff.repository";
+import { findServicesIds } from "../modules/service/service.repository";
 
 export async function assertFacilityOwner(
   db: DB,
@@ -29,4 +34,15 @@ export async function assertFacilityStaffMember(
     throw new ForbiddenError("Not member of facility");
   }
   return staffMember;
+}
+export async function assertFacilityServices(
+  db: DB,
+  facilityId: string,
+  servicesIds: AddServiceToStaffMemberRequest,
+): Promise<AddServiceToStaffMemberRequest> {
+  const facilityServicesIds = await findServicesIds(db, facilityId);
+  if (servicesIds.serviceIds.every((service) => facilityServicesIds.includes({ id: service }))) {
+    throw new BadRequestError("Not all services match provided by facilities services");
+  }
+  return servicesIds;
 }

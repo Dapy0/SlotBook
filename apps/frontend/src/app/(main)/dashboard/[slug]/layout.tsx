@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 
 import { getMe } from "@/lib/session";
 import { NavLinks, type NavItem } from "@/app/(main)/dashboard/_components/NavLinks";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function FacilityDashboardLayout({
   children,
@@ -48,6 +50,22 @@ export default async function FacilityDashboardLayout({
           </Badge>
         </div>
         <NavLinks items={navItems} />
+        <Button
+          render={
+            <Link
+              key={`/venues/${slug}`}
+              href={`/venues/${slug}`}
+              className={
+                "vertical" === "vertical"
+                  ? `rounded-md px-3 py-2 text-sm font-medium transition`
+                  : `-mb-px border-b-2 px-4 py-2 text-sm font-medium transition`
+              }
+            >
+              {"Go to venue page"}
+            </Link>
+          }
+          className={"w-full justify-start"}
+        ></Button>
       </aside>
 
       <main className="min-w-0 flex-1">{children}</main>

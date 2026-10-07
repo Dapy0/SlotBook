@@ -44,6 +44,7 @@ export function NavLinks({ items, orientation = "vertical" }: Props) {
           </Link>
         );
       })}
+
     </nav>
   );
 }

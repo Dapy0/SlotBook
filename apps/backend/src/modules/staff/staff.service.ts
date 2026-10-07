@@ -1,6 +1,10 @@
-import type { CreateStaffMemberRequest, ManagedStaffMemberResponse, StaffMemberResponse } from "@slotbook/shared";
+import type {
+  CreateStaffMemberRequest,
+  ManagedStaffMemberResponse,
+  StaffMemberResponse,
+} from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
-import { ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import { findUserByEmail } from "../auth/auth.repository.ts";
 import {
   findServiceByServiceIdAndMemberId,
@@ -25,7 +29,9 @@ export async function addNewStaffMembersToFacilityById(
   if (user.deletedAt != null) {
     throw new NotFoundError("User with this email not found");
   }
-
+  if (userId === user.id) {
+    throw new ForbiddenError("Owner can not add them selfs as a worker");
+  }
   await insertStaffMemberById(db, user.id, facilityId).catch((e) => {
     if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("User already working here");

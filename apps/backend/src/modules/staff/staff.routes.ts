@@ -17,7 +17,7 @@ import {
   insertServicesByStaffMemberId,
   updateActiveStatusByStaffId,
 } from "./staff.repository";
-import { assertFacilityOwner, assertFacilityStaffMember } from "../../lib/authz.ts";
+import { assertFacilityOwner, assertFacilityServices, assertFacilityStaffMember } from "../../lib/authz.ts";
 
 export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -112,7 +112,7 @@ export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const { id: facilityId } = request.params;
       await assertFacilityOwner(request.server.drizzle, facilityId, request.user.id);
       await assertFacilityStaffMember(request.server.drizzle, facilityId, request.params.staffId);
-
+      await assertFacilityServices(request.server.drizzle, facilityId, request.body);
       await request.server.drizzle
         .transaction(async (tx) => {
           await deleteAllServicesByStaffMemberId(tx, request.params.staffId);
@@ -121,7 +121,7 @@ export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
         .catch((err) => {
           throw new Error("Something in transaction went wrong :" + err);
         });
-          // Осталось проверить если все status если они пренадлежат facilities и добавить на фронт потом для расписания изменения сделать
+          
       const [staff] = await findStaffMembersForOwner(
         request.server.drizzle,
         facilityId,

@@ -132,3 +132,10 @@ export async function updateServiceById(
 
   return service;
 }
+
+export async function findServicesIds(db: DB, facilityId: string) {
+  return await db
+    .select({ id: services.id })
+    .from(services)
+    .where(eq(services.facilityId, facilityId));
+}

@@ -2,6 +2,8 @@
 import { useState } from "react";
 import type { ServiceResponse } from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
+import { setStaffServices } from "@/services/staff";
+import { useRouter } from "next/navigation";
 
 type Props = {
   facilityId: string;
@@ -18,6 +20,7 @@ export function StaffServicesForm({
   initialServiceIds,
   onDone,
 }: Props) {
+  const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(initialServiceIds));
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,10 +45,10 @@ export function StaffServicesForm({
       if (initialServiceIds.every((v, i) => v === setToArr[i])) {
         return onDone();
       }
-      
-      // TODO 6.4: setStaffServices(facilityId, staffId, [...selected]), затем onDone() и router.refresh()
-      void facilityId;
-      void staffId;
+      await setStaffServices(facilityId, staffId, { serviceIds: [...selected] });
+
+      onDone();
+      router.refresh();
     } catch (err) {
       void err;
       setError("TODO");
