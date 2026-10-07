@@ -1,40 +1,42 @@
-import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
+import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
 import ScoreBadge from "@/components/layout/ScoreBadge";
-import { Badge } from "@/components/ui/badge";
-import type { FacilityResponse } from '@slotbook/shared';
-import * as Icons from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import type { Route } from 'next';
+import type { FacilityResponse } from "@slotbook/shared";
+import { MapPin } from "lucide-react";
+import type { Route } from "next";
 import Link from "next/link";
+
+export function CategoryDot({ color }: { color: string }) {
+  return (
+    <span aria-hidden className="size-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+  );
+}
+
 function SmallFacilityPreviewCard({ facility }: { facility: FacilityResponse }) {
-  const { name, address, city, category, id, score, slug } = facility;
-  const Icon = Icons[
-    CATEGORY_METADATA[category].icon as keyof typeof Icons
-  ] as unknown as LucideIcon;
+  const { name, address, city, category, score, slug } = facility;
+  const meta = CATEGORY_METADATA[category];
 
   return (
     <Link
-      href={`venues/${slug}` as Route}
-      className="relative max-w-60 min-w-60 overflow-hidden rounded-md border p-4"
+      href={`/venues/${slug}` as Route}
+      className="group flex h-full flex-col gap-5 rounded-xl border border-border bg-card p-5 transition-[box-shadow,border-color] duration-200 ease-out outline-none hover:border-[color-mix(in_oklch,var(--primary),var(--border)_40%)] hover:shadow-md focus-visible:ring-3 focus-visible:ring-ring/50"
     >
-      <div className="absolute inset-0 z-5 h-full w-full bg-linear-to-t from-gray-100 to-gray-50"></div>{" "}
-      {/*Gradient*/}
-      {/* <img src="" alt="" /> */}
-      <div className="relative z-10">
-        <div className="flex items-center justify-between">
-          {" "}
-          <Badge variant="outline" className={CATEGORY_METADATA[category].badgeClassName}>
-            <Icon />
-            {CATEGORY_METADATA[category].label}
-          </Badge>
-          <ScoreBadge score={score} />
-        </div>
-        <div className="mt-6 flex flex-col">
-          <h3 className={"text-lg font-bold"}>{name}</h3>
-          <p className={"text-md text-gray-600"}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
+          <CategoryDot color={meta.color} />
+          <span className="truncate">{meta.label}</span>
+        </span>
+        <ScoreBadge score={score} />
+      </div>
+      <div className="mt-auto flex min-w-0 flex-col gap-1">
+        <h3 className="truncate text-lg font-semibold group-hover:underline group-hover:decoration-primary group-hover:decoration-2">
+          {name}
+        </h3>
+        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <MapPin aria-hidden className="size-3.5 shrink-0" />
+          <span className="truncate">
             {city}, {address}
-          </p>
-        </div>
+          </span>
+        </p>
       </div>
     </Link>
   );
