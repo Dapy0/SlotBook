@@ -16,7 +16,7 @@ export function BookedBanner() {
   return (
     <div
       role="status"
-      className="flex items-start gap-3 rounded-xl border border-success/30 bg-success/10 p-4"
+      className="flex enter items-start gap-3 rounded-xl border border-success/30 bg-success/10 p-4"
     >
       <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-success" />
       <div className="flex-1">

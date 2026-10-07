@@ -68,7 +68,7 @@ function FiltersSidebar({
       <div
         id="venue-filters"
         className={cn(
-          "mt-3 flex-col gap-6 rounded-xl border border-border bg-card p-4 lg:mt-0 lg:flex",
+          "mt-3 flex-col gap-6 rounded-xl border border-border bg-card p-4 max-lg:enter lg:mt-0 lg:flex",
           isOpen ? "flex" : "hidden",
         )}
       >

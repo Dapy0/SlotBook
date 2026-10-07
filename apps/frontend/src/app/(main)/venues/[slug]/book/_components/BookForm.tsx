@@ -384,7 +384,7 @@ function BookForm({
                           aria-label={formatCalendarDate(day.date)}
                           onClick={() => handleSelectDate(day.date)}
                           className={cn(
-                            "flex h-18 w-14 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                            "flex h-18 w-14 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm press outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                             isSelected
                               ? "border-primary bg-primary text-primary-foreground"
                               : "border-border bg-card hover:border-[color-mix(in_oklch,var(--primary),var(--border)_30%)] hover:bg-accent",
@@ -412,7 +412,7 @@ function BookForm({
                 {!selectedDaySlots ? (
                   <EmptyNote>Pick a day to see the free times.</EmptyNote>
                 ) : (
-                  <div className="flex flex-col gap-5">
+                  <div key={selection.date} className="enter flex flex-col gap-5">
                     {slotGroups.map((group) => (
                       <div key={group.label} className="flex flex-col gap-2">
                         <h3 className="font-sans text-sm font-semibold text-muted-foreground">
@@ -432,7 +432,7 @@ function BookForm({
                                 aria-label={`${start} to ${end}`}
                                 onClick={() => handleSelectSlot(slot)}
                                 className={cn(
-                                  "h-11 min-w-20 rounded-full border px-4 text-sm font-semibold nums transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                                  "h-11 min-w-20 rounded-full border px-4 text-sm font-semibold nums press outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                                   isSelected
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-border bg-card hover:border-[color-mix(in_oklch,var(--primary),var(--border)_30%)] hover:bg-accent",

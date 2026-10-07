@@ -38,7 +38,7 @@ export function BookingActions({ bookingId, status }: Props) {
     <div className="flex flex-col items-end gap-1">
       {isConfirmingCancel ? (
         <div
-          className="flex flex-wrap items-center justify-end gap-2"
+          className="flex enter flex-wrap items-center justify-end gap-2"
           role="group"
           aria-label="Confirm cancellation"
         >

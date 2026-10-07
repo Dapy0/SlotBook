@@ -37,7 +37,11 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
   }
 
   return (
-    <div className="flex flex-col items-end gap-1.5" role="group" aria-label="Confirm cancellation">
+    <div
+      className="flex enter flex-col items-end gap-1.5"
+      role="group"
+      aria-label="Confirm cancellation"
+    >
       <p className="text-sm font-medium">Cancel this booking?</p>
       <div className="flex gap-2">
         <Button
