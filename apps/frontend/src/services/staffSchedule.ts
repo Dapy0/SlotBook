@@ -15,15 +15,15 @@ export async function getStaffSchedule(facilityId: string, staffId: string) {
 export async function putStaffSchedule(
   facilityId: string,
   staffId: string,
-  data: ChangeWeekScheduleRequest[],
+  data: ChangeWeekScheduleRequest,
 ) {
 
   return await api(
     `/facilities/${facilityId}/staff/${staffId}/schedule`,
-    changeWeekScheduleRequestSchema.array(),
+    staffScheduleEntryResponseSchema.array(),
     {
       method: "PUT",
       body: JSON.stringify(data),
-    }
+    },
   );
 }

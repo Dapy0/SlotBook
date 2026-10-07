@@ -1,8 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { WeeklyScheduleForm, type ScheduleEntry } from "@/components/schedule/WeeklyScheduleForm";
+import { getStaffSchedule, putStaffSchedule } from "@/services/staffSchedule";
+import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
+import { useRouter } from "next/navigation";
+import { ApiError } from "@/lib/api";
 
 type Props = {
   facilityId: string;
@@ -10,25 +14,30 @@ type Props = {
   onDone: () => void;
 };
 
-// Шаг 7: недельное расписание сотрудника.
 // Переиспользуем WeeklyScheduleForm (один интервал в день — ограничение MVP).
 export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
   const [initial, setInitial] = useState<ScheduleEntry[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // TODO 7.3: загрузи текущее расписание при открытии панели:
-  //           useEffect → getStaffSchedule(facilityId, staffId) → setInitial(...)
-  //           Ответ содержит id, createdAt, staffMemberId. Что из этого нужно форме?
-  //           Время приходит как "09:00:00", а <input type="time"> ждёт "09:00".
-  //           Подумай, что будет, если панель закроют до ответа сервера.
-  void setInitial;
-  void setLoadError;
+  useEffect(() => {
+    getStaffSchedule(facilityId, staffId)
+      .then((res) => {
+        setInitial(res);
+      })
+      .catch((err) => setLoadError(err));
+  }, []);
 
-  async function handleSubmit(entries: ScheduleEntry[]) {
-    // TODO 7.4: putStaffSchedule(facilityId, staffId, entries), затем router.refresh().
-    //           WeeklyScheduleForm сама покажет ошибку, если ты пробросишь исключение.
+  async function handleSubmit(entries: ChangeWeekScheduleRequest) {
+    try {
+      await putStaffSchedule(facilityId, staffId, entries);
+      router.refresh();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw new Error(error.message);
+      }
+    }
     void entries;
-    throw new Error(`TODO: save schedule for ${staffId} in ${facilityId}`);
   }
 
   return (
@@ -40,8 +49,6 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
           <Spinner /> Loading schedule…
         </div>
       ) : (
-        // WeeklyScheduleForm читает initialData только при первом рендере,
-        // поэтому рендерим её, когда данные уже пришли
         <WeeklyScheduleForm initialData={initial} onSubmit={handleSubmit} />
       )}
       <div className="flex justify-end">

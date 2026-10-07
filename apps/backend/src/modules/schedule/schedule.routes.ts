@@ -1,7 +1,10 @@
-import { scheduleBody, scheduleParamsSchema } from "./schedule.schema.ts";
+import { scheduleParamsSchema, type ScheduleBody } from "./schedule.schema.ts";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { changeWeekSchedule, receiveStaffSchedule } from "./schedule.service";
-import { staffScheduleEntryResponseSchema } from "@slotbook/shared";
+import {
+  changeWeekScheduleRequestSchema,
+  staffScheduleEntryResponseSchema,
+} from "@slotbook/shared";
 
 export const scheduleRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -29,7 +32,7 @@ export const scheduleRoutes: FastifyPluginAsyncZod = async (fastify) => {
       onRequest: [fastify.authenticate],
       schema: {
         params: scheduleParamsSchema,
-        body: scheduleBody,
+        body: changeWeekScheduleRequestSchema,
         response: {
           200: staffScheduleEntryResponseSchema.array(),
         },
@@ -41,7 +44,7 @@ export const scheduleRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.user.id,
         request.params.id,
         request.params.staffId,
-        request.body,
+        request.body as ScheduleBody,
       );
       return response.send(schedule);
     },

@@ -43,13 +43,11 @@ export function checkStaffScheduleFitsFacility(
     }
     if (current.startTime < facilityDay.startTime || current.endTime > facilityDay.endTime) {
       throw new ConflictError(
-        `Staff schedule outside facility hours on day ${current.dayOfTheWeek}`,
+        `Staff schedule outside facility hours that are ${facilityDay.startTime.slice(0, 5)}-${facilityDay.endTime.slice(0, 5)} on day ${current.dayOfTheWeek}`,
       );
     }
   }
 }
-
-
 
 export function convertShortDayNameToDayNumber(dayName: WeekdayByName): Weekday {
   return WEEKDAY_BY_NAME[dayName];

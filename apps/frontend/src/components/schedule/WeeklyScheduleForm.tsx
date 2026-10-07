@@ -37,7 +37,7 @@ function buildInitialRows(initialData: ScheduleEntry[]): DayRow[] {
     const existing = initialData.find((d) => d.dayOfTheWeek === value);
     return existing
       ? { enabled: true, startTime: existing.startTime, endTime: existing.endTime }
-      : { enabled: false, startTime: "09:00", endTime: "18:00" };
+      : { enabled: false, startTime: "09:00:00", endTime: "18:00:00" };
   });
 }
 
@@ -75,8 +75,8 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
 
     const payload: ScheduleEntry[] = enabledRows.map(({ dayOfTheWeek, startTime, endTime }) => ({
       dayOfTheWeek,
-      startTime: `${startTime}:00`,
-      endTime: `${endTime}:00`,
+      startTime: startTime.length == 5 ? `${startTime}:00` : startTime,
+      endTime: endTime.length == 5 ? `${endTime}:00` : endTime,
     }));
 
     setIsSubmitting(true);
