@@ -25,7 +25,9 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       .then((res) => {
         setInitial(res);
       })
-      .catch((err) => setLoadError(err));
+      .catch(() =>
+        setLoadError("Couldn't load the schedule. Close this panel and try again."),
+      );
   }, []);
 
   async function handleSubmit(entries: ChangeWeekScheduleRequest) {
@@ -33,11 +35,13 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       await putStaffSchedule(facilityId, staffId, entries);
       router.refresh();
     } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(error.message);
-      }
+      // Re-throw every failure so the form never reports a save that did not happen.
+      throw new Error(
+        error instanceof ApiError
+          ? error.message
+          : "Couldn't save the schedule. Check your connection and try again.",
+      );
     }
-    void entries;
   }
 
   return (

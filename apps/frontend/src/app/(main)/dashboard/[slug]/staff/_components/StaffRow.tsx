@@ -55,11 +55,11 @@ export function StaffRow({
             serviceNames.join(" · ")
           )}
         </p>
-        <div className="mt-1 flex gap-1" aria-label="Work days">
+        <ul className="mt-1 flex gap-1" aria-label="Work days">
           {WEEKDAYS.map((day) => {
             const works = workDaySet.has(day.value);
             return (
-              <span
+              <li
                 key={day.value}
                 title={works ? "Working day" : "Day off"}
                 className={`flex size-7 items-center justify-center rounded-md text-xs font-medium ${
@@ -67,10 +67,11 @@ export function StaffRow({
                 }`}
               >
                 {day.label}
-              </span>
+                <span className="sr-only">{works ? ": working" : ": day off"}</span>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
 
       <StaffActions

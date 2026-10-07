@@ -15,8 +15,6 @@ export default async function WorkLayout({ children }: { children: React.ReactNo
   const base = `/work`;
   const navItems: NavItem[] = [
     { href: `${base}`, label: "Today", exact: true },
-    { href: `${base}/bookings`, label: "Bookings" },
-    { href: `${base}/schedule`, label: "Schedule" },
   ];
 
   return (
@@ -34,7 +32,7 @@ export default async function WorkLayout({ children }: { children: React.ReactNo
 
       <NavLinks items={navItems} orientation="horizontal" />
 
-      <main className="min-w-0">{children}</main>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }

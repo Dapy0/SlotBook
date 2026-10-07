@@ -22,10 +22,10 @@ function ScoreBadge({ styles = "", score }: { styles?: string; score: number | n
         "nums inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs font-semibold text-secondary-foreground",
         styles,
       )}
-      aria-label={`Rated ${score.toFixed(1)} out of 5`}
     >
       <Star aria-hidden className="size-3 fill-primary stroke-primary" />
-      {score.toFixed(1)}
+      <span aria-hidden>{score.toFixed(1)}</span>
+      <span className="sr-only">Rated {score.toFixed(1)} out of 5</span>
     </span>
   );
 }

@@ -13,7 +13,7 @@ import Link from "next/link";
 
 function ProfileMenu({
   me,
-  profilePicture = "https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/",
+  profilePicture = "",
   onLogout,
 }: {
   me: AuthMeResponse;
@@ -33,7 +33,7 @@ function ProfileMenu({
           render={
             <Button variant="ghost" size="icon" aria-label="Account menu" className="rounded-full">
               <Avatar>
-                <AvatarImage src={profilePicture} />
+                {profilePicture && <AvatarImage src={profilePicture} alt="" />}
                 <AvatarFallback>{me.user.name[0].toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>

@@ -45,7 +45,7 @@ export default function ServicesList({
 
       {filteredGroups.map((group) => (
         <section key={group.section} className="border-t border-border first:border-t-0">
-          <h3 className="bg-muted/60 px-5 py-2 font-sans text-sm font-semibold">{group.section}</h3>
+          <h2 className="bg-muted/60 px-5 py-2 font-sans text-sm font-semibold">{group.section}</h2>
           <ul className="divide-y divide-border">
             {group.items.map((service) => {
               const query = new URLSearchParams();

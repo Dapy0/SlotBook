@@ -12,9 +12,15 @@ import type { FacilityListQuery } from "@slotbook/shared";
 import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@/app/(main)/_common/types";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { createParams } from "@/lib/queryStrings";
+import type { Route } from "next";
+
+const PAGE_SIZE = 10;
+const MAX_LIMIT = 50;
 
 async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery> }) {
-  const { category, rating, limit = 10, offset = 0, q, sort, city } = await searchParams;
+  const { category, rating, limit = PAGE_SIZE, offset = 0, q, sort, city } = await searchParams;
   const country = (await cookies()).get("_sb_country")?.value || "PL";
 
   const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
@@ -29,6 +35,8 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
   const title = categoryName ? CATEGORY_METADATA[categoryName].label : "All venues";
   const found = facilitiesWithServices.length;
   const hasFilters = Boolean(category || rating || q || city);
+  // The API caps one request at 50, so "Show more" grows the page up to that limit.
+  const canShowMore = found >= Number(limit) && Number(limit) < MAX_LIMIT;
 
   return (
     <div>
@@ -59,6 +67,15 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
                   key={facilityWithServices.id}
                 />
               ))}
+              {canShowMore && (
+                <Link
+                  href={`/venues?${createParams({ category, rating, q, city, sort, limit: Number(limit) + PAGE_SIZE })}` as Route}
+                  scroll={false}
+                  className={cn(buttonVariants({ variant: "outline", size: "lg" }), "self-center")}
+                >
+                  Show more venues
+                </Link>
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border bg-card p-8">

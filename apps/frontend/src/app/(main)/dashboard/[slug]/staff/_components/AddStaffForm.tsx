@@ -32,15 +32,19 @@ export function AddStaffForm({ facilityId, onDone }: Props) {
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 404) {
-          setError("No user with such email");
+          setError("No SlotBook account uses this email. Ask them to sign up first.");
+          return;
         }
         if (err.status === 409) {
-          setError("This user already works here");
+          setError("This person is already on your team.");
+          return;
         }
         if (err.status === 403) {
-          setError("You can add yourself as an owner.");
+          setError("You can't add yourself: owners manage the venue, not staff slots.");
+          return;
         }
       }
+      setError("Couldn't add this person. Check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }

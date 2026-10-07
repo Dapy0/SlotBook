@@ -26,10 +26,10 @@ Tokens live in `apps/frontend/src/app/globals.css` (`:root` and `.dark`). Use to
 | `--muted-foreground` | `oklch(0.47 0.02 265)` | `oklch(0.74 0.02 85)` | secondary text (≥4.5:1) |
 | `--accent` | `oklch(0.94 0.045 85)` | `oklch(0.3 0.03 265)` | hover / soft selection |
 | `--border` / `--input` | `oklch(0.9 0.012 85)` | `oklch(1 0 0 / 10%)` / `15%` | hairlines, fields |
-| `--ring` | `oklch(0.7 0.13 78)` | `oklch(0.8 0.12 82)` | focus |
-| `--success` | `oklch(0.52 0.12 155)` | `oklch(0.75 0.13 155)` | confirmed |
-| `--warning` | `oklch(0.58 0.13 65)` | `oklch(0.82 0.13 80)` | pending |
-| `--destructive` | `oklch(0.55 0.2 28)` | `oklch(0.7 0.18 25)` | cancel, errors |
+| `--ring` | `oklch(0.6 0.12 72)` | `oklch(0.8 0.12 82)` | focus |
+| `--success` | `oklch(0.47 0.11 155)` | `oklch(0.75 0.13 155)` | confirmed |
+| `--warning` | `oklch(0.5 0.12 60)` | `oklch(0.82 0.13 80)` | pending |
+| `--destructive` | `oklch(0.52 0.2 28)` | `oklch(0.7 0.18 25)` | cancel, errors |
 
 Status mapping: `pending` → warning tint, `confirmed` → success tint, `cancelled` → muted, `completed` → ink outline.
 Category colors: a single muted family (low-chroma tints, same lightness), used only as a small dot.

@@ -23,8 +23,7 @@ export default async function AppointmentsPage({
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight">My appointments</h1>
         <p className="text-muted-foreground">
-          New bookings wait for the venue to confirm. You can cancel up to 2 hours before the
-          start.
+          New bookings wait for the venue to confirm. You can cancel any time before the start.
         </p>
       </header>
       {booked && <BookedBanner />}

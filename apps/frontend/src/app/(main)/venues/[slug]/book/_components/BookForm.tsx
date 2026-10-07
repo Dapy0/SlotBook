@@ -323,6 +323,22 @@ function BookForm({
 
             {requestKey === null ? (
               <EmptyNote>Choose a service and a staff member to see their free times.</EmptyNote>
+            ) : isLoadingSlots && error ? (
+              <div className="flex flex-col items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-4">
+                <p role="alert" className="text-sm text-destructive">
+                  Couldn&apos;t load the free times. Check your connection and try again.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setError(null);
+                    setReloadToken((t) => t + 1);
+                  }}
+                >
+                  Try again
+                </Button>
+              </div>
             ) : isLoadingSlots ? (
               <div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
                 <span className="sr-only">Loading free times…</span>
@@ -412,7 +428,7 @@ function BookForm({
                                 aria-label={`${start} to ${end}`}
                                 onClick={() => handleSelectSlot(slot)}
                                 className={cn(
-                                  "nums h-10 min-w-20 rounded-full border px-4 text-sm font-semibold transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                                  "nums h-11 min-w-20 rounded-full border px-4 text-sm font-semibold transition-colors duration-150 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                                   isSelected
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-border bg-card hover:border-[color-mix(in_oklch,var(--primary),var(--border)_30%)] hover:bg-accent",
@@ -436,7 +452,7 @@ function BookForm({
               Booking created. Waiting for the venue to confirm.
             </p>
           )}
-          {error && (
+          {error && !isLoadingSlots && (
             <p
               role="alert"
               className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"

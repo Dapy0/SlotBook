@@ -49,7 +49,7 @@ export function ServiceRow({ facilityId, service, onEdit }: Props) {
       </div>
 
       <div className="flex items-center gap-3 sm:justify-end">
-        <ActiveToggle facilityId={facilityId} serviceId={id} isActive={isActive} />
+        <ActiveToggle facilityId={facilityId} serviceId={id} isActive={isActive} serviceName={name} />
         <Button size="sm" variant="outline" onClick={onEdit}>
           Edit
         </Button>

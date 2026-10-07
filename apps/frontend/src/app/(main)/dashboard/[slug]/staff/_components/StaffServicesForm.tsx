@@ -41,8 +41,10 @@ export function StaffServicesForm({
     setError(null);
     setIsSubmitting(true);
     try {
-      const setToArr = [...selected];
-      if (initialServiceIds.every((v, i) => v === setToArr[i])) {
+      const isUnchanged =
+        initialServiceIds.length === selected.size &&
+        initialServiceIds.every((id) => selected.has(id));
+      if (isUnchanged) {
         return onDone();
       }
       await setStaffServices(facilityId, staffId, { serviceIds: [...selected] });

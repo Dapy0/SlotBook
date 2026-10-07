@@ -1,4 +1,4 @@
-import { Map } from "@/app/(main)/venues/[slug]/_components/Map";
+import { LazyMap } from "@/app/(main)/venues/[slug]/_components/LazyMap";
 import { buttonVariants } from "@/components/ui/button";
 import { getMapLink } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
@@ -15,7 +15,7 @@ function CardWithMap({ address, latitude, longitude }: ICardWithMap) {
       className="flex flex-col overflow-hidden rounded-xl border border-border bg-card"
     >
       <div className="h-48 w-full bg-muted">
-        <Map latitude={latitude} longitude={longitude} />
+        <LazyMap latitude={latitude} longitude={longitude} />
       </div>
       <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
         <span className="min-w-0 truncate">{address}</span>

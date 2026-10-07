@@ -48,7 +48,7 @@ export function StaffActions({
   if (isConfirming) {
     return (
       <div className="flex flex-col items-end gap-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <span className="text-sm text-muted-foreground">Remove {name} from the team?</span>
           <Button
             size="sm"

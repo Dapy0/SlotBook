@@ -22,6 +22,7 @@ import type { VariantProps } from "class-variance-authority";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
+import { usePathname } from "next/navigation";
 import { setCountry } from "@/app/actions/setCountry";
 import type { Route } from "next";
 import type { CountryOption } from "@/lib/sharedSchemas";
@@ -75,6 +76,7 @@ export function Header<T extends string>({
   country?: string;
 }) {
   const { me, isLoading, logout } = useAuth();
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   const items = countries
@@ -92,15 +94,24 @@ export function Header<T extends string>({
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 md:px-6 lg:px-8">
         <Logo />
         <nav aria-label="Main" className="ml-6 hidden items-center gap-1 sm:flex">
-          {navBtns?.map((btn) => (
-            <Link
-              key={btn.linkHref.toString()}
-              href={btn.linkHref as Route<T>}
-              className={buttonVariants({ variant: "ghost" })}
-            >
-              {btn.value}
-            </Link>
-          ))}
+          {navBtns?.map((btn) => {
+            const href = btn.linkHref.toString();
+            const isActive = pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={btn.linkHref as Route<T>}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "relative after:absolute after:inset-x-2.5 after:-bottom-[13px] after:h-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity",
+                  isActive && "after:opacity-100",
+                )}
+              >
+                {btn.value}
+              </Link>
+            );
+          })}
         </nav>
         <div className="ml-auto flex items-center gap-2">
           {countries && items && (

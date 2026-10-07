@@ -145,7 +145,7 @@ export default function LoginPage() {
         New to SlotBook?{" "}
         <Link
           href={withNext("/register", next) as "/register"}
-          className="font-medium text-brand-ink underline-offset-4 hover:underline"
+          className="font-medium text-brand-ink underline underline-offset-4"
         >
           Create an account
         </Link>

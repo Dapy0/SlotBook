@@ -72,7 +72,7 @@ function BigFacilityPreviewCard({
               <li key={service.id} className="border-b border-border last:border-b-0">
                 <Link
                   href={`/venues/${slug}/book?${createParams({ service: service.id })}` as Route}
-                  className="group flex items-center justify-between gap-3 px-4 py-2.5 transition-colors duration-150 outline-none hover:bg-accent focus-visible:bg-accent"
+                  className="group flex items-center justify-between gap-3 px-4 py-2.5 transition-colors duration-150 outline-none hover:bg-accent focus-visible:bg-accent focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-inset"
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-medium">{service.name}</span>

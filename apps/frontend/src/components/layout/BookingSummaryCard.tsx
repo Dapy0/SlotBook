@@ -113,7 +113,7 @@ export default function BookingSummaryCard({
       <p className="mt-3 text-sm text-muted-foreground">
         {needsLogin
           ? "You'll log in before confirming. Your choice is kept."
-          : "The venue confirms your booking. You can cancel up to 2 hours before the start."}
+          : "The venue confirms your booking. You can cancel any time before it starts."}
       </p>
     </section>
   );

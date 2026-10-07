@@ -25,7 +25,7 @@ function SearchPanel({ cities }: { cities: FacilityCityResponse[] }) {
   return (
     <form
       role="search"
-      className="flex w-full flex-col gap-2 rounded-xl border border-border bg-card p-2 shadow-md sm:flex-row sm:items-center sm:gap-0"
+      className="flex w-full flex-col gap-2 rounded-xl border border-border bg-card p-2 shadow-md transition-[box-shadow,border-color] duration-150 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/40 sm:flex-row sm:items-center sm:gap-0"
       onSubmit={(e) => {
         e.preventDefault();
         const query = createParams({

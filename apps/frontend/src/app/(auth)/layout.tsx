@@ -10,9 +10,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           { variant: "ghost", linkHref: "/categories", value: "Categories" },
         ]}
       />
-      <div className="mx-auto flex w-full max-w-6xl flex-1 items-start justify-center px-4 py-10 sm:items-center md:py-16">
+      <main className="mx-auto flex w-full max-w-6xl flex-1 items-start justify-center px-4 py-10 sm:items-center md:py-16">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

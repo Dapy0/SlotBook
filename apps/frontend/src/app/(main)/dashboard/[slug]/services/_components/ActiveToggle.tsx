@@ -10,9 +10,10 @@ type Props = {
   facilityId: string;
   serviceId: string;
   isActive: boolean;
+  serviceName: string;
 };
 
-export function ActiveToggle({ facilityId, serviceId, isActive }: Props) {
+export function ActiveToggle({ facilityId, serviceId, isActive, serviceName }: Props) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,10 +34,10 @@ export function ActiveToggle({ facilityId, serviceId, isActive }: Props) {
       <Switch
         role="switch"
         checked={isActive}
-        aria-label={isActive ? "Hide service" : "Show service"}
+        aria-label={` visible to clients`}
         disabled={isPending}
         size={"default"}
-        aria-invalid={error == null ? "false" : true}
+        aria-invalid={error != null}
         onClick={toggle}
       ></Switch>
       {error && <span className="text-sm text-destructive">{error}</span>}
