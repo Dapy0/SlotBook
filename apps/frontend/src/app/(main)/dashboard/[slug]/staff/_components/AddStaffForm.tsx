@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api";
-import { addStaffMembersForOwner } from '@/services/staff';
+import { addStaffMembersForOwner } from "@/services/staff";
 
 type Props = {
   facilityId: string;
@@ -37,6 +37,9 @@ export function AddStaffForm({ facilityId, onDone }: Props) {
         if (err.status === 409) {
           setError("This user already works here");
         }
+        if (err.status === 403) {
+          setError("You can add yourself as an owner.");
+        }
       }
     } finally {
       setIsSubmitting(false);
@@ -44,10 +47,7 @@ export function AddStaffForm({ facilityId, onDone }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-3 sm:flex-row sm:items-end"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
       <div className="flex flex-1 flex-col gap-1.5">
         <Label htmlFor="staff-email">Email</Label>
         <Input
