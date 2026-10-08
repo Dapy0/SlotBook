@@ -17,7 +17,8 @@ describe("RegisterRequest", () => {
 describe("LoginRequest", () => {
   test("accepts valid data", () => {
     expect(
-      loginRequestSchema.safeParse({ email: validPayload.email, password: validPayload.password }).success,
+      loginRequestSchema.safeParse({ email: validPayload.email, password: validPayload.password })
+        .success,
     ).toBe(true);
   });
   test("rejects invalid data", () => {

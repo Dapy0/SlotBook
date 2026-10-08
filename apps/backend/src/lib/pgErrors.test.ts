@@ -1,5 +1,5 @@
-import { expect, it } from 'vitest';
-import { getPgErrorCode } from './pgErrors';
+import { expect, it } from "vitest";
+import { getPgErrorCode } from "./pgErrors";
 
 it.each([
   [{ code: "23505" }, "23505"],

@@ -11,4 +11,3 @@ export async function getStaffMembersForOwner(facilityId: string) {
     managedStaffMemberResponseSchema.array(),
   );
 }
-

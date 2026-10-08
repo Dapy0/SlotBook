@@ -1,11 +1,10 @@
-import { countryCodeSchema, type Weekday } from '@slotbook/shared';
-import * as z from 'zod';
+import { countryCodeSchema, type Weekday } from "@slotbook/shared";
+import * as z from "zod";
 
 export const countryOptionSchema = z.object({
   country: countryCodeSchema,
 });
 export type CountryOption = z.infer<typeof countryOptionSchema>;
-
 
 export const WEEKDAY_BY_NAME = {
   Mon: 1,

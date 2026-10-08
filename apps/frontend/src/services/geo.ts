@@ -8,7 +8,7 @@ export async function getCountries() {
   });
 }
 
-export async function getCountryByIp(){
+export async function getCountryByIp() {
   const incoming = await headers();
   const forwarded = incoming.get("x-forwarded-for") ?? incoming.get("x-real-ip") ?? "";
 

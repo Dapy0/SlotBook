@@ -1,4 +1,3 @@
-
 import { api } from "@/lib/api";
 import {
   bookingResponseSchema,
@@ -15,7 +14,6 @@ export async function createBooking(facilityId: string, data: CreateBookingReque
 export async function getFacilityBookings(facilityId: string) {
   return await api(`/facilities/${facilityId}/bookings`, bookingResponseSchema);
 }
-
 
 export async function updateBookingStatus(bookingId: string, status: "confirmed" | "canceled") {
   return api(`/bookings/${bookingId}`, bookingResponseSchema, {

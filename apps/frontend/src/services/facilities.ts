@@ -39,7 +39,10 @@ export async function getDataForBooking(facilityId: string) {
 }
 
 export async function getFacilityScheduleBySlug(slug: string) {
-  return await api(`/facilities/by-slug/${slug}/schedule`, facilityScheduleEntryResponseSchema.array());
+  return await api(
+    `/facilities/by-slug/${slug}/schedule`,
+    facilityScheduleEntryResponseSchema.array(),
+  );
 }
 export async function getFacilityScheduleById(id: string) {
   return await api(`/facilities/${id}/schedule`, facilityScheduleEntryResponseSchema.array());

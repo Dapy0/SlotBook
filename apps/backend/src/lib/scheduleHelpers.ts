@@ -7,7 +7,7 @@ import {
   type FacilityResponse,
   type Weekday,
 } from "@slotbook/shared";
-import { dayBounds } from '../modules/availability/slotEngine';
+import { dayBounds } from "../modules/availability/slotEngine";
 
 export const WEEKDAY_BY_NAME = {
   Mon: 1,

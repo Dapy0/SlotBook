@@ -1,4 +1,4 @@
-import type { FastifyReply } from 'fastify';
+import type { FastifyReply } from "fastify";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 

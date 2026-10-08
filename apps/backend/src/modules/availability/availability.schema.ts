@@ -6,4 +6,3 @@ export const availabilityParamSchema = z.object({
 export const availabilityParamWithSlugSchema = z.object({
   slug: z.string(),
 });
-

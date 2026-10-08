@@ -30,11 +30,7 @@ export async function findReviewsByFacilityId(
     .innerJoin(services, eq(bookings.serviceId, services.id))
     .where(eq(bookings.facilityId, facilityId));
 }
-export async function insertReview(
-  db: DB,
-  bookingId: string,
-  data: CreateReviewRequest,
-) {
+export async function insertReview(db: DB, bookingId: string, data: CreateReviewRequest) {
   const [review] = await db
     .insert(reviews)
     .values({

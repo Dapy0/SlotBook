@@ -2,11 +2,11 @@ import { fromZonedTime } from "date-fns-tz";
 
 export type Interval = { start: Date; end: Date };
 export type ScheduleRow = { dayOfTheWeek: number; startTime: string; endTime: string };
-  // [
-  //   { start: "11:10", end: "12:10" },
-  //   { start: "12:20", end: "12:40" },
-  // ];
-  // {start: "12:00", end: "12:30"}
+// [
+//   { start: "11:10", end: "12:10" },
+//   { start: "12:20", end: "12:40" },
+// ];
+// {start: "12:00", end: "12:30"}
 
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.start < b.end && b.start < a.end;
@@ -24,7 +24,6 @@ export function intersectIntervals(a: Interval[], b: Interval[]): Interval[] {
   return res;
 }
 export function deleteIntersectedIntervals(a: Interval[], b: Interval[]): Interval[] {
-
   const newIntervals = [];
   for (const x of a) {
     for (const y of b) {

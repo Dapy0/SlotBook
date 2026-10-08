@@ -1,7 +1,7 @@
 "use client";
 
-import { WEEKDAY_BY_NAME } from '@/lib/sharedSchemas';
-import type { FacilityScheduleEntryResponse } from '@slotbook/shared';
+import { WEEKDAY_BY_NAME } from "@/lib/sharedSchemas";
+import type { FacilityScheduleEntryResponse } from "@slotbook/shared";
 import { useState } from "react";
 type PlaceholderRange = { id: string; from: string; to: string; error?: string };
 type Day = {

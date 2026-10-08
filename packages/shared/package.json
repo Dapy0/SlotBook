@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
-
   "sideEffects": true,
   "scripts": {
     "test": "vitest run",

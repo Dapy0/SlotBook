@@ -1,4 +1,4 @@
-import "server-only"
+import "server-only";
 import { api } from "@/lib/api";
 import { cookies } from "next/headers";
 import type z from "zod";

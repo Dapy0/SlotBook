@@ -9,7 +9,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
-
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

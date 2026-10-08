@@ -31,4 +31,3 @@ export const emailInputSchema = z
   .trim()
   .toLowerCase()
   .pipe(z.email("Enter a valid email address"));
-

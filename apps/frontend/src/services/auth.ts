@@ -1,6 +1,11 @@
 import { api } from "@/lib/api";
 import * as z from "zod";
-import { authMeResponseSchema, authResponseSchema, type LoginRequest, type RegisterRequest } from "@slotbook/shared";
+import {
+  authMeResponseSchema,
+  authResponseSchema,
+  type LoginRequest,
+  type RegisterRequest,
+} from "@slotbook/shared";
 export async function authMe() {
   return await api(`/auth/me`, authMeResponseSchema);
 }

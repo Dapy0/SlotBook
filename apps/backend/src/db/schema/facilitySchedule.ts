@@ -1,6 +1,6 @@
 import { pgTable, smallint, time, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 import { facilities } from "./facility.ts";
-import type { Weekday } from '@slotbook/shared';
+import type { Weekday } from "@slotbook/shared";
 
 export const facilitySchedules = pgTable(
   "facility_schedule",
@@ -12,9 +12,7 @@ export const facilitySchedules = pgTable(
     dayOfTheWeek: smallint("day_of_the_week").$type<Weekday>().notNull(),
     startTime: time("start_time", { precision: 0 }).notNull(),
     endTime: time("end_time", { precision: 0 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
     unique("facility_schedules_unique_slot").on(

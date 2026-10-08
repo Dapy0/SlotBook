@@ -1,4 +1,4 @@
-import { fromZonedTime } from 'date-fns-tz';
+import { fromZonedTime } from "date-fns-tz";
 import { addDaysToIso, getIsoWeekDay, todayInTimeZone } from "../../lib/utils";
 import {
   intersectIntervals,
@@ -44,7 +44,6 @@ export function computeDaySlots(input: DaySlotsInput): Interval[] {
     .sort((a, b) => a.start.getTime() - b.start.getTime());
   return slots;
 }
-
 
 export function dayBounds(date: string, timeZone: string): Interval {
   return {

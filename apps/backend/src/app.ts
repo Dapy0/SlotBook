@@ -28,7 +28,7 @@ import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
 import bookingExpiry from "./plugins/bookingExpiry";
-import { staffMeRoutes } from './modules/staff/staffMe.routes';
+import { staffMeRoutes } from "./modules/staff/staffMe.routes";
 const isDev = process.env.NODE_ENV !== "production";
 export async function createServer() {
   const app = Fastify({

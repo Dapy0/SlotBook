@@ -4,7 +4,7 @@ import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
 import { findReviewsByFacilityId, insertReview } from "./review.repository.ts";
 import { updateFacilityScore } from "../facility/facility.repository.ts";
-import { getPgErrorCode, PG } from '../../lib/pgErrors';
+import { getPgErrorCode, PG } from "../../lib/pgErrors";
 
 export async function createReviewForBooking(
   db: DB,

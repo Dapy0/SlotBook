@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
-import { timezoneSchema } from './common/primitives';
+import { timezoneSchema } from "./common/primitives";
 
 export const userResponseSchema = z.strictObject({
   id: z.uuid(),

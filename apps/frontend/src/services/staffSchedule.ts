@@ -17,7 +17,6 @@ export async function putStaffSchedule(
   staffId: string,
   data: ChangeWeekScheduleRequest,
 ) {
-
   return await api(
     `/facilities/${facilityId}/staff/${staffId}/schedule`,
     staffScheduleEntryResponseSchema.array(),

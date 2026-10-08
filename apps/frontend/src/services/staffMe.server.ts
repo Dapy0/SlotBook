@@ -1,6 +1,10 @@
 import { apiWithAuth } from "@/lib/api.server";
-import { createParams } from '@/lib/queryStrings';
-import { facilityBookingResponseSchema, staffMeResponseSchema, type StaffBookingQuery } from "@slotbook/shared";
+import { createParams } from "@/lib/queryStrings";
+import {
+  facilityBookingResponseSchema,
+  staffMeResponseSchema,
+  type StaffBookingQuery,
+} from "@slotbook/shared";
 import React, { cache } from "react";
 
 export const getStaffMe = cache(async () => {
@@ -13,4 +17,3 @@ export async function getStaffMeBookings(query: StaffBookingQuery = {}) {
     facilityBookingResponseSchema.array(),
   );
 }
-

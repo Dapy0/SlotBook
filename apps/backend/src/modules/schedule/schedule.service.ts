@@ -15,7 +15,7 @@ import {
 } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
 import type { StaffScheduleEntryResponse } from "@slotbook/shared";
-import { assertFacilityOwner } from '../../lib/authz';
+import { assertFacilityOwner } from "../../lib/authz";
 
 export async function receiveStaffSchedule(
   db: DB,
