@@ -33,8 +33,9 @@ import { findStaffMemberById } from "../staff/staff.repository";
 import type { BookingsFilter } from "./booking.schema";
 import { sql } from "drizzle-orm";
 import { assertFacilityOwner } from "../../lib/authz";
-import { addDaysToIso, todayInTimeZone } from "../../lib/utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
+import { resolveDateRange } from "../../lib/scheduleHelpers";
+import { mapBookingToContractFormat } from "../../lib/utils";
 async function resolveBookingActors(
   db: DB,
   booking: BookingEntity,
@@ -51,32 +52,15 @@ async function resolveBookingActors(
   return actors;
 }
 
-function mapBookingToContractFormat<T extends { timeRange: { start: Date; end: Date } }>({
-  timeRange,
-  ...rest
-}: T): Omit<T, "timeRange"> & { startsAt: Date; endsAt: Date } {
-  return { ...rest, startsAt: timeRange.start, endsAt: timeRange.end };
-}
-
 export async function getFacilityBookingsForOwner(
   db: DB,
   userId: string,
   facilityId: string,
   filters: BookingQuery,
-  now = new Date(),
 ): Promise<FacilityBookingResponse[]> {
   const facility = await assertFacilityOwner(db, facilityId, userId);
 
-  const from = filters.from ?? todayInTimeZone(facility.timezone, now);
-  const to = filters.to ?? addDaysToIso(from, 6);
-  if (from > to) {
-    throw new BadRequestError("`to` must not be before `from`");
-  }
-  const overlaps = {
-    from: dayBounds(from, facility.timezone).start,
-    to: dayBounds(to, facility.timezone).end,
-  };
-
+  const overlaps = resolveDateRange(facility, filters);
   const facilityBookings = await findBookingsWithDetails(db, {
     order: "asc",
     facilityId: facilityId,

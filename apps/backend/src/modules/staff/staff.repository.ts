@@ -1,4 +1,4 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, getColumns, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { staffMembers, type StaffMemberEntity } from "../../db/schema/staffMember.ts";
 import { staffServices, type StaffServiceEntity } from "../../db/schema/staffService.ts";
@@ -15,6 +15,10 @@ import type {
   Weekday,
 } from "@slotbook/shared";
 import { facilities, staffSchedules } from "../../db/schema";
+export async function findStaffMemberByUserId(db: DB, userId: string): Promise<StaffMemberEntity> {
+  const [res] = await db.select().from(staffMembers).where(eq(staffMembers.userId, userId));
+  return res;
+}
 
 export async function findStaffByFacilityIdPublic(
   db: DB,
@@ -129,19 +133,11 @@ export async function assignServiceToStaff(
 }
 
 export async function findServicesByStaffMemberId(db: DB, staffMemberId: string) {
-  //   SELECT  name from services
-  // JOIN staff_services
-  // ON staff_services.service_id = services.id
-  // WHERE staff_services.staff_member_id = 'cccccccc-cccc-4ccc-8ccc-cccccccccc01'
-
   const result = await db
-    .select({
-      name: services.name,
-    })
+    .select({ ...getColumns(services) })
     .from(services)
     .innerJoin(staffServices, eq(staffServices.serviceId, services.id))
     .where(eq(staffServices.staffMemberId, staffMemberId));
-  if (!result) return [];
 
   return result;
 }
@@ -178,12 +174,14 @@ export async function insertServicesByStaffMemberId(
   staffMemberId: string,
   data: AddServiceToStaffMemberRequest,
 ) {
-  return await db
-    .insert(staffServices)
-    .values(
-      data.serviceIds.map((serviceId) => ({
-        staffMemberId,
-        serviceId: serviceId,
-      })),
-    )
+  return await db.insert(staffServices).values(
+    data.serviceIds.map((serviceId) => ({
+      staffMemberId,
+      serviceId: serviceId,
+    })),
+  );
+}
+
+export async function authorizeStaff(db: DB, staffMemberId: string) {
+  return { db, staffMemberId };
 }

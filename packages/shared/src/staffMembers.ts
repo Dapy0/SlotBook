@@ -1,7 +1,12 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
-import { weekdaySchema, staffScheduleEntryResponseSchema } from "./schedule";
+import {
+  weekdaySchema,
+  staffScheduleEntryResponseSchema,
+  facilityScheduleEntryResponseSchema,
+} from "./schedule";
 import { emailInputSchema } from "./common/primitives";
+import { bookingQuerySchema } from "./bookings";
 
 // Request
 
@@ -51,3 +56,31 @@ export const staffMemberDetailsResponseSchema = managedStaffMemberResponseSchema
 export type StaffMemberDetailsResponse = z.infer<typeof staffMemberDetailsResponseSchema>;
 export const staffMemberParamsSchema = z.object({ id: z.uuid(), staffId: z.uuid() });
 export type StaffMemberParams = z.infer<typeof staffMemberParamsSchema>;
+
+export const staffMeResponseSchema = z.object({
+  staffMemberId: z.string().trim(),
+  isActive: z.boolean(),
+  facility: z.object({
+    id: z.string().trim(),
+    slug: z.string().trim(),
+    name: z.string().trim(),
+    timezone: z.string().trim(),
+    currency: z.string().trim(),
+  }),
+  services: z.array(
+    z.object({
+      id: z.string().trim(),
+      name: z.string().trim(),
+      durationMinutes: z.int(),
+      priceCents: z.int(),
+      isActive: z.boolean(),
+    }),
+  ),
+
+  schedule: staffScheduleEntryResponseSchema.array(),
+  facilitySchedule: facilityScheduleEntryResponseSchema.array(),
+});
+export type StaffMeResponse = z.infer<typeof staffMeResponseSchema>;
+
+export const staffBookingQuerySchema = bookingQuerySchema.omit({ staffMemberId: true });
+export type StaffBookingQuery = z.infer<typeof staffBookingQuerySchema>;

@@ -17,7 +17,11 @@ import {
   insertServicesByStaffMemberId,
   updateActiveStatusByStaffId,
 } from "./staff.repository";
-import { assertFacilityOwner, assertFacilityServices, assertFacilityStaffMember } from "../../lib/authz.ts";
+import {
+  assertFacilityOwner,
+  assertFacilityServices,
+  assertFacilityStaffMember,
+} from "../../lib/authz.ts";
 
 export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -88,13 +92,21 @@ export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, response) => {
       const { id: facilityId } = request.params;
       await assertFacilityOwner(request.server.drizzle, facilityId, request.user.id);
-      await assertFacilityStaffMember(request.server.drizzle, facilityId, request.params.staffId);
+      const staffMember = await assertFacilityStaffMember(
+        request.server.drizzle,
+        facilityId,
+        request.params.staffId,
+      );
       await updateActiveStatusByStaffId(
         request.server.drizzle,
         request.params.staffId,
         request.body,
       );
-      const [staff] = await findStaffMembersForOwner(request.server.drizzle, facilityId);
+      const [staff] = await findStaffMembersForOwner(
+        request.server.drizzle,
+        facilityId,
+        staffMember.id,
+      );
       return response.send(staff);
     },
   );
@@ -121,7 +133,7 @@ export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
         .catch((err) => {
           throw new Error("Something in transaction went wrong :" + err);
         });
-          
+
       const [staff] = await findStaffMembersForOwner(
         request.server.drizzle,
         facilityId,
@@ -130,5 +142,6 @@ export const staffRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.send(staff);
     },
   );
+
   fastify.register(scheduleRoutes, { prefix: "/:id/staff/:staffId" });
 };

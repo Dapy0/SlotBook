@@ -12,7 +12,6 @@ export function getLocalWallTime(date: Date, timeZone: string): string {
   }).format(date);
 }
 export function addDaysToIso(isoDate: string, amount: number): string {
-
   const [year, month, day] = isoDate.split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day + amount)).toISOString().slice(0, 10);
 }
@@ -24,4 +23,11 @@ export function getIsoWeekDay(isoDate: string): number {
   const [year, month, day] = isoDate.split("-").map(Number);
   const UTCWeekDay = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
   return UTCWeekDay === 0 ? 7 : UTCWeekDay;
+}
+
+export function mapBookingToContractFormat<T extends { timeRange: { start: Date; end: Date } }>({
+  timeRange,
+  ...rest
+}: T): Omit<T, "timeRange"> & { startsAt: Date; endsAt: Date } {
+  return { ...rest, startsAt: timeRange.start, endsAt: timeRange.end };
 }

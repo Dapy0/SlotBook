@@ -27,7 +27,8 @@ import fastifyCaching from "@fastify/caching";
 import { AppError } from "./lib/errors.ts";
 import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
-import bookingExpiry from './plugins/bookingExpiry';
+import bookingExpiry from "./plugins/bookingExpiry";
+import { staffMeRoutes } from './modules/staff/staffMe.routes';
 const isDev = process.env.NODE_ENV !== "production";
 export async function createServer() {
   const app = Fastify({
@@ -105,6 +106,7 @@ export async function createServer() {
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(facilityRoutes, { prefix: "/facilities" });
   await app.register(serviceRoutes, { prefix: "/facilities" });
+  await app.register(staffMeRoutes, { prefix: "/staff" });
   await app.register(mineBookingsRoutes, { prefix: "/bookings" });
   await app.register(geoRoutes);
 

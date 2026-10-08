@@ -2,12 +2,16 @@ import type {
   AddServiceToStaffMemberRequest,
   FacilityResponse,
   StaffMemberResponse,
+  StaffMembership,
 } from "@slotbook/shared";
 import type { DB } from "../db/drizzlePlugin";
 import { BadRequestError, ForbiddenError } from "./errors";
 import { assertFound } from "../modules/utils";
 import { findFacilityById } from "../modules/facility/facility.repository";
-import { findStaffMemberById } from "../modules/staff/staff.repository";
+import {
+  findStaffMemberById,
+  findStaffMemberByUserIdWithFacilityData,
+} from "../modules/staff/staff.repository";
 import { findServicesIds } from "../modules/service/service.repository";
 
 export async function assertFacilityOwner(
@@ -45,4 +49,11 @@ export async function assertFacilityServices(
     throw new BadRequestError("Not all services match provided by facilities services");
   }
   return servicesIds;
+}
+export async function requireStaffMember(db: DB, userId: string): Promise<StaffMembership> {
+  const staff = await findStaffMemberByUserIdWithFacilityData(db, userId);
+  if (!staff) {
+    throw new ForbiddenError("You are not a staff member");
+  }
+  return staff;
 }

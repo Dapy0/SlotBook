@@ -1,6 +1,13 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
 import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
-import type { Weekday } from "@slotbook/shared";
+import {
+  addDaysToIso,
+  todayInTimeZone,
+  type BookingQuery,
+  type FacilityResponse,
+  type Weekday,
+} from "@slotbook/shared";
+import { dayBounds } from '../modules/availability/slotEngine';
 
 export const WEEKDAY_BY_NAME = {
   Mon: 1,
@@ -97,4 +104,21 @@ export function combineDateAndTimeInZone(date: string, time: string, timeZone: s
   const offset = naiveUtc - displayedAsUtc;
 
   return new Date(naiveUtc + offset);
+}
+
+export function resolveDateRange(
+  facility: FacilityResponse,
+  filters: BookingQuery,
+  now = new Date(),
+) {
+  const from = filters.from ?? todayInTimeZone(facility.timezone, now);
+  const to = filters.to ?? addDaysToIso(from, 6);
+  if (from > to) {
+    throw new BadRequestError("`to` must not be before `from`");
+  }
+  const overlaps = {
+    from: dayBounds(from, facility.timezone).start,
+    to: dayBounds(to, facility.timezone).end,
+  };
+  return overlaps;
 }
