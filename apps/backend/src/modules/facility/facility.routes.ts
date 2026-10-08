@@ -65,22 +65,22 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.send(facilities);
     },
   );
-  fastify.post(
-    "/",
-    {
-      schema: {
-        body: createFacilityRequestSchema,
-        response: {
-          200: facilityResponseSchema,
-        },
-      },
-    },
-    async (request, response) => {
-      const facility = await createFacilityDraft(request.server.drizzle,request.user.id, request.body);
+  // fastify.post(
+  //   "/",
+  //   {
+  //     schema: {
+  //       body: createFacilityRequestSchema,
+  //       response: {
+  //         200: facilityResponseSchema,
+  //       },
+  //     },
+  //   },
+  //   async (request, response) => {
+  //     const facility = await createFacilityDraft(request.server.drizzle,request.user.id, request.body);
 
-      return response.send(facility);
-    },
-  );
+  //     return response.send(facility);
+  //   },
+  // );
   fastify.get(
     "/search",
     {

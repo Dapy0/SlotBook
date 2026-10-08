@@ -77,7 +77,7 @@ export async function updateOwnedFacility(
   facilityId: string,
   userId: string,
   data: UpdateFacilityRequest,
-  now = new Date(),
+  
 ): Promise<FacilityResponse> {
   await assertFacilityOwner(db, facilityId, userId);
 

@@ -8,7 +8,6 @@ export function slugifyStr(input: string, maxLength = 60): string {
     remove: undefined,
     lower: true,
     strict: false,
-    locale: "en",
     trim: true,
   }).slice(0, maxLength);
 }
