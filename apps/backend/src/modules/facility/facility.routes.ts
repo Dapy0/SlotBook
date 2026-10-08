@@ -28,6 +28,7 @@ import {
 import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
+  createFacilityDraft,
   getAllPublicFacilities,
   getFacilityByIdOrThrow,
   getFacilityBySlugOrThrow,
@@ -62,6 +63,22 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
         "public, max-age=60, s-maxage=600, stale-while-revalidate=30",
       );
       return response.send(facilities);
+    },
+  );
+  fastify.post(
+    "/",
+    {
+      schema: {
+        body: createFacilityRequestSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await createFacilityDraft(request.server.drizzle,request.user.id, request.body);
+
+      return response.send(facility);
     },
   );
   fastify.get(

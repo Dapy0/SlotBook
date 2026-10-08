@@ -25,7 +25,8 @@ import {
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
-import { assertFacilityOwner } from '../../lib/authz';
+import { assertFacilityOwner } from "../../lib/authz";
+import { slugifyStr } from "../../../../../packages/shared/src/utils/slug";
 export async function getFacilityBySlugOrThrow(
   db: DB,
   facilityId: string,
@@ -42,7 +43,6 @@ export async function getFacilityByIdOrThrow(
   assertFound(facility, "Facility not found");
   return facility;
 }
-
 
 export async function getAllPublicFacilities(
   db: DB,
@@ -77,10 +77,15 @@ export async function updateOwnedFacility(
   facilityId: string,
   userId: string,
   data: UpdateFacilityRequest,
+  now = new Date(),
 ): Promise<FacilityResponse> {
   await assertFacilityOwner(db, facilityId, userId);
 
-  const updatedFacility = await updateFacilityById(db, facilityId, data);
+  const updatedFacility = await updateFacilityById(db, facilityId, data).catch((e) => {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
+      throw new ConflictError(`Venue with such slug: ${data.slug} already exists. `);
+    }
+  });
 
   if (!updatedFacility) {
     throw new NotFoundError("Facility not found");
@@ -137,4 +142,19 @@ export async function changeFacilityWeekSchedule(
     throw new Error("Something in transaction went wrong");
   }
   return transaction;
+}
+export async function createFacilityDraft(
+  db: DB,
+  userId: string,
+  data: CreateFacilityRequest,
+): Promise<FacilityResponse> {
+  const base = slugifyStr(data.name);
+
+  const res = await insertFacility(db, { ...data, ownerId: userId, slug: base }).catch((e) => {
+    if (getPgErrorCode(e) === PG.UNIQUE) {
+      throw new ConflictError(`Venue with such slug: ${base} already exists. `);
+    }
+    throw e;
+  });
+  return res;
 }
