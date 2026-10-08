@@ -1,6 +1,6 @@
 @keyframes slide-up {
   from {
-    transform: translateY(100%);
+    transform: translateY(60%);
     opacity: 0;
   }
   to {
@@ -8,6 +8,27 @@
     opacity: 1;
   }
 }
+
 .animateSlideUp {
-  animation: slide-up 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation: slide-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Gold highlighter stroke behind the word, like a marked slot in a paper appointment book. */
+.highlight {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding: 0 0.12em;
+  margin: 0 -0.04em;
+  border-radius: 0.12em;
+  background-image: linear-gradient(var(--primary), var(--primary));
+  background-repeat: no-repeat;
+  background-size: 100% 42%;
+  background-position: 0 88%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animateSlideUp {
+    animation: none;
+  }
 }

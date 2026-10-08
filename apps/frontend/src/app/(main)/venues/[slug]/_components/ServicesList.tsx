@@ -1,5 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { durationFormatter, moneyFormatterFromCents } from "@/lib/format";
 import { convertMinutesToTime } from "@/lib/utils";
 import type { ServiceResponse } from "@slotbook/shared";
@@ -37,57 +36,53 @@ export default function ServicesList({
     .filter((group) => group.items.length > 0);
 
   return (
-    <div className="w-full rounded-sm border border-gray-200 bg-white shadow-sm">
+    <div className="w-full overflow-hidden rounded-xl border border-border bg-card">
       {filteredGroups.length === 0 && (
-        <p className="px-6 py-8 text-center text-sm text-gray-400">
-          No services match your search.
+        <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+          {q ? "No services match your search." : "This venue hasn't added services yet."}
         </p>
       )}
 
-      {filteredGroups.map((group, i) => {
-        return (
-          <div key={group.section} className={i > 0 ? "border-t border-gray-200" : ""}>
-            <p className="px-6 pt-4 pb-1 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-              {group.section}
-            </p>
-            <div className="divide-y divide-gray-100">
-              {group.items.map((service) => {
-                const query = new URLSearchParams();
-                query.append("service", service.id);
-                return (
-                  <div key={service.name} className="flex items-center justify-between px-6 py-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">{service.name}</span>
-                        {/* {service.badge && (
-                      <Badge className="bg-teal-50 text-xs font-medium text-teal-600">
-                        {service.badge}
-                      </Badge>
-                    )} */}
-                      </div>
-                      <p className="mt-0.5 text-xs text-gray-400">
-                        {durationFormatter.format({
-                          hours: convertMinutesToTime(service.durationMinutes)[0],
-                          minutes: convertMinutesToTime(service.durationMinutes)[1],
-                        })}
+      {filteredGroups.map((group) => (
+        <section key={group.section} className="border-t border-border first:border-t-0">
+          <h2 className="bg-muted/60 px-5 py-2 font-sans text-sm font-semibold">{group.section}</h2>
+          <ul className="divide-y divide-border">
+            {group.items.map((service) => {
+              const query = new URLSearchParams();
+              query.append("service", service.id);
+              const [hours, minutes] = convertMinutesToTime(service.durationMinutes);
+              return (
+                <li key={service.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                  <div className="min-w-0">
+                    <p className="font-medium">{service.name}</p>
+                    {service.description && (
+                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                        {service.description}
                       </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-semibold text-gray-900">
-                        {moneyFormatterFromCents(service.priceCents, service.currency)}
-                      </span>
-                      <Link href={`${pathname}/book?${query}` as Route}>
-                        <Button>Book</Button>
-                      </Link>
-                    </div>
+                    )}
+                    <p className="mt-0.5 text-sm text-muted-foreground nums">
+                      {durationFormatter.format({ hours, minutes })}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+
+                  <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+                    <span className="font-semibold nums">
+                      {moneyFormatterFromCents(service.priceCents, service.currency)}
+                    </span>
+                    <Link
+                      href={`${pathname}/book?${query}` as Route}
+                      aria-label={`Book ${service.name}`}
+                      className={buttonVariants({ size: "sm" })}
+                    >
+                      Book
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }

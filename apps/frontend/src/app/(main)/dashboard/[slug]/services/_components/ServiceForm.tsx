@@ -149,7 +149,7 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           onChange={(e) => set("name", e.target.value)}
           placeholder="Men's haircut"
         />
-        {errors.name && <span className="text-xs text-red-500">{errors.name}</span>}
+        {errors.name && <span className="text-sm text-destructive">{errors.name}</span>}
       </div>
 
       <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -160,9 +160,11 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           value={values.description}
           onChange={(e) => set("description", e.target.value)}
           placeholder="Classic cut with styling"
-          className="rounded-md border bg-white px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="rounded-md border border-input bg-card px-3 py-2 text-base shadow-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
         />
-        {errors.description && <span className="text-xs text-red-500">{errors.description}</span>}
+        {errors.description && (
+          <span className="text-sm text-destructive">{errors.description}</span>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -173,7 +175,7 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           onChange={(e) => set("category", e.target.value)}
           placeholder="haircut"
         />
-        {errors.category && <span className="text-xs text-red-500">{errors.category}</span>}
+        {errors.category && <span className="text-sm text-destructive">{errors.category}</span>}
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -182,7 +184,7 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           id="duration"
           value={values.durationMinutes}
           onChange={(e) => set("durationMinutes", Number(e.target.value))}
-          className="h-9 rounded-md border bg-white px-3 text-sm"
+          className="h-9 rounded-md border border-input bg-card px-3 text-sm shadow-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           {DURATIONS.map((m) => (
             <option key={m} value={m}>
@@ -202,10 +204,10 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
           onChange={(e) => set("price", e.target.value)}
           placeholder="80.00"
         />
-        {errors.price && <span className="text-xs text-red-500">{errors.price}</span>}
+        {errors.price && <span className="text-sm text-destructive">{errors.price}</span>}
       </div>
 
-      <label className="flex items-center gap-2 self-end pb-2 text-sm text-gray-700">
+      <label className="flex items-center gap-2 self-end pb-2 text-sm text-foreground">
         <input
           type="checkbox"
           checked={values.isActive}
@@ -215,7 +217,7 @@ export function ServiceForm({ facilityId, currency, service, onDone }: Props) {
         Visible to clients
       </label>
 
-      {formError && <p className="text-sm text-red-500 sm:col-span-2">{formError}</p>}
+      {formError && <p className="text-sm text-destructive sm:col-span-2">{formError}</p>}
 
       <div className="flex justify-end gap-2 sm:col-span-2">
         <Button type="button" variant="outline" onClick={onDone} disabled={isSubmitting}>

@@ -1,4 +1,4 @@
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,13 +8,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { AuthMeResponse, UserResponse } from "@slotbook/shared";
-import { ArrowUp } from "lucide-react";
+import type { AuthMeResponse } from "@slotbook/shared";
 import Link from "next/link";
 
 function ProfileMenu({
   me,
-  profilePicture = "https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/",
+  profilePicture = "",
   onLogout,
 }: {
   me: AuthMeResponse;
@@ -32,28 +31,24 @@ function ProfileMenu({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button variant="ghost" size="icon" aria-label="Account menu" className="rounded-full">
               <Avatar>
-                <AvatarImage src={profilePicture} />
+                {profilePicture && <AvatarImage src={profilePicture} alt="" />}
                 <AvatarFallback>{me.user.name[0].toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>
           }
         />
-        <DropdownMenuContent className="w-32">
+        <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Link href={"/account/appointments"}>My bookings</Link>
+            <DropdownMenuItem render={<Link href={"/account/appointments"} />}>
+              My bookings
             </DropdownMenuItem>
             {me.ownedFacilities.length > 0 && (
-              <DropdownMenuItem>
-                <Link href={"/dashboard"}> My venues</Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href={"/dashboard"} />}>My venues</DropdownMenuItem>
             )}
             {me.staffMembership !== null && (
-              <DropdownMenuItem>
-                <Link href={"/work"}> Staff Panel</Link>
-              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href={"/work"} />}>Staff panel</DropdownMenuItem>
             )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

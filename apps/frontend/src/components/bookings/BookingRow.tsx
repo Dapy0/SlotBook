@@ -1,19 +1,9 @@
 import { formatInTimeZone } from "date-fns-tz";
-import {
-  checkTransition,
-  TRANSITIONS,
-  type BookingStatus,
-  type FacilityBookingResponse,
-} from "@slotbook/shared";
-import { Badge } from "@/components/ui/badge";
+import { TRANSITIONS, type FacilityBookingResponse } from "@slotbook/shared";
 import { moneyFormatterFromCents } from "@/lib/format";
 import { BookingActions } from "@/components/bookings/BookingActions";
-
-const STATUS: Record<BookingStatus, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "border-amber-200 bg-amber-50 text-amber-700" },
-  confirmed: { label: "Confirmed", className: "border-green-200 bg-green-50 text-green-700" },
-  canceled: { label: "Canceled", className: "border-gray-200 bg-gray-100 text-gray-500" },
-};
+import { StatusBadge } from "@/components/bookings/StatusBadge";
+import { cn } from "@/lib/utils";
 
 type Props = {
   booking: FacilityBookingResponse;
@@ -34,39 +24,54 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
     currency,
   } = booking;
 
-  const time = `${formatInTimeZone(startsAt, timeZone, "HH:mm")}–${formatInTimeZone(endsAt, timeZone, "HH:mm")}`;
-
   const isChangeable =
     (TRANSITIONS[status]["confirmed"] || TRANSITIONS[status]["canceled"]) && startsAt > new Date();
 
   return (
     <div
-      className={`grid grid-cols-1 gap-2 px-4 py-3 sm:grid-cols-[110px_1fr_auto] sm:items-center sm:gap-4 ${
-        status === "canceled" ? "opacity-60" : ""
-      }`}
+      className={cn(
+        "grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 gap-y-3 px-4 py-3.5 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] sm:items-center",
+        status === "canceled" && "bg-muted/40",
+      )}
     >
-      <span className="font-mono text-sm font-medium text-gray-900">{time}</span>
+      <div className="flex flex-col leading-tight nums">
+        <span className="font-semibold">{formatInTimeZone(startsAt, timeZone, "HH:mm")}</span>
+        <span className="text-sm text-muted-foreground">
+          {formatInTimeZone(endsAt, timeZone, "HH:mm")}
+        </span>
+      </div>
 
       <div className="flex min-w-0 flex-col gap-0.5">
-        <p className="m-0 truncate font-medium text-gray-900">
+        <p
+          className={cn(
+            "truncate font-medium",
+            status === "canceled" && "text-muted-foreground line-through",
+          )}
+        >
           {serviceName}
-          {showStaff && <span className="font-normal text-gray-500"> · {staffMemberName}</span>}
+          {showStaff && (
+            <span className="font-normal text-muted-foreground no-underline">
+              {" "}
+              · {staffMemberName}
+            </span>
+          )}
         </p>
-        <p className="m-0 truncate text-sm text-gray-500">
+        <p className="truncate text-sm text-muted-foreground">
           {client.clientName} ·{" "}
-          <a href={`mailto:${client.clientEmail}`} className="hover:underline">
+          <a
+            href={`mailto:${client.clientEmail}`}
+            className="hover:text-foreground hover:underline"
+          >
             {client.clientEmail}
           </a>
         </p>
       </div>
 
-      <div className="flex items-center gap-3 sm:justify-end">
-        <span className="text-sm font-semibold whitespace-nowrap">
+      <div className="col-span-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:justify-end">
+        <span className="text-sm font-semibold whitespace-nowrap nums">
           {moneyFormatterFromCents(priceCents, currency)}
         </span>
-        <Badge variant="outline" className={STATUS[status].className}>
-          {STATUS[status].label}
-        </Badge>
+        <StatusBadge status={status} short />
         {isChangeable && <BookingActions bookingId={id} status={status} />}
       </div>
     </div>

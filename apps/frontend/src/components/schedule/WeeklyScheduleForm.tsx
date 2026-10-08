@@ -91,15 +91,15 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {DAYS.map((day, i) => {
         const row = rows[i];
         return (
           <div
             key={day.value}
-            className="flex items-center gap-4 rounded-lg border border-border bg-card p-4"
+            className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-lg border border-border bg-card p-4"
           >
-            <label className="flex w-32 items-center gap-2 text-sm font-medium">
+            <label className="flex w-full items-center gap-2 text-sm font-medium sm:w-32">
               <input
                 type="checkbox"
                 checked={row.enabled}
@@ -146,7 +146,7 @@ export function WeeklyScheduleForm({ initialData, onSubmit }: WeeklyScheduleForm
         </div>
       )}
       {success && (
-        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600">
+        <div className="rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
           Schedule saved
         </div>
       )}

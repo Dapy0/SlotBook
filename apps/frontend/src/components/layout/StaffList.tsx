@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { createParams } from "@/lib/queryStrings";
-import type { StaffMemberPublicResponse } from '@slotbook/shared';
+import type { StaffMemberPublicResponse } from "@slotbook/shared";
 import { StarIcon } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -17,38 +17,57 @@ export default function StaffList({
   const filtered = staff.filter((s) => s.name.toLowerCase().includes(q));
   const pathname = usePathname();
   return (
-    <div className="w-full rounded-sm border border-gray-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-xl border border-border bg-card">
       {filtered.length === 0 && (
-        <p className="px-6 py-8 text-center text-sm text-gray-400">No staff match your search.</p>
+        <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+          {q ? "No staff match your search." : "No staff listed yet."}
+        </p>
       )}
 
-      <div className="divide-y divide-gray-100">
+      <ul className="divide-y divide-border">
         {filtered.map((member) => {
-          const query = createParams({
-            staff: member.id,
-          });
+          const query = createParams({ staff: member.id });
+          const hasScore = member.reviewsCount > 0 && member.score != null;
           return (
-            <div key={member.name} className="flex items-center justify-between px-6 py-4">
-              <div>
-                <span className="text-sm font-medium text-gray-900">{member.name}</span>
-                <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
-                  <StarIcon size={12} className="fill-amber-400 text-amber-400" />
-                  <span className="font-medium text-gray-700">
-                    {Number(member.score).toFixed(2)}
-                  </span>
-                  <span className="text-gray-400">({member.reviewsCount} reviews)</span>
+            <li key={member.id} className="flex items-center justify-between gap-4 px-5 py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  aria-hidden
+                  className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent font-heading font-semibold"
+                >
+                  {member.name.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{member.name}</p>
+                  <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                    {hasScore ? (
+                      <>
+                        <StarIcon aria-hidden className="size-3.5 fill-primary stroke-primary" />
+                        <span className="font-medium text-foreground nums">
+                          {Number(member.score).toFixed(1)}
+                        </span>
+                        <span className="nums">
+                          ({member.reviewsCount} {member.reviewsCount === 1 ? "review" : "reviews"})
+                        </span>
+                      </>
+                    ) : (
+                      "No reviews yet"
+                    )}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                <Link href={`${pathname}/book?${query}` as Route}>
-                  <Button variant={"outline"}>Book</Button>
-                </Link>
-              </div>
-            </div>
+              <Link
+                href={`${pathname}/book?${query}` as Route}
+                aria-label={`Book with ${member.name}`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                Book
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

@@ -1,25 +1,42 @@
 import SearchPanel from "@/app/(main)/_components/SearchPanel";
-import { Button } from "@/components/ui/button";
-import { Dot } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { RotatingCategory } from "@/app/(main)/_components/RotatingCategory";
-import SmallFacilityPreviewCard from "@/app/(main)/_components/SmallFacilityPreviewCard";
+import SmallFacilityPreviewCard, {
+  CategoryDot,
+} from "@/app/(main)/_components/SmallFacilityPreviewCard";
 import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
 import { getCitiesList, searchFacilities } from "@/services/facilities";
 import { getCategories } from "@/services/categories";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cookies } from "next/headers";
+import { ArrowRight } from "lucide-react";
 
 import Link from "next/link";
 import { createParams } from "@/lib/queryStrings";
 import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
+import type { Route } from "next";
+
 const CATEGORY_WORDS = [
-  "manicure",
-  "for a haircut",
-  "an english lesson",
-  "coloring",
-  "guitar lessons",
-  "soccer",
+  "a manicure",
+  "a haircut",
+  "an English lesson",
+  "a hair colouring",
+  "a guitar lesson",
+  "a football pitch",
+];
+
+const STEPS = [
+  {
+    title: "Pick a service",
+    text: "Search by venue, service or city and open the price list.",
+  },
+  {
+    title: "Choose a free time",
+    text: "Slots come from the staff schedule, so every time you see is really open. Book up to 30 days ahead.",
+  },
+  {
+    title: "The venue confirms",
+    text: "Your booking appears in My appointments. Plans changed? Cancel any time before it starts.",
+  },
 ];
 
 async function Page() {
@@ -31,91 +48,145 @@ async function Page() {
     getCitiesList({ country: local }),
   ]).catch();
 
+  const countryLabel = new Intl.DisplayNames(["en"], { type: "region" }).of(local) ?? local;
+  const topRated = [...facilities]
+    .filter((facility) => facility.score != null)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+    .slice(0, 3);
+
   return (
-    <div>
-      <section className="flex flex-col justify-center gap-3 text-center">
-        <h1 className="mt-10 flex items-center justify-center gap-2 text-6xl">
-          Book
-          <RotatingCategory CATEGORY_WORDS={CATEGORY_WORDS} />
-        </h1>
-        <p className="text-l text-gray-400">Books without waiting and "I will recall u later".</p>
-        <div className="mx-20 mt-10 mb-0">
+    <div className="flex flex-col gap-20 pb-8 md:gap-24">
+      <section className="grid items-start gap-10 pt-4 md:pt-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-16">
+        <div className="flex min-w-0 flex-col gap-6">
+          <h1 className="min-h-[4.3em] text-[clamp(2.4rem,6vw,4.5rem)] leading-[1.05] font-bold tracking-[-0.03em] sm:min-h-[3.2em]">
+            Book <RotatingCategory CATEGORY_WORDS={CATEGORY_WORDS} />
+            <br />
+            in a slot that&apos;s actually free.
+          </h1>
+          <p className="max-w-[52ch] text-lg text-muted-foreground">
+            Times come straight from each venue&apos;s staff schedule. No phone tag, no
+            &ldquo;we&apos;ll call you back to confirm.&rdquo;
+          </p>
           <SearchPanel cities={citiesList} />
         </div>
-        <div className="mt-5">
-          <div className="flex flex-wrap justify-center gap-2">
-            <Suspense
-              fallback={Array.from({ length: 5 }).map((index) => (
-                <Skeleton key={`skel-cat-${index}`} className="w-20" />
-              ))}
-            >
-              {categories.map((category) => (
-                <Link
-                  key={CATEGORY_METADATA[category.categoryName].label}
-                  href={`/venues?${createParams({ category: CATEGORY_METADATA[category.categoryName].slug })}`}
-                >
-                  <Button
-                    variant={"outline"}
-                    style={
-                      {
-                        "--icon-color-temp": CATEGORY_METADATA[category.categoryName].color,
-                      } as React.CSSProperties
-                    }
-                    className={
-                      "text-medium text-center hover:border-(--icon-color-temp) hover:bg-[color-mix(in_oklch,var(--icon-color-temp)_15%,white)]"
-                    }
+
+        <nav
+          aria-label="Browse by category"
+          className="rounded-xl border border-border bg-card p-2 lg:mt-2"
+        >
+          <p className="px-3 pt-2 pb-3 text-sm font-medium text-muted-foreground">
+            Browse by category
+          </p>
+          <ul className="flex flex-col">
+            {categories.map((category) => {
+              const meta = CATEGORY_METADATA[category.categoryName];
+              return (
+                <li key={meta.slug} className="border-t border-border first:border-t-0">
+                  <Link
+                    href={`/venues?${createParams({ category: meta.slug })}` as Route}
+                    className="group flex items-center gap-3 rounded-md px-3 py-3 transition-colors duration-150 outline-none hover:bg-accent focus-visible:bg-accent focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-inset"
                   >
-                    <Dot className={`size-7 [&>circle]:text-(--icon-color-temp)`} />
-                    {CATEGORY_METADATA[category.categoryName].label}
-                    <span className="text-xs text-gray-400">{category.count}</span>
-                  </Button>
-                </Link>
-              ))}
-            </Suspense>
-          </div>
-        </div>
+                    <CategoryDot color={meta.color} />
+                    <span className="font-medium">{meta.label}</span>
+                    <span className="ml-auto text-sm text-muted-foreground nums">
+                      {category.count} {category.count === 1 ? "venue" : "venues"}
+                    </span>
+                    <ArrowRight
+                      aria-hidden
+                      className="size-4 text-muted-foreground transition-transform duration-150 group-hover:translate-x-0.5"
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+            {categories.length === 0 && (
+              <li className="px-3 py-3 text-sm text-muted-foreground">
+                No venues in {countryLabel} yet.
+              </li>
+            )}
+          </ul>
+        </nav>
       </section>
-      <main className="mt-20 flex flex-col gap-5">
-        <div>
-          <h1 className="text-3xl font-semibold">Close to you</h1>
-          <div className="mt-5 flex flex-wrap gap-8">
+
+      <section aria-labelledby="venues-heading" className="flex flex-col gap-6">
+        <div className="flex items-end justify-between gap-4">
+          <h2 id="venues-heading" className="text-3xl font-bold tracking-tight">
+            Venues in {countryLabel}
+          </h2>
+          <Link href="/venues" className={buttonVariants({ variant: "link" })}>
+            See all
+            <ArrowRight aria-hidden />
+          </Link>
+        </div>
+        {facilities.length > 0 ? (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {facilities.map((facility) => (
-              <SmallFacilityPreviewCard key={facility.id} facility={facility} />
+              <li key={facility.id}>
+                <SmallFacilityPreviewCard facility={facility} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground">
+            No venues in {countryLabel} yet. Try another country in the header.
+          </p>
+        )}
+      </section>
+
+      {topRated.length > 0 && (
+        <section aria-labelledby="top-heading" className="flex flex-col gap-6">
+          <h2 id="top-heading" className="text-3xl font-bold tracking-tight">
+            Top rated
+          </h2>
+          <div className="flex flex-col gap-4">
+            {topRated.map((facility) => (
+              <BigFacilityPreviewCard key={facility.id} facilityWithServices={facility} />
             ))}
           </div>
-        </div>
-        <div>
-          <h1 className="text-3xl font-semibold">Promoted</h1>
-          <div className="mt-5 flex flex-col gap-3">
-            {facilities.slice(1, 6).map((facility) => (
-              <BigFacilityPreviewCard key={facility.id + "Big"} facilityWithServices={facility} />
-            ))}
-          </div>
-        </div>
-      </main>
-      <footer className="mt-20 w-full">
-        <div className="mx-auto my-0 max-w-3xl text-center">
-          <p className="m-0 text-xl font-semibold">How it works</p>
-          <p className="mt-2 text-gray-600">
-            Slots come directly from the venue's schedule, so you see actual availability — not
-            "we'll call you back to confirm." Bookings are open 30 days ahead, confirmation comes
-            via Telegram, and you can cancel up to 2 hours before the start.
+        </section>
+      )}
+
+      <section
+        aria-labelledby="how-heading"
+        className="grid gap-10 rounded-2xl bg-secondary px-6 py-10 text-secondary-foreground md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.6fr)] md:px-10 md:py-14"
+      >
+        <div className="flex flex-col gap-3">
+          <h2 id="how-heading" className="text-3xl font-bold tracking-tight">
+            How booking works
+          </h2>
+          <p className="text-secondary-foreground/75">
+            Real availability, from search to confirmation.
           </p>
         </div>
-        <div className="mt-20 overflow-hidden rounded-md border">
-          <div className="gpa-4 flex flex-wrap items-center justify-between bg-muted p-4">
-            <div>
-              <p className="m-0 text-xl font-semibold">Have your own venue?</p>
-              <p className="mt-2 text-gray-600">
-                Set up your services, staff, and working hours — the schedule builds itself.
-              </p>
-            </div>
-            <Button className="" variant={"default"}>
-              Add your venue
-            </Button>
-          </div>
+        <ol className="flex flex-col">
+          {STEPS.map((step, i) => (
+            <li
+              key={step.title}
+              className="grid grid-cols-[3rem_1fr] gap-4 border-t border-secondary-foreground/15 py-5 first:border-t-0 first:pt-0 last:pb-0"
+            >
+              <span className="font-heading text-2xl font-bold text-primary nums">{i + 1}</span>
+              <div className="flex flex-col gap-1">
+                <h3 className="text-lg font-semibold">{step.title}</h3>
+                <p className="text-secondary-foreground/75">{step.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-border bg-card p-6 md:flex-row md:items-center md:p-10">
+        <div className="flex max-w-xl flex-col gap-2">
+          <h2 className="text-2xl font-bold tracking-tight">Run a venue?</h2>
+          <p className="text-muted-foreground">
+            Add your services, staff and working hours once. Clients then book the times your
+            schedule really has free.
+          </p>
         </div>
-      </footer>
+        <Link href="/dashboard" className={buttonVariants({ variant: "secondary", size: "lg" })}>
+          Manage your venue
+          <ArrowRight aria-hidden />
+        </Link>
+      </section>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
-import { CATEGORY_METADATA } from '@/app/(main)/_common/types';
+import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
+import { CategoryDot } from "@/app/(main)/_components/SmallFacilityPreviewCard";
 import { useFilterHref } from "@/components/hooks/useFilterHref";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -10,15 +10,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { convertToSelectFormat } from "@/lib/utils";
-import {
-  FACILITY_CATEGORIES,
-  type FacilityCityResponse,
-} from "@slotbook/shared";
+import { cn, convertToSelectFormat } from "@/lib/utils";
+import { FACILITY_CATEGORIES, type FacilityCityResponse } from "@slotbook/shared";
+import { SlidersHorizontal } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
+
 const RATINGS = [null, "4.0", "4.5", "4.8"];
+
+function FilterHeading({ children }: { children: React.ReactNode }) {
+  return <h2 className="mb-2 font-sans text-sm font-semibold">{children}</h2>;
+}
+
+// Only filters the API really applies are shown: category, city and rating.
 function FiltersSidebar({
   counts,
   cities,
@@ -29,139 +35,127 @@ function FiltersSidebar({
   const buildHref = useFilterHref();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   const activeCategory = searchParams.get("category");
   const activeRating = searchParams.get("rating");
   const activeCity = searchParams.get("city");
-  const activePrice = searchParams.get("priceMax");
   const formattedCities = convertToSelectFormat(cities, "city", "city");
+  const activeCount = [activeCategory, activeRating, activeCity].filter(Boolean).length;
+
+  const rowClass = (isSelected: boolean) =>
+    cn(
+      "flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-2 text-sm transition-colors duration-150 outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50",
+      isSelected && "bg-accent font-semibold",
+    );
 
   return (
-    <aside className="flex h-fit w-65 shrink-0 flex-col gap-6 rounded-md border p-4">
-      <div>
-        <p className="mb-3 text-xs font-medium text-gray-500">CATEGORY</p>
-        <div className="flex flex-col gap-1">
-          <Link href={buildHref({ category: null }) as Route}>
-            <Button
-              variant={"ghost"}
-              className={`-mx-2 flex w-full items-center justify-between rounded-md px-2 py-1 text-sm transition-colors hover:bg-gray-100 ${
-                !activeCategory ? "bg-gray-100 font-medium" : "text-gray-700"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <span className="size-2 shrink-0 rounded-full bg-black" />
-                All
-              </span>
-              <span className="text-gray-400">{counts.reduce((sum, c) => sum + c.count, 0)}</span>
-            </Button>
-          </Link>
-          {FACILITY_CATEGORIES.map((category) => {
-            const { label, slug, color } = CATEGORY_METADATA[category];
-            const isSelected = activeCategory === slug;
+    <aside className="w-full shrink-0 lg:sticky lg:top-6 lg:w-64">
+      <Button
+        variant="outline"
+        className="w-full justify-between lg:hidden"
+        aria-expanded={isOpen}
+        aria-controls="venue-filters"
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal aria-hidden />
+          Filters
+        </span>
+        {activeCount > 0 && <span className="text-muted-foreground nums">{activeCount} on</span>}
+      </Button>
 
-            return (
-              <Link key={slug} href={buildHref({ category: isSelected ? null : slug }) as Route}>
-                <Button
-                  variant={"ghost"}
-                  key={category}
-                  className={`-mx-2 flex w-full items-center justify-between rounded-md px-2 py-1 text-sm transition-colors hover:bg-gray-100 ${
-                    isSelected ? "bg-gray-100 font-medium" : "text-gray-700"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="size-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
-                    {label}
-                  </span>
-                  <span className="text-gray-400">
-                    {counts.find((el) => el?.categoryName === category)?.count ?? 0}
-                  </span>
-                </Button>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <p className="mb-3 text-xs font-medium text-gray-500">CITY</p>
-        <Select
-          value={activeCity}
-          items={formattedCities}
-          onValueChange={(v) =>
-            router.replace(buildHref({ city: v === "all" ? null : v }) as Route)
-          }
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="City" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={null}>All cities</SelectItem>
-
-            {formattedCities.map((city) => (
-              <SelectItem value={city.value}> {city.label.toWellFormed()}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <p className="mb-3 text-xs font-medium text-gray-500">RATING</p>
-        <div className="flex gap-2">
-          {RATINGS.map((value) => (
-            <Link key={value} href={buildHref({ rating: value }) as Route}>
-              <Button
-                key={value ?? "any"}
-                size="sm"
-                variant={activeRating === value ? "default" : "outline"}
+      <div
+        id="venue-filters"
+        className={cn(
+          "mt-3 flex-col gap-6 rounded-xl border border-border bg-card p-4 max-lg:enter lg:mt-0 lg:flex",
+          isOpen ? "flex" : "hidden",
+        )}
+      >
+        <section>
+          <FilterHeading>Category</FilterHeading>
+          <ul className="-mx-1 flex flex-col">
+            <li>
+              <Link
+                href={buildHref({ category: null }) as Route}
+                aria-current={!activeCategory ? "page" : undefined}
+                className={rowClass(!activeCategory)}
               >
-                {value ? `${value}+` : "Any"}
-              </Button>
-            </Link>
-          ))}
-        </div>
-      </div>
+                <span className="flex items-center gap-2">
+                  <CategoryDot color="var(--foreground)" />
+                  All
+                </span>
+                <span className="text-muted-foreground nums">
+                  {counts.reduce((sum, c) => sum + c.count, 0)}
+                </span>
+              </Link>
+            </li>
+            {FACILITY_CATEGORIES.map((category) => {
+              const { label, slug, color } = CATEGORY_METADATA[category];
+              const isSelected = activeCategory === slug;
+              const count = counts.find((el) => el?.categoryName === category)?.count ?? 0;
 
-      <div>
-        <p className="mb-3 text-xs font-medium text-gray-500">PRICE FROM</p>
-        <Select
-          value={activePrice ?? "any"}
-          onValueChange={(v) =>
-            router.replace(buildHref({ priceMax: v === "any" ? null : v }) as Route)
-          }
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any</SelectItem>
-            <SelectItem value="50">Up to 50 zł</SelectItem>
-            <SelectItem value="100">Up to 100 zł</SelectItem>
-            <SelectItem value="200">Up to 200 zł</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+              return (
+                <li key={slug}>
+                  <Link
+                    href={buildHref({ category: isSelected ? null : slug }) as Route}
+                    aria-current={isSelected ? "page" : undefined}
+                    className={cn(rowClass(isSelected), count === 0 && "text-muted-foreground")}
+                  >
+                    <span className="flex items-center gap-2">
+                      <CategoryDot color={color} />
+                      {label}
+                    </span>
+                    <span className="text-muted-foreground nums">{count}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
 
-      <div>
-        <p className="mb-3 text-xs font-medium text-gray-500">AVAILABILITY</p>
-        <div className="flex flex-col gap-2">
-          {[
-            { key: "availableToday", label: "Slots available today" },
-            { key: "openWeekends", label: "Open on weekends" },
-          ].map(({ key, label }) => (
-            <label key={key} className="flex items-center gap-2 text-sm text-gray-700">
-              <Checkbox
-                checked={searchParams.get(key) === "1"}
-                onCheckedChange={(checked) =>
-                  router.replace(buildHref({ [key]: checked ? "1" : null }) as Route)
-                }
-              />
-              {label}
-            </label>
-          ))}
-        </div>
+        <section>
+          <FilterHeading>City</FilterHeading>
+          <Select
+            value={activeCity}
+            items={formattedCities}
+            onValueChange={(v) => router.replace(buildHref({ city: v || null }) as Route)}
+          >
+            <SelectTrigger aria-label="City" className="w-full">
+              <SelectValue placeholder="All cities" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={null}>All cities</SelectItem>
+              {formattedCities.map((city) => (
+                <SelectItem key={city.value} value={city.value}>
+                  {city.label.toWellFormed()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </section>
+
+        <section>
+          <FilterHeading>Rating</FilterHeading>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Minimum rating">
+            {RATINGS.map((value) => {
+              const isActive = activeRating === value;
+              return (
+                <Link
+                  key={value ?? "any"}
+                  href={buildHref({ rating: value }) as Route}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    buttonVariants({ size: "sm", variant: isActive ? "default" : "outline" }),
+                    "rounded-full px-3 nums",
+                  )}
+                >
+                  {value ? `${value}+` : "Any"}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </aside>
   );

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { ManagedStaffMemberResponse, ServiceResponse } from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { AddStaffForm } from "./AddStaffForm";
 import { StaffRow } from "./StaffRow";
 import { StaffServicesForm } from "./StaffServicesForm";
@@ -27,23 +28,28 @@ export function StaffManager({ facilityId, staff, services, emptyTitle, emptyTex
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        {!isAdding && <Button onClick={() => setIsAdding(true)}>+ Add staff</Button>}
+        {!isAdding && (
+          <Button onClick={() => setIsAdding(true)}>
+            <Plus aria-hidden />
+            Add staff
+          </Button>
+        )}
       </div>
 
       {isAdding && (
-        <div className="rounded-lg border bg-white p-5">
-          <h2 className="mb-4 font-semibold text-gray-900">Add staff member</h2>
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="mb-4 text-lg font-semibold">Add staff member</h2>
           <AddStaffForm facilityId={facilityId} onDone={() => setIsAdding(false)} />
         </div>
       )}
 
       {staff.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-12 text-center">
-          <p className="font-medium text-gray-900">{emptyTitle}</p>
-          <p className="text-sm text-gray-500">{emptyText}</p>
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-card py-12 text-center">
+          <p className="font-medium text-foreground">{emptyTitle}</p>
+          <p className="text-sm text-muted-foreground">{emptyText}</p>
         </div>
       ) : (
-        <ul className="divide-y overflow-clip rounded-lg border bg-white">
+        <ul className="divide-y divide-border overflow-clip rounded-xl border border-border bg-card">
           {staff.map((member) => {
             const open = panel?.staffId === member.id ? panel.kind : null;
             return (
@@ -56,7 +62,7 @@ export function StaffManager({ facilityId, staff, services, emptyTitle, emptyTex
                   onOpenSchedule={() => setPanel({ staffId: member.id, kind: "schedule" })}
                 />
                 {open === "services" && (
-                  <div className="bg-gray-50 p-5">
+                  <div className="bg-muted/50 p-5">
                     <StaffServicesForm
                       facilityId={facilityId}
                       staffId={member.id}
@@ -67,7 +73,7 @@ export function StaffManager({ facilityId, staff, services, emptyTitle, emptyTex
                   </div>
                 )}
                 {open === "schedule" && (
-                  <div className="bg-gray-50 p-5">
+                  <div className="bg-muted/50 p-5">
                     <StaffScheduleEditor
                       facilityId={facilityId}
                       staffId={member.id}

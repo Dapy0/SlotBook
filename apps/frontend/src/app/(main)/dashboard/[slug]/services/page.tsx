@@ -22,8 +22,8 @@ export default async function FacilityServicesPage({
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-gray-900">Services</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-3xl font-bold tracking-tight">Services</h1>
+        <p className="text-sm text-muted-foreground">
           {activeCount} active · {services.length - activeCount} hidden from clients
         </p>
       </header>

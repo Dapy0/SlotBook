@@ -1,28 +1,26 @@
 import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import FiltersSidebar from "@/app/(main)/venues/_components/FiltersSidebar";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getCategories } from "@/services/categories";
-import { getCitiesList, getFacilities, searchFacilities } from "@/services/facilities";
-import { SearchIcon } from "lucide-react";
+import { getCitiesList, searchFacilities } from "@/services/facilities";
 import { cookies } from "next/headers";
-import { count } from "drizzle-orm";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import ResultsToolbar from "@/app/(main)/venues/_components/ResultsToolbar";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FacilityListQuery } from "@slotbook/shared";
 import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@/app/(main)/_common/types";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { createParams } from "@/lib/queryStrings";
+import type { Route } from "next";
+
+const PAGE_SIZE = 10;
+const MAX_LIMIT = 50;
 
 async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery> }) {
-  const { category, rating, limit = 10, offset = 0, q, sort, city } = await searchParams;
+  const { category, rating, limit = PAGE_SIZE, offset = 0, q, sort, city } = await searchParams;
   const country = (await cookies()).get("_sb_country")?.value || "PL";
 
   const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
@@ -34,49 +32,66 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
     getCitiesList({ country }),
   ]);
 
-  const countAll = categories.reduce((sum, c) => sum + c.count, 0);
-  const shown = categoryName
-    ? (categories.find((c) => c.categoryName === categoryName)?.count ?? 0)
-    : countAll;
-  const title = categoryName ? CATEGORY_METADATA[categoryName].label : "All";
+  const title = categoryName ? CATEGORY_METADATA[categoryName].label : "All venues";
+  const found = facilitiesWithServices.length;
+  const hasFilters = Boolean(category || rating || q || city);
+  // The API caps one request at 50, so "Show more" grows the page up to that limit.
+  const canShowMore = found >= Number(limit) && Number(limit) < MAX_LIMIT;
 
   return (
-    <div className="">
-      <BreadCrumbs
-        
-      />
-      <div className="mb-6 flex items-baseline gap-2">
-        <h1 className="text-3xl font-bold">{title} Venues</h1>
-        <span className="text-lg text-gray-400">
-          {shown} of {countAll}
+    <div>
+      <BreadCrumbs />
+      <div className="mb-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+        <span className="text-muted-foreground nums">
+          {found >= Number(limit) ? `${found}+` : found} {found === 1 ? "venue" : "venues"}
+          {city ? ` in ${city}` : ""}
         </span>
       </div>
 
-      <div className="flex items-start gap-8">
-        <Suspense fallback={<Skeleton className="h-160 w-65" />}>
+      <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
+        <Suspense fallback={<Skeleton className="h-96 w-full lg:w-64" />}>
           <FiltersSidebar cities={cities} counts={categories} />
         </Suspense>
 
-        <div className="flex flex-1 flex-col gap-4">
-          <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+        <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
+          <Suspense fallback={<Skeleton className="h-11 w-full" />}>
             <ResultsToolbar />
           </Suspense>
 
-          <div className="flex flex-col gap-4">
-            {}
-            {facilitiesWithServices.length > 0 ? (
-              facilitiesWithServices.map((facilityWithServices) => (
+          {found > 0 ? (
+            <div className="flex flex-col gap-4">
+              {facilitiesWithServices.map((facilityWithServices) => (
                 <BigFacilityPreviewCard
                   facilityWithServices={facilityWithServices}
                   key={facilityWithServices.id}
                 />
-              ))
-            ) : (
-              <div className="flex items-center self-center pt-10 text-3xl text-gray-400">
-                No facilities in this category
-              </div>
-            )}
-          </div>
+              ))}
+              {canShowMore && (
+                <Link
+                  href={
+                    `/venues?${createParams({ category, rating, q, city, sort, limit: Number(limit) + PAGE_SIZE })}` as Route
+                  }
+                  scroll={false}
+                  className={cn(buttonVariants({ variant: "outline", size: "lg" }), "self-center")}
+                >
+                  Show more venues
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border bg-card p-8">
+              <h2 className="text-xl font-semibold">No venues match these filters</h2>
+              <p className="max-w-prose text-muted-foreground">
+                Try another category or city, or lower the minimum rating.
+              </p>
+              {hasFilters && (
+                <Link href="/venues" className={buttonVariants({ variant: "outline" })}>
+                  Clear all filters
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

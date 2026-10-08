@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import type { Route } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { usePathname } from "next/navigation";
 function formatSlug(slug: string): string {
   return slug
@@ -38,7 +39,7 @@ function BreadCrumbs() {
       <Breadcrumb>
         <BreadcrumbList>
           {crumbs.map(({ name, link }, index) => (
-            <div key={name + index} className="contents">
+            <Fragment key={name + index}>
               <BreadcrumbItem>
                 {index === crumbs.length - 1 ? (
                   <BreadcrumbPage>{name}</BreadcrumbPage>
@@ -47,7 +48,7 @@ function BreadCrumbs() {
                 )}
               </BreadcrumbItem>
               {index !== crumbs.length - 1 && <BreadcrumbSeparator />}
-            </div>
+            </Fragment>
           ))}
         </BreadcrumbList>
       </Breadcrumb>

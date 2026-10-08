@@ -25,7 +25,7 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       .then((res) => {
         setInitial(res);
       })
-      .catch((err) => setLoadError(err));
+      .catch(() => setLoadError("Couldn't load the schedule. Close this panel and try again."));
   }, []);
 
   async function handleSubmit(entries: ChangeWeekScheduleRequest) {
@@ -33,19 +33,21 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       await putStaffSchedule(facilityId, staffId, entries);
       router.refresh();
     } catch (error) {
-      if (error instanceof ApiError) {
-        throw new Error(error.message);
-      }
+      // Re-throw every failure so the form never reports a save that did not happen.
+      throw new Error(
+        error instanceof ApiError
+          ? error.message
+          : "Couldn't save the schedule. Check your connection and try again.",
+      );
     }
-    void entries;
   }
 
   return (
     <div className="flex flex-col gap-3">
       {loadError ? (
-        <p className="text-sm text-red-500">{loadError}</p>
+        <p className="text-sm text-destructive">{loadError}</p>
       ) : initial === null ? (
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner /> Loading schedule…
         </div>
       ) : (

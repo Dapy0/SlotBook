@@ -5,7 +5,7 @@ import { NavLinks, type NavItem } from "@/app/(main)/dashboard/_components/NavLi
 export default async function WorkLayout({ children }: { children: React.ReactNode }) {
   const userAuth = await getMe();
   if (userAuth == null) {
-    redirect("/login?next=/work");
+    redirect(`/login?next=${encodeURIComponent("/work")}`);
   }
   console.log(userAuth.staffMembership);
   if (userAuth.staffMembership == null) {
@@ -22,13 +22,11 @@ export default async function WorkLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex w-full flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <span className="text-xs font-medium tracking-wide text-gray-400 uppercase">
-          Staff area
-        </span>
-        <h1 className="text-2xl font-bold text-gray-900">{membership.facilityName}</h1>
+        <p className="text-sm font-medium text-muted-foreground">Staff area</p>
+        <h1 className="text-3xl font-bold tracking-tight">{membership.facilityName}</h1>
 
         {membership.isActive === false && (
-          <p className="w-fit rounded-md bg-amber-50 px-3 py-1.5 text-sm text-amber-700">
+          <p className="w-fit rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning">
             Your account is deactivated in this venue. New bookings are not accepted.
           </p>
         )}
@@ -36,7 +34,7 @@ export default async function WorkLayout({ children }: { children: React.ReactNo
 
       <NavLinks items={navItems} orientation="horizontal" />
 
-      <main className="min-w-0">{children}</main>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }

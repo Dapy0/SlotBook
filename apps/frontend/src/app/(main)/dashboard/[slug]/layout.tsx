@@ -1,10 +1,11 @@
 import { notFound, redirect } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 
 import { getMe } from "@/lib/session";
 import { NavLinks, type NavItem } from "@/app/(main)/dashboard/_components/NavLinks";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import type { Route } from "next";
+import { ExternalLink } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default async function FacilityDashboardLayout({
   children,
@@ -17,58 +18,51 @@ export default async function FacilityDashboardLayout({
 
   const userAuth = await getMe();
   if (userAuth == null) {
-    redirect(`/login?next=${slug}`);
+    redirect(`/login?next=${encodeURIComponent(`/dashboard/${slug}`)}`);
   }
   const facility = userAuth.ownedFacilities.find((ele) => ele.slug === slug);
   if (!facility) {
     return notFound();
   }
   const base = `/dashboard/${slug}`;
+  // Settings is not built yet, so it is not linked.
   const navItems: NavItem[] = [
     { href: `${base}`, label: "Overview", exact: true },
     { href: `${base}/bookings`, label: "Bookings" },
     { href: `${base}/services`, label: "Services" },
     { href: `${base}/staff`, label: "Staff" },
-    { href: `${base}/settings`, label: "Settings" },
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 md:flex-row md:gap-8">
-      <aside className="flex w-full shrink-0 flex-col gap-4 md:w-56">
-        <div className="flex flex-col gap-1 border-b pb-4">
-          <span className="text-xs font-medium tracking-wide text-gray-400 uppercase">Venue</span>
-          <span className="font-semibold text-gray-900">{facility.name}</span>
-          <Badge
-            variant="outline"
-            className={`w-fit ${
-              facility.isPublished
-                ? "border-green-500 bg-green-100 text-green-600"
-                : "border-gray-500 bg-gray-100 text-gray-600"
-            } `}
+    <div className="flex w-full flex-col gap-6 md:flex-row md:gap-10">
+      <aside className="flex w-full shrink-0 flex-col gap-4 md:sticky md:top-6 md:w-56 md:self-start">
+        <div className="flex items-center justify-between gap-3 md:flex-col md:items-start">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <span className="truncate font-heading text-lg font-bold">{facility.name}</span>
+            <span
+              className={cn(
+                "inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold",
+                facility.isPublished
+                  ? "border-success/30 bg-success/10 text-success"
+                  : "border-border bg-muted text-muted-foreground",
+              )}
+            >
+              <span aria-hidden className="size-1.5 rounded-full bg-current" />
+              {facility.isPublished ? "Published" : "Draft"}
+            </span>
+          </div>
+          <Link
+            href={`/venues/${slug}` as Route}
+            className="flex shrink-0 items-center gap-1 text-sm font-medium text-brand-ink hover:underline"
           >
-            {facility.isPublished ? "Published" : "Draft"}
-          </Badge>
+            View public page
+            <ExternalLink aria-hidden className="size-3.5" />
+          </Link>
         </div>
         <NavLinks items={navItems} />
-        <Button
-          render={
-            <Link
-              key={`/venues/${slug}`}
-              href={`/venues/${slug}`}
-              className={
-                "vertical" === "vertical"
-                  ? `rounded-md px-3 py-2 text-sm font-medium transition`
-                  : `-mb-px border-b-2 px-4 py-2 text-sm font-medium transition`
-              }
-            >
-              {"Go to venue page"}
-            </Link>
-          }
-          className={"w-full justify-start"}
-        ></Button>
       </aside>
 
-      <main className="min-w-0 flex-1">{children}</main>
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
 }

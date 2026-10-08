@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { patchStaffMembersForOwner } from "@/services/staff";
+import { ApiError } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -33,8 +34,12 @@ export function StaffActions({
       await patchStaffMembersForOwner(facilityId, staffId, { isActive: nextIsActive });
       router.refresh();
     } catch (err) {
-      console.log(err);
-      setError("Worker still has future appointments. First cancel them and then fire them.");
+      // 409 means upcoming bookings block the change; anything else is a generic failure.
+      setError(
+        err instanceof ApiError && err.status === 409
+          ? "This person still has upcoming bookings. Cancel them first, then remove them."
+          : "Couldn't update this staff member. Try again.",
+      );
     } finally {
       setIsPending(false);
     }
@@ -42,22 +47,22 @@ export function StaffActions({
 
   if (isConfirming) {
     return (
-      <div className="flex flex-col items-end gap-1">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Fire {name}?</span>
+      <div className="enter flex flex-col items-end gap-1">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <span className="text-sm text-muted-foreground">Remove {name} from the team?</span>
           <Button
             size="sm"
             variant="destructive"
             disabled={isPending}
             onClick={() => changeStatus(false)}
           >
-            Fire
+            Remove
           </Button>
           <Button size="sm" variant="outline" onClick={() => setIsConfirming(false)}>
             Cancel
           </Button>
         </div>
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        {error && <span className="text-sm text-destructive">{error}</span>}
       </div>
     );
   }
@@ -73,7 +78,7 @@ export function StaffActions({
         </Button>
         {isActive ? (
           <Button size="sm" variant="ghost" onClick={() => setIsConfirming(true)}>
-            Fire
+            Remove
           </Button>
         ) : (
           <Button size="sm" disabled={isPending} onClick={() => changeStatus(true)}>
@@ -81,7 +86,7 @@ export function StaffActions({
           </Button>
         )}
       </div>
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span className="text-sm text-destructive">{error}</span>}
     </div>
   );
 }

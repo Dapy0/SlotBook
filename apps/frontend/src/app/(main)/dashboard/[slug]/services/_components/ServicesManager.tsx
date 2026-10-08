@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { ServiceResponse } from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { ServiceForm } from "./ServiceForm";
 import { ServiceRow } from "./ServiceRow";
 
@@ -31,27 +32,34 @@ export function ServicesManager({ facilityId, currency, services }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        {!isCreating && <Button onClick={startCreate}>+ New service</Button>}
+        {!isCreating && (
+          <Button onClick={startCreate}>
+            <Plus aria-hidden />
+            New service
+          </Button>
+        )}
       </div>
 
       {isCreating && (
-        <div className="rounded-lg border bg-white p-5">
-          <h2 className="mb-4 font-semibold text-gray-900">New service</h2>
+        <div className="rounded-xl border border-border bg-card p-5">
+          <h2 className="mb-4 text-lg font-semibold">New service</h2>
           <ServiceForm facilityId={facilityId} currency={currency} onDone={closeForms} />
         </div>
       )}
 
       {services.length === 0 && !isCreating ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-12 text-center">
-          <p className="font-medium text-gray-900">No services yet</p>
-          <p className="text-sm text-gray-500">Add your first service so clients can book it</p>
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-card py-12 text-center">
+          <p className="font-medium text-foreground">No services yet</p>
+          <p className="text-sm text-muted-foreground">
+            Add your first service so clients can book it
+          </p>
         </div>
       ) : (
-        <ul className="divide-y rounded-lg border bg-white overflow-clip">
+        <ul className="divide-y divide-border overflow-clip rounded-xl border border-border bg-card">
           {services.map((service) => (
             <li key={service.id}>
               {editingId === service.id ? (
-                <div className="bg-gray-50 p-5">
+                <div className="bg-muted/50 p-5">
                   <ServiceForm
                     facilityId={facilityId}
                     currency={currency}

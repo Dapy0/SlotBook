@@ -1,18 +1,19 @@
 import { CancelBookingButton } from "@/app/(main)/account/appointments/_components/CancelBookingButton";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { formatDateToTimezone, formatTimeToTimezone, moneyFormatterFromCents } from "@/lib/format";
-import type { BookingStatus, BookingWithDetailsResponse } from "@slotbook/shared";
+import { StatusBadge } from "@/components/bookings/StatusBadge";
+import { formatTimeToTimezone, moneyFormatterFromCents } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { BookingWithDetailsResponse } from "@slotbook/shared";
+import type { Route } from "next";
 import Link from "next/link";
-const STATUS: Record<BookingStatus, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "border-amber-200 bg-amber-50 text-amber-700" },
-  confirmed: { label: "Confirmed", className: "border-green-200 bg-green-50 text-green-700" },
-  canceled: { label: "Canceled", className: "border-gray-200 bg-gray-100 text-gray-500" },
-};
+
 type Props = {
   booking: BookingWithDetailsResponse;
   isHighlighted?: boolean;
 };
+
+function datePart(date: Date, timeZone: string, part: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat("en-GB", { timeZone, ...part }).format(date);
+}
 
 function AppointmentItem({ booking, isHighlighted = false }: Props) {
   const {
@@ -28,44 +29,73 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
     priceCents,
     currency,
   } = booking;
-  const date = formatDateToTimezone(startsAt, facilityTimezone);
-  const time = `${formatTimeToTimezone(startsAt, facilityTimezone)}–${formatTimeToTimezone(endsAt, facilityTimezone)}`;
+  const time = `${formatTimeToTimezone(startsAt, facilityTimezone)} – ${formatTimeToTimezone(endsAt, facilityTimezone)}`;
   const now = new Date();
   const isCancelable = status !== "canceled" && startsAt > now;
   const isCompleted = status === "confirmed" && endsAt <= now;
-  const badge = isCompleted
-    ? { label: "завершено", className: STATUS.confirmed.className }
-    : STATUS[status];
 
   return (
-    <div
-      className={`flex w-full flex-col gap-3 p-4 transition sm:flex-row sm:items-center sm:justify-between ${
-        isHighlighted ? "bg-primary/5" : ""
-      } ${status === "canceled" ? "opacity-60" : ""}`}
+    <article
+      className={cn(
+        "flex w-full gap-4 rounded-xl border border-border bg-card p-4 sm:items-center sm:p-5",
+        isHighlighted && "border-primary ring-3 ring-primary/30",
+        status === "canceled" && "bg-muted/50",
+      )}
     >
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className="m-0 truncate font-medium text-gray-900">{serviceName}</p>
-        <p className="text-sm font-light text-gray-600">
-          <Link href={`/venues/${facilitySlug}`} className="hover:underline">
-            {facilityName}
-          </Link>
-          {" · "}
-          {staffMemberName}
-          {" · "}
-          {date}, {time}
-        </p>
+      {/* Date set like a page of an appointment book. */}
+      <div
+        className={cn(
+          "flex w-16 shrink-0 flex-col items-center justify-center self-start rounded-lg border py-2",
+          status === "canceled"
+            ? "border-border text-muted-foreground"
+            : "border-primary/60 bg-accent",
+        )}
+      >
+        <span className="text-xs font-semibold uppercase">
+          {datePart(startsAt, facilityTimezone, { month: "short" })}
+        </span>
+        <span className="font-heading text-2xl leading-none font-bold nums">
+          {datePart(startsAt, facilityTimezone, { day: "numeric" })}
+        </span>
+        <span className="text-xs text-muted-foreground">
+          {datePart(startsAt, facilityTimezone, { weekday: "short" })}
+        </span>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3">
-        <span className="text-md font-bold whitespace-nowrap">
-          {moneyFormatterFromCents(priceCents, currency)}
-        </span>
-        <Badge variant="outline" className={badge.className}>
-          {badge.label}
-        </Badge>
-        {isCancelable && <CancelBookingButton bookingId={id} />}
+      <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p
+              className={cn(
+                "font-semibold",
+                status === "canceled" && "text-muted-foreground line-through",
+              )}
+            >
+              {serviceName}
+            </p>
+            <StatusBadge status={isCompleted ? "completed" : status} />
+          </div>
+          <p className="text-sm font-medium nums">{time}</p>
+          <p className="text-sm text-muted-foreground">
+            <Link
+              href={`/venues/${facilitySlug}` as Route}
+              className="font-medium text-foreground hover:text-brand-ink hover:underline"
+            >
+              {facilityName}
+            </Link>
+            {" · with "}
+            {staffMemberName}
+          </p>
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end">
+          <span className="font-semibold whitespace-nowrap nums">
+            {moneyFormatterFromCents(priceCents, currency)}
+          </span>
+          {isCancelable && <CancelBookingButton bookingId={id} />}
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 

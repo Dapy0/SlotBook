@@ -24,32 +24,44 @@ export function ServiceRow({ facilityId, service, onEdit }: Props) {
   return (
     <div
       className={`grid grid-cols-1 gap-3 px-4 py-4 sm:grid-cols-[1fr_auto] sm:items-center ${
-        isActive ? "" : "bg-gray-50"
+        isActive ? "" : "bg-muted/50"
       }`}
     >
       <div className="flex min-w-0 flex-col gap-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className={`m-0 font-medium ${isActive ? "text-gray-900" : "text-gray-400"}`}>
+          <p
+            className={`m-0 font-medium ${isActive ? "text-foreground" : "text-muted-foreground"}`}
+          >
             {name}
           </p>
-          <Badge variant="outline" className="text-xs font-normal text-gray-500">
+          <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
             {category}
           </Badge>
           {!isActive && (
-            <Badge variant="outline" className="border-gray-200 bg-gray-100 text-xs text-gray-500">
+            <Badge
+              variant="outline"
+              className="border-border bg-muted text-xs text-muted-foreground"
+            >
               Hidden
             </Badge>
           )}
         </div>
-        {description && <p className="m-0 line-clamp-1 text-sm text-gray-500">{description}</p>}
-        <p className="m-0 text-sm text-gray-600">
+        {description && (
+          <p className="m-0 line-clamp-1 text-sm text-muted-foreground">{description}</p>
+        )}
+        <p className="m-0 text-sm text-muted-foreground">
           {duration} ·{" "}
           <span className="font-semibold">{moneyFormatterFromCents(priceCents, currency)}</span>
         </p>
       </div>
 
       <div className="flex items-center gap-3 sm:justify-end">
-        <ActiveToggle facilityId={facilityId} serviceId={id} isActive={isActive} />
+        <ActiveToggle
+          facilityId={facilityId}
+          serviceId={id}
+          isActive={isActive}
+          serviceName={name}
+        />
         <Button size="sm" variant="outline" onClick={onEdit}>
           Edit
         </Button>
