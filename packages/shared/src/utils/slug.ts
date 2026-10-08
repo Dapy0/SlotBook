@@ -5,7 +5,6 @@ export function slugifyStr(input: string, maxLength = 60): string {
   }
   return slugify(input, {
     replacement: "-",
-    remove: undefined,
     lower: true,
     strict: false,
     trim: true,

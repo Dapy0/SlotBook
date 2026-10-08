@@ -28,7 +28,6 @@ import {
 import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
-  createFacilityDraft,
   getAllPublicFacilities,
   getFacilityByIdOrThrow,
   getFacilityBySlugOrThrow,

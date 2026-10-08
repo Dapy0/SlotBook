@@ -25,10 +25,12 @@ const envSchema = {
     },
   },
 };
-type EnvPropertiesSchema = typeof envSchema.properties;
-type MapType<T> = T extends "string" ? string : T extends "number" ? number : any;
+// Must stay in sync with envSchema above (fastify-env validates it at startup).
 export type EnvType = {
-  [K in keyof EnvPropertiesSchema]: MapType<EnvPropertiesSchema[K]["type"]>;
+  PORT: number;
+  DATABASE_URL: string;
+  JWT_SECRET_KEY: string;
+  APP_HOST: string;
 };
 
 export const fastifyEnvOptions: FastifyEnvOptions = {

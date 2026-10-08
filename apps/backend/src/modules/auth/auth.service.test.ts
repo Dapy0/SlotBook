@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { FastifyInstance } from "fastify";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { findUserByEmail, insertUserByUserData } from "./auth.repository.ts";
 import bcrypt from "bcrypt";
 import { signInUser, signUpUser } from "./auth.service.ts";
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../lib/errors.ts";
+
+type JWT = FastifyInstance["jwt"];
 
 vi.mock("./auth.repository.ts");
 vi.mock("bcrypt");
@@ -27,7 +30,7 @@ describe("signUpUser Tests", async () => {
       timezone: "Europe/Warsaw",
       deletedAt: null,
     });
-    const { user, token } = await signUpUser(fakeDb, fakeJwt as any, {
+    const { user, token } = await signUpUser(fakeDb, fakeJwt as unknown as JWT, {
       name: "test",
       email: "test@test.com",
       password: "test",
@@ -55,7 +58,7 @@ describe("signUpUser Tests", async () => {
       timezone: "Europe/Warsaw",
       deletedAt: null,
     });
-    await signUpUser(fakeDb, fakeJwt as any, {
+    await signUpUser(fakeDb, fakeJwt as unknown as JWT, {
       name: "test",
       email: "test@test.com",
       password: "test",
@@ -81,7 +84,7 @@ describe("signUpUser Tests", async () => {
       timezone: "Europe/Warsaw",
       deletedAt: null,
     });
-    const { user, token } = await signUpUser(fakeDb, fakeJwt as any, {
+    const { user } = await signUpUser(fakeDb, fakeJwt as unknown as JWT, {
       name: "test",
       email: "test@test.com",
       password: "test",
@@ -93,7 +96,7 @@ describe("signUpUser Tests", async () => {
     vi.mocked(bcrypt.hash).mockResolvedValue("hashedPassword" as never);
     vi.mocked(insertUserByUserData).mockRejectedValue({ cause: { code: "23505" } });
     await expect(
-      signUpUser(fakeDb, fakeJwt as any, {
+      signUpUser(fakeDb, fakeJwt as unknown as JWT, {
         name: "test",
         email: "test@test.com",
         password: "test",
@@ -105,7 +108,7 @@ describe("signUpUser Tests", async () => {
     const newError = new Error("Failed to insert user");
     vi.mocked(insertUserByUserData).mockRejectedValue(newError);
     await expect(
-      signUpUser(fakeDb, fakeJwt as any, {
+      signUpUser(fakeDb, fakeJwt as unknown as JWT, {
         name: "test",
         email: "test@test.com",
         password: "test",
@@ -126,7 +129,7 @@ describe("signUpUser Tests", async () => {
       deletedAt: null,
     });
 
-    await signUpUser(fakeDb, fakeJwt as any, {
+    await signUpUser(fakeDb, fakeJwt as unknown as JWT, {
       name: "test",
       email: "test@test.com",
       password: "test",
@@ -150,7 +153,7 @@ describe("Sign In service unit tests", () => {
       deletedAt: null,
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
-    const { user, token } = await signInUser(fakeDb, fakeJwt as any, {
+    const { user, token } = await signInUser(fakeDb, fakeJwt as unknown as JWT, {
       email: "test@test.com",
       password: "test",
     });
@@ -168,7 +171,7 @@ describe("Sign In service unit tests", () => {
     vi.mocked(findUserByEmail).mockResolvedValue(null);
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
     await expect(
-      signInUser(fakeDb, fakeJwt as any, {
+      signInUser(fakeDb, fakeJwt as unknown as JWT, {
         email: "test@test.com",
         password: "test",
       }),
@@ -187,7 +190,7 @@ describe("Sign In service unit tests", () => {
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(false as never);
     await expect(
-      signInUser(fakeDb, fakeJwt as any, {
+      signInUser(fakeDb, fakeJwt as unknown as JWT, {
         email: "test@test.com",
         password: "test",
       }),
@@ -206,7 +209,7 @@ describe("Sign In service unit tests", () => {
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 
-    await signInUser(fakeDb, fakeJwt as any, {
+    await signInUser(fakeDb, fakeJwt as unknown as JWT, {
       email: "test@test.com",
       password: "test",
     });
@@ -226,7 +229,7 @@ describe("Sign In service unit tests", () => {
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 
-    await signInUser(fakeDb, fakeJwt as any, {
+    await signInUser(fakeDb, fakeJwt as unknown as JWT, {
       email: "test@test.com",
       password: "test",
     });
@@ -246,7 +249,7 @@ describe("Sign In service unit tests", () => {
     });
     vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
 
-    const { user } = await signInUser(fakeDb, fakeJwt as any, {
+    const { user } = await signInUser(fakeDb, fakeJwt as unknown as JWT, {
       email: "test@test.com",
       password: "test",
     });

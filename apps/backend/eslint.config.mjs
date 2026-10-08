@@ -6,7 +6,13 @@ import vitest from "@vitest/eslint-plugin";
 import globals from "globals";
 
 export default defineConfig([
-  globalIgnores(["dist/**", "drizzle/**", "eslint.config.mjs", "drizzle.config.ts"]),
+  globalIgnores([
+    "dist/**",
+    "drizzle/**",
+    "eslint.config.mjs",
+    "drizzle.config.ts",
+    "vitest.config.ts",
+  ]),
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
