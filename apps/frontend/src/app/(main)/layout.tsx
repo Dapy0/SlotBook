@@ -31,7 +31,7 @@ export default async function RootLayout({
           { variant: "default", linkHref: "/register", value: "Sign up" },
         ]}
       />
-      <main className="min-h-0 flex-1 overflow-y-auto">
+      <main className="relative min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6 md:py-8 lg:px-8">{children}</div>
       </main>
     </div>
