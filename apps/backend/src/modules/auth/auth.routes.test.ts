@@ -2,7 +2,7 @@ import { startTestDatabase, stopTestDatabase } from "../../test/setup.ts";
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { createServer } from "../../app.ts";
-import { afterEach } from "vitest";
+import { afterEach, beforeEach } from "vitest";
 import { users } from "../../db/schema/user.ts";
 
 let app: FastifyInstance;
@@ -19,7 +19,6 @@ afterAll(async () => {
   await app.close();
   await stopTestDatabase();
 });
-
 
 describe("POST auth/register", () => {
   test("create users and returns status code 201 and set httOnly cookie with token", async () => {
@@ -70,7 +69,8 @@ describe("POST auth/register", () => {
 describe("POST auth/login", () => {
   const credentials = { email: "test@test.com", password: "password123" };
 
-  beforeAll(async () => {
+  // beforeEach, not beforeAll: the top-level afterEach deletes all users after every test.
+  beforeEach(async () => {
     await app.inject({
       method: "POST",
       url: "/auth/register",
@@ -123,7 +123,7 @@ describe("GET /auth/me", () => {
   });
   test("returns users data with valid cookies", async () => {
     const credentials = { email: "test@test.com", password: "password123" };
-    const registerResponse = await app.inject({
+    await app.inject({
       method: "POST",
       url: "/auth/register",
       payload: { name: "Test", ...credentials },

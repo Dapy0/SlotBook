@@ -38,8 +38,8 @@ describe("Review Response", () => {
     expect(z.encode(reviewResponseSchema, decoded)).toEqual(fixture);
   });
 
-  test("rejects comment: null", () => {
+  test("accepts comment: null (review without text)", () => {
     const r = reviewResponseSchema.safeParse({ ...fixture, comment: null });
-    expect(r.success).toBe(false);
+    expect(r.success).toBe(true);
   });
 });
