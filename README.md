@@ -6,7 +6,9 @@
 
 <!-- Live demo: add the link here once deployed -->
 
-**Live demo:** _coming soon_ · **Demo accounts:** `client@slotbook.test` / `owner@slotbook.test`, password `password123`
+**🔗 Live demo: [slotbook-app.vercel.app](https://slotbook-app.vercel.app)**
+
+Demo accounts (password `password123`): client `client@slotbook.test` · owner `owner@slotbook.test`
 
 SlotBook is a full-stack TypeScript monorepo: a Fastify + PostgreSQL API, a Next.js App Router frontend, and a shared package of Zod contracts that both sides import, so the request and response types are defined once.
 
