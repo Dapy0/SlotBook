@@ -1,12 +1,14 @@
 # SlotBook
+![SlotBook: home page, booking flow and owner dashboard](docs/screenshots/banner.jpg)
+[![Live demo](https://img.shields.io/badge/Live_demo-slotbook--app.vercel.app-EBB84E?style=for-the-badge)](https://slotbook-app.vercel.app)
+<!-- **🔗 Live demo: [slotbook-app.vercel.app](https://slotbook-app.vercel.app)** -->
 
 **Online appointment booking for service businesses.** Salons, clinics, gyms, auto shops and tutors publish their venue, services and staff, and clients book a free slot in a few clicks, without a phone call.
 
-![SlotBook: home page, booking flow and owner dashboard](docs/screenshots/collage.jpg)
+<!-- ![SlotBook: home page, booking flow and owner dashboard](docs/screenshots/collage.jpg) -->
 
 <!-- Live demo: add the link here once deployed -->
 
-**🔗 Live demo: [slotbook-app.vercel.app](https://slotbook-app.vercel.app)**
 
 Demo accounts (password `password123`): client `client@slotbook.test` · owner `owner@slotbook.test`
 
