@@ -5,6 +5,7 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
+    "start": "tsx src/index.ts",
     "dev": "tsx watch --watch src src/index.ts",
     "dev:debug": "tsx --inspect-brk=9229 src/index.ts",
     "db:generate": "drizzle-kit generate",
