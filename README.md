@@ -1,4 +1,5 @@
 # SlotBook
+
 ![SlotBook: home page, booking flow and owner dashboard](docs/screenshots/banner.jpg)
 [![Live demo](https://img.shields.io/badge/Live_demo-slotbook--app.vercel.app-EBB84E?style=for-the-badge)](https://slotbook-app.vercel.app)
 <!-- **🔗 Live demo: [slotbook-app.vercel.app](https://slotbook-app.vercel.app)** -->
@@ -8,7 +9,6 @@
 <!-- ![SlotBook: home page, booking flow and owner dashboard](docs/screenshots/collage.jpg) -->
 
 <!-- Live demo: add the link here once deployed -->
-
 
 Demo accounts (password `password123`): client `client@slotbook.test` · owner `owner@slotbook.test`
 
