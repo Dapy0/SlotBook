@@ -1,8 +1,8 @@
 import * as z from "zod";
 import type { ApiErrorCode } from "@slotbook/shared";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
-
+const BACKEND_URL =
+  typeof window === "undefined" ? (process.env.BACKEND_URL ?? "http://localhost:3001") : "/api";
 export class ApiError extends Error {
   constructor(
     public status: number,
