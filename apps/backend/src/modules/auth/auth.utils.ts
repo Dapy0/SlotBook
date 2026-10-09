@@ -5,7 +5,7 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 export function setAuthCookie(response: FastifyReply, token: string) {
   response.setCookie("token", token, {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: COOKIE_MAX_AGE,

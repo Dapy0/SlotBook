@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
   // },
   typedRoutes: true,
   allowedDevOrigins: ["localhost", "127.0.0.1"],
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.BACKEND_URL ?? "http://localhost:3001"}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
