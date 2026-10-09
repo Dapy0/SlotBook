@@ -8,7 +8,7 @@
     "dev:frontend": "npm run dev --workspace=apps/frontend",
     "dev": "concurrently -n backend,frontend -c blue,magenta \"npm:dev:backend\" \"npm:dev:frontend\"",
     "dev:debug": "concurrently -n backend,frontend -c blue,magenta \"npm:dev:backend:debug\" \"npm:dev:frontend\"",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspaces --if-present",
     "backend:generate": "npm run db:generate --workspace=apps/backend",
     "backend:migrate": "npm run db:migrate --workspace=apps/backend",
     "backend:test": "npm run test --workspace=apps/backend",
