@@ -185,3 +185,11 @@ export async function insertServicesByStaffMemberId(
 export async function authorizeStaff(db: DB, staffMemberId: string) {
   return { db, staffMemberId };
 }
+export async function findStaffMemberName(db: DB, staffMemberId: string) {
+  const [res] = await db
+    .select({ name: users.name })
+    .from(staffMembers)
+    .innerJoin(users, eq(users.id, staffMembers.userId))
+    .where(eq(staffMembers.id, staffMemberId));
+  return res;
+}

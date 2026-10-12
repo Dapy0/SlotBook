@@ -14,8 +14,9 @@ import {
   checkStaffScheduleFitsFacility,
 } from "../../lib/scheduleHelpers.ts";
 import { findFacilitySchedule } from "../facility/facilitySchedule.repository.ts";
-import type { StaffScheduleEntryResponse } from "@slotbook/shared";
+import type { ScheduleEntryInput, StaffScheduleEntryResponse } from "@slotbook/shared";
 import { assertFacilityOwner } from "../../lib/authz";
+import type { StaffScheduleEntity } from "../../db/schema";
 
 export async function receiveStaffSchedule(
   db: DB,
@@ -57,13 +58,22 @@ export async function changeWeekSchedule(
 
   checkNoOverlapWithinSchedule(data);
   checkStaffScheduleFitsFacility(data, facilitySchedule);
+
   const transaction = await db.transaction(async (tx) => {
-    await deleteScheduleByStaffId(tx, staffId);
-    const inserted = await insertScheduleByStaffId(tx, staffId, data);
-    return inserted;
+    return applyStaffWeekSchedule(tx, staffId, data);
   });
   if (!transaction) {
     throw new Error("Something in transaction went wrong");
   }
   return transaction;
+}
+
+export async function applyStaffWeekSchedule(
+  db: DB,
+  staffMemberId: string,
+  entries: readonly ScheduleEntryInput[],
+): Promise<StaffScheduleEntity[]> {
+  await deleteScheduleByStaffId(db, staffMemberId);
+  if (entries.length === 0) return [];
+  return insertScheduleByStaffId(db, staffMemberId, entries);
 }

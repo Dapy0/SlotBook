@@ -1,8 +1,9 @@
-import { check, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, pgTable, smallint, text, time, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 import { facilities } from "./facility.ts";
 import { staffMembers } from "./staffMember";
 import { sql } from "drizzle-orm";
 import { users } from "./user";
+import type { Weekday } from "@slotbook/shared";
 
 export const scheduleChangeRequests = pgTable(
   "schedule_change_requests",
@@ -20,7 +21,7 @@ export const scheduleChangeRequests = pgTable(
     staffNote: text("staff_note"),
     ownerComment: text("owner_comment"),
     decidedByUserId: uuid("decided_by_user_id").references(() => users.id),
-    decidedAT: timestamp("decided_at", { withTimezone: true, mode: "date" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true, mode: "date" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
@@ -33,3 +34,28 @@ export const scheduleChangeRequests = pgTable(
 );
 export type ScheduleChangeRequestEntity = typeof scheduleChangeRequests.$inferSelect;
 export type NewScheduleChangeRequestEntity = typeof scheduleChangeRequests.$inferInsert;
+
+// Entity
+
+export const scheduleChangeRequestEntries = pgTable(
+  "schedule_change_request_entries",
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    requestId: uuid("request_id")
+      .references(() => scheduleChangeRequests.id, { onDelete: "cascade" })
+      .notNull(),
+    dayOfTheWeek: smallint("day_of_the_week").$type<Weekday>().notNull(),
+    startTime: time("start_time", { precision: 0 }).notNull(),
+    endTime: time("end_time", { precision: 0 }).notNull(),
+  },
+  (table) => [
+    unique("schedule_change_request_entries_unique_slot").on(
+      table.requestId,
+      table.dayOfTheWeek,
+      table.startTime,
+      table.endTime,
+    ),
+  ],
+);
+export type ScheduleChangeRequestEntryEntity = typeof scheduleChangeRequestEntries.$inferSelect;
+export type NewScheduleChangeRequestEntryEntity = typeof scheduleChangeRequestEntries.$inferInsert;

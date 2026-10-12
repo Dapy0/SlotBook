@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { instantSchema, wallTimeSchema } from "./common/codecs";
+import { wallTimeSchema } from "./common/codecs";
 
 export const weekdaySchema = z.literal([1, 2, 3, 4, 5, 6, 7]);
 export type Weekday = z.infer<typeof weekdaySchema>;
@@ -14,7 +14,7 @@ type ScheduleEntryBase = z.infer<typeof scheduleEntryBaseSchema>;
 
 const scheduleEntryResponseBaseSchema = scheduleEntryBaseSchema.extend({
   id: z.uuid(),
-  createdAt: instantSchema,
+  // createdAt: instantSchema,
 });
 
 // Intersection Rule
@@ -77,3 +77,9 @@ export const staffScheduleEntryResponseSchema = scheduleEntryResponseBaseSchema.
   staffMemberId: z.uuid(),
 });
 export type StaffScheduleEntryResponse = z.infer<typeof staffScheduleEntryResponseSchema>;
+
+//
+export type ScheduleEntryInput = Pick<
+  ScheduleEntryRequest,
+  "dayOfTheWeek" | "startTime" | "endTime"
+>;

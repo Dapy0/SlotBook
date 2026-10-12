@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { staffSchedules, type StaffScheduleEntity } from "../../db/schema/staffSchedule.ts";
-import type { ScheduleBody } from "./schedule.schema.ts";
+import type { ScheduleEntryInput } from '@slotbook/shared';
 
 export async function findScheduleByStaffId(
   db: DB,
@@ -15,7 +15,7 @@ export async function deleteScheduleByStaffId(db: DB, staffId: string) {
 export async function insertScheduleByStaffId(
   db: DB,
   staffId: string,
-  newSchedule: ScheduleBody,
+  newSchedule: readonly ScheduleEntryInput[],
 ): Promise<StaffScheduleEntity[]> {
   const insertedSchedule = await db
     .insert(staffSchedules)

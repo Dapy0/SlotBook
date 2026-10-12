@@ -1,10 +1,10 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
-import type { ScheduleBody } from "../modules/schedule/schedule.schema.ts";
 import {
   addDaysToIso,
   todayInTimeZone,
   type BookingQuery,
   type FacilityResponse,
+  type ScheduleEntryInput,
   type Weekday,
 } from "@slotbook/shared";
 import { dayBounds } from "../modules/availability/slotEngine";
@@ -40,8 +40,8 @@ export function checkNoOverlapWithinSchedule(
 }
 
 export function checkStaffScheduleFitsFacility(
-  staffSchedule: ScheduleBody,
-  facilitySchedule: ScheduleBody,
+  staffSchedule: readonly ScheduleEntryInput[],
+  facilitySchedule: readonly ScheduleEntryInput[],
 ) {
   for (const current of staffSchedule) {
     const facilityDay = facilitySchedule.find((f) => f.dayOfTheWeek === current.dayOfTheWeek);

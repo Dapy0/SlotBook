@@ -29,6 +29,7 @@ import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
 import bookingExpiry from "./plugins/bookingExpiry";
 import { staffMeRoutes } from "./modules/staff/staffMe.routes";
+import { scheduleRequestMeRoutes, scheduleRequestRoutes } from './modules/scheduleRequest/scheduleRequest.routes';
 const isDev = process.env.NODE_ENV !== "production";
 export async function createServer() {
   const app = Fastify({
@@ -108,6 +109,8 @@ export async function createServer() {
   await app.register(serviceRoutes, { prefix: "/facilities" });
   await app.register(staffMeRoutes, { prefix: "/staff" });
   await app.register(mineBookingsRoutes, { prefix: "/bookings" });
+  await app.register(scheduleRequestRoutes, { prefix: "/facilities" });
+  await app.register(scheduleRequestMeRoutes, { prefix: "/staff/me/schedule-requests" });
   await app.register(geoRoutes);
 
   return app;
