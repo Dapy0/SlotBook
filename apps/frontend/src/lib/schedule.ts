@@ -12,7 +12,6 @@ export const WEEKDAYS: { value: Weekday; label: string }[] = [
 
 type Entry = { dayOfTheWeek: Weekday; startTime: string; endTime: string };
 
-// [{1,"15:00:00","19:00:00"},{1,"10:00:00","14:00:00"}], 1 → "10:00–14:00, 15:00–19:00"
 export function formatDayShifts(entries: Entry[], day: Weekday): string | null {
   const shifts = entries
     .filter((e) => e.dayOfTheWeek === day)

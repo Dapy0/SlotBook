@@ -28,7 +28,7 @@ export const scheduleChangeRequests = pgTable(
   (table) => [
     check(
       "schedule_change_request_status_check",
-      sql`${table.status} IN ("pending", "approved", "rejected", "withdrawn")`,
+      sql`${table.status} IN ('pending', 'approved', 'rejected', 'withdrawn')`,
     ),
   ],
 );

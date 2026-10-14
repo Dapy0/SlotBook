@@ -14,7 +14,6 @@ type Props = {
   onDone: () => void;
 };
 
-// Переиспользуем WeeklyScheduleForm (один интервал в день — ограничение MVP).
 export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
   const [initial, setInitial] = useState<ScheduleEntry[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -33,7 +32,6 @@ export function StaffScheduleEditor({ facilityId, staffId, onDone }: Props) {
       await putStaffSchedule(facilityId, staffId, entries);
       router.refresh();
     } catch (error) {
-      // Re-throw every failure so the form never reports a save that did not happen.
       throw new Error(
         error instanceof ApiError
           ? error.message

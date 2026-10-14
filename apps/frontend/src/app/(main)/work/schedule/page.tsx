@@ -1,6 +1,8 @@
 import { getStaffMe } from "@/services/staffMe.server";
 import { moneyFormatterFromCents } from "@/lib/format";
 import { formatDayShifts, WEEKDAYS } from "@/lib/schedule";
+import { getMyScheduleRequests } from '@/services/scheduleRequests.server';
+import { ScheduleRequestSection } from '@/app/(main)/work/schedule/_components/ScheduleRequestSection';
 
 function formatMinutes(total: number) {
   const h = Math.floor(total / 60);
@@ -10,7 +12,7 @@ function formatMinutes(total: number) {
 }
 
 export default async function WorkSchedulePage() {
-  const staffMe = await getStaffMe();
+  const [staffMe, requests] = await Promise.all([getStaffMe(), getMyScheduleRequests()]);
   const { facility, schedule, facilitySchedule, services } = staffMe;
 
   return (
@@ -55,12 +57,12 @@ export default async function WorkSchedulePage() {
             </tbody>
           </table>
         </div>
-
-        <p className="rounded-lg border border-dashed bg-gray-50 px-4 py-3 text-sm text-gray-500">
-          Want to change your hours? Schedule requests are coming soon.
-        </p>
       </section>
-
+      <ScheduleRequestSection
+        currentSchedule={schedule}
+        requests={requests}
+        isActive={staffMe.isActive}
+      />
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-gray-900">My services</h2>
         {services.length === 0 ? (

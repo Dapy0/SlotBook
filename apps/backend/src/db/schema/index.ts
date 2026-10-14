@@ -7,3 +7,4 @@ export * from "./staffSchedule.ts";
 export * from "./booking.ts";
 export * from "./facilitySchedule.ts";
 export * from "./reviews.ts";
+export * from "./scheduleChangeRequests.ts";
