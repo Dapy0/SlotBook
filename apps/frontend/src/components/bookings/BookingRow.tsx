@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 type Props = {
   booking: FacilityBookingResponse;
   timeZone: string;
-  showStaff?: boolean; // в кабинете мастера (S8) колонка мастера не нужна
+  showStaff?: boolean;
 };
 
 export function BookingRow({ booking, timeZone, showStaff = true }: Props) {

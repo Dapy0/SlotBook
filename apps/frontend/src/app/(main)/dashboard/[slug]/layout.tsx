@@ -31,7 +31,9 @@ export default async function FacilityDashboardLayout({
     { href: `${base}/bookings`, label: "Bookings" },
     { href: `${base}/services`, label: "Services" },
     { href: `${base}/staff`, label: "Staff" },
+    { href: `${base}/hours`, label: "Hours" },
     { href: `${base}/schedule-requests`, label: "Schedule Request" },
+    { href: `${base}/settings`, label: "Settings" },
   ];
 
   return (

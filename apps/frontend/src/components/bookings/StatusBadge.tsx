@@ -3,7 +3,6 @@ import type { BookingStatus } from "@slotbook/shared";
 
 type DisplayStatus = BookingStatus | "completed";
 
-// Status colors follow DESIGN.md: pending = warning, confirmed = success, canceled = muted.
 const STATUS: Record<DisplayStatus, { label: string; className: string }> = {
   pending: {
     label: "Waiting for confirmation",

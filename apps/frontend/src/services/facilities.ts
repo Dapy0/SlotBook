@@ -7,7 +7,9 @@ import {
   facilityScheduleEntryResponseSchema,
   facilityWithServicesResponseSchema,
   serviceResponseSchema,
+  type CreateFacilityRequest,
   type FacilityListQuery,
+  type UpdateFacilityRequest,
 } from "@slotbook/shared";
 
 export async function getFacilities(params: FacilityListQuery) {
@@ -59,4 +61,35 @@ export async function getMyFacilities(cookie: string) {
 
 export async function getFacilityServicesById(facilityId: string) {
   return await api(`/facilities/${facilityId}/services`, serviceResponseSchema.array());
+}
+
+export async function createFacility(payload: CreateFacilityRequest) {
+  return await api(`/facilities/`, facilityResponseSchema, {
+    method: "POST",
+  });
+}
+
+export async function updateFacility(facilityId: string, payload: UpdateFacilityRequest) {
+  return await api(`/facilities/${facilityId}`, facilityResponseSchema, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+export async function publishFacility(id: string) {
+  return await api(`/facilities/${id}/publish`, facilityResponseSchema, {
+    method: "POST",
+    body: JSON.stringify(""),
+  });
+}
+export async function unpublishFacility(id: string) {
+  return await api(`/facilities/${id}/unpublish`, facilityResponseSchema, {
+    method: "POST",
+    body: JSON.stringify(''),
+  });
+}
+
+export async function deleteFacility(id: string) {
+  return await api(`/facilities/${id}`, facilityResponseSchema, {
+    method: "DELETE",
+  });
 }

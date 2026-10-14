@@ -4,6 +4,7 @@ import { getMe } from "@/lib/session";
 import type { Route } from "next";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const userAuth = await getMe();
@@ -15,18 +16,27 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight">My venues</h1>
-        <p className="text-muted-foreground">Manage bookings, services and staff.</p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight">My venues</h1>
+          <p className="text-muted-foreground">Manage bookings, services and staff.</p>
+        </div>
+        {facilities.length > 0 && (
+          <Link href="/dashboard/new" className={buttonVariants({ variant: "outline" })}>
+            Add venue
+          </Link>
+        )}
       </header>
 
       {facilities.length === 0 ? (
         <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border bg-card p-8">
           <h2 className="text-xl font-semibold">You don&apos;t manage a venue yet</h2>
           <p className="max-w-prose text-muted-foreground">
-            Venue creation isn&apos;t open in the app yet. Once a venue is linked to your account,
-            it appears here.
+            Create a draft, add hours, services and staff, then publish when it&apos;s ready.
           </p>
+          <Link href="/dashboard/new" className={buttonVariants()}>
+            Add your venue
+          </Link>
         </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

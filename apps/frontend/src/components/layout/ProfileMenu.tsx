@@ -44,8 +44,12 @@ function ProfileMenu({
             <DropdownMenuItem render={<Link href={"/account/appointments"} />}>
               My bookings
             </DropdownMenuItem>
-            {me.ownedFacilities.length > 0 && (
+            {me.ownedFacilities.length > 0 ? (
               <DropdownMenuItem render={<Link href={"/dashboard"} />}>My venues</DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem render={<Link href={"/dashboard/new"} />}>
+                Add your venue
+              </DropdownMenuItem>
             )}
             {me.staffMembership !== null && (
               <DropdownMenuItem render={<Link href={"/work"} />}>Staff panel</DropdownMenuItem>

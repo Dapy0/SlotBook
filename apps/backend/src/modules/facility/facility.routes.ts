@@ -130,6 +130,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/:id/manage",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
@@ -149,6 +150,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/:id/readiness",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
@@ -165,9 +167,10 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.send(facility);
     },
   );
-  fastify.get(
+  fastify.post(
     "/:id/publish",
     {
+      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
@@ -185,9 +188,10 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
   );
 
-   fastify.get(
+   fastify.post(
      "/:id/unpublish",
      {
+       onRequest: [fastify.authenticate],
        schema: {
          params: facilityParamsSchema,
          response: {

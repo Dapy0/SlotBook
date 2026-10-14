@@ -11,13 +11,10 @@ type Props = {
 };
 
 export function WeekNav({ title, from, to, hrefFor }: Props) {
-  // TODO 1: подпись диапазона через formatCalendarDate: "1 Oct – 7 Oct 2026"
   const rangeLabel = `${from} – ${to}`;
 
-  // TODO 2: from - 7 и from + 7 через addDaysToIso
   const prevHref = hrefFor({ from: undefined });
   const nextHref = hrefFor({ from: undefined });
-  // TODO 3: "This week" — ссылка без from (сброс на сегодня)
   const todayHref = hrefFor({ from: undefined });
 
   return (

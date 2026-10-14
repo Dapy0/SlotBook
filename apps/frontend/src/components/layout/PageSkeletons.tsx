@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Loading placeholders shaped like the real pages, so content doesn't jump when it arrives.
 
 export function ListPageSkeleton({ rows = 4 }: { rows?: number }) {
   return (

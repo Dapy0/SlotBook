@@ -7,6 +7,8 @@ import { moneyFormatterFromCents } from "../../../../lib/format";
 import { formatInTimeZone } from "date-fns-tz";
 import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { getFacilityReadiness } from '@/services/facilities.server';
+import { ReadinessCard } from '@/app/(main)/dashboard/_components/ReadinessCard';
 
 function SectionHeader({
   title,
@@ -36,6 +38,7 @@ export default async function FacilityOverviewPage({
   const { slug } = await params;
   const userAuth = await getMe();
   const facility = userAuth?.ownedFacilities.find((facility) => facility.slug == slug)!;
+  const readiness = facility.isPublished ? null : await getFacilityReadiness(facility.id);
   const today = formatInTimeZone(new Date(), facility.timezone, "yyyy-MM-dd");
 
   const [todayBookings, pendingBookings] = await Promise.all([
@@ -61,6 +64,9 @@ export default async function FacilityOverviewPage({
 
   return (
     <div className="flex flex-col gap-10">
+      {readiness && (
+        <ReadinessCard facilityId={facility.id} slug={facility.slug} readiness={readiness} />
+      )}
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
         <p className="text-muted-foreground">

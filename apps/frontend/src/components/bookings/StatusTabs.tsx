@@ -18,7 +18,6 @@ export function StatusTabs({ status, hrefFor }: Props) {
   return (
     <nav className="flex w-fit gap-1 rounded-lg bg-gray-100 p-1" aria-label="Filter by status">
       {STATUS_FILTERS.map((f) => {
-        // TODO 4: активна ли вкладка
         const isActive = false;
         return (
           <Link

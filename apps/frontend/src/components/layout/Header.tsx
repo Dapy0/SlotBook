@@ -104,7 +104,7 @@ export function Header<T extends string>({
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  "relative after:absolute after:inset-x-2.5 after:-bottom-[13px] after:h-[3px] after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity",
+                  "relative after:absolute after:inset-x-2.5 after:-bottom-3.25 after:h-0.75 after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity",
                   isActive && "after:opacity-100",
                 )}
               >
