@@ -6,7 +6,7 @@ export function slugifyStr(input: string, maxLength = 60): string {
   return slugify(input, {
     replacement: "-",
     lower: true,
-    strict: false,
+    strict: true,
     trim: true,
   }).slice(0, maxLength);
 }

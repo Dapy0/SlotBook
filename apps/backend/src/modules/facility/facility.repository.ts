@@ -1,5 +1,6 @@
-import { and, asc, avg, count, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import { and, asc, avg, count, exists, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
+
 import {
   facilities,
   type FacilityEntity,
@@ -13,6 +14,13 @@ import type {
 } from "@slotbook/shared";
 import { reviews } from "../../db/schema/reviews.ts";
 import { bookings } from "../../db/schema/booking.ts";
+import {
+  facilitySchedules,
+  services,
+  staffMembers,
+  staffSchedules,
+  staffServices,
+} from "../../db/schema";
 
 export async function findAllFacilitiesByParams(
   db: DB,
@@ -147,4 +155,62 @@ export async function findCitiesByCountry(
     .where(and(eq(facilities.isPublished, true), eq(facilities.country, country)))
     .groupBy(facilities.city)
     .orderBy(desc(count()));
+}
+
+export async function countReadinessFacts(
+  db: DB,
+  facilityId: string,
+): Promise<{ hours: number; activeServices: number; bookableStaff: number }> {
+  const [[hours], [activeServices], [bookableStaff]] = await Promise.all([
+    db
+      .select({ count: count() })
+      .from(facilitySchedules)
+      .where(eq(facilitySchedules.facilityId, facilityId)),
+    db
+      .select({ count: count() })
+      .from(services)
+      .where(and(eq(services.facilityId, facilityId), eq(services.isActive, true))),
+    db
+      .select({ count: count() })
+      .from(staffMembers)
+      .where(
+        and(
+          eq(staffMembers.facilityId, facilityId),
+          eq(staffMembers.isActive, true),
+          exists(
+            db
+              .select({ one: sql`1` })
+              .from(staffServices)
+              .where(eq(staffServices.staffMemberId, staffMembers.id)),
+          ),
+          exists(
+            db
+              .select({ one: sql`1` })
+              .from(staffSchedules)
+              .where(eq(staffSchedules.staffMemberId, staffMembers.id)),
+          ),
+        ),
+      ),
+  ]);
+
+  return {
+    hours: hours?.count ?? 0,
+    activeServices: activeServices?.count ?? 0,
+    bookableStaff: bookableStaff?.count ?? 0,
+  };
+}
+export async function setFacilityPublished(
+  db: DB,
+  facilityId: string,
+  isPublished: boolean,
+): Promise<FacilityEntity | null> {
+  const [res] =
+    (await db
+      .update(facilities)
+      .set({
+        isPublished: isPublished,
+      })
+      .where(eq(facilities.id, facilityId))
+      .returning()) ?? null;
+  return res;
 }

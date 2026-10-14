@@ -7,6 +7,7 @@ import {
   facilityCategoryQuerySchema,
   facilityCityResponseSchema,
   facilityListQuerySchema,
+  facilityReadinessResponseSchema,
   facilityResponseSchema,
   facilityScheduleEntryResponseSchema,
   facilityWithServicesResponseSchema,
@@ -31,10 +32,14 @@ import {
   getAllPublicFacilities,
   getFacilityByIdOrThrow,
   getFacilityBySlugOrThrow,
+  getFacilityReadiness,
   getFacilityScheduleById,
   getFacilityScheduleBySlug,
+  getOwnedFacility,
   getOwnFacilitiesByUserId,
+  publishFacility,
   removeOwnedFacilityById,
+  unPublishFacility,
   updateOwnedFacility,
 } from "./facility.service.ts";
 import { findStaffByFacilityIdPublic } from "../staff/staff.repository.ts";
@@ -64,22 +69,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.send(facilities);
     },
   );
-  // fastify.post(
-  //   "/",
-  //   {
-  //     schema: {
-  //       body: createFacilityRequestSchema,
-  //       response: {
-  //         200: facilityResponseSchema,
-  //       },
-  //     },
-  //   },
-  //   async (request, response) => {
-  //     const facility = await createFacilityDraft(request.server.drizzle,request.user.id, request.body);
 
-  //     return response.send(facility);
-  //   },
-  // );
   fastify.get(
     "/search",
     {
@@ -137,6 +127,84 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       return response.send(facility);
     },
   );
+  fastify.get(
+    "/:id/manage",
+    {
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await getOwnedFacility(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+      );
+      return response.send(facility);
+    },
+  );
+  fastify.get(
+    "/:id/readiness",
+    {
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: facilityReadinessResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await getFacilityReadiness(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+      );
+      return response.send(facility);
+    },
+  );
+  fastify.get(
+    "/:id/publish",
+    {
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await publishFacility(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+      );
+      return response.send(facility);
+    },
+  );
+
+   fastify.get(
+     "/:id/unpublish",
+     {
+       schema: {
+         params: facilityParamsSchema,
+         response: {
+           200: facilityResponseSchema,
+         },
+       },
+     },
+     async (request, response) => {
+       const facility = await unPublishFacility(
+         request.server.drizzle,
+         request.params.id,
+         request.user.id,
+       );
+       return response.send(facility);
+     },
+   );
+
   fastify.get(
     "/by-slug/:slug",
     {
@@ -257,7 +325,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
         params: facilityParamsSchema,
         body: changeWeekScheduleRequestSchema,
         response: {
-          201: facilityScheduleEntryResponseSchema.array(),
+          200: facilityScheduleEntryResponseSchema.array(),
         },
       },
     },
@@ -268,7 +336,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.user.id,
         request.body,
       );
-      return response.status(201).send(schedule);
+      return response.send(schedule);
     },
   );
   fastify.delete(
@@ -285,7 +353,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, response) => {
       await removeOwnedFacilityById(request.server.drizzle, request.params.id, request.user.id);
 
-      return response.status(204);
+      response.status(204);
     },
   );
   fastify.get(

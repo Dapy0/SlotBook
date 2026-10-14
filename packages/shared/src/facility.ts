@@ -9,6 +9,14 @@ import {
 } from "./common/primitives";
 import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
 
+export const FACILITY_READINESS_KEYS = [
+  "HAS_HOURS",
+  "HAS_ACTIVE_SERVICE",
+  "HAS_BOOKABLE_STAFF",
+  "HAS_LOCATION",
+] as const;
+export const facilityReadinessKeysSchema = z.enum(FACILITY_READINESS_KEYS);
+export type FacilityReadinessKey = z.infer<typeof facilityReadinessKeysSchema>;
 export const FACILITY_CATEGORIES = [
   "BEAUTY",
   "SPORT_FITNESS",
@@ -66,18 +74,31 @@ const facilityRequestBaseSchema = facilityBaseSchema.extend({
   country: countryCodeInputSchema,
   currency: currencyCodeInputSchema,
 });
-export const createFacilityRequestSchema = facilityRequestBaseSchema.extend({
-  currency: currencyCodeInputSchema.default("PLN"),
-  images: z.array(z.url()).default([]),
-  isPublished: z.boolean().default(false),
-});
+export const createFacilityRequestSchema = facilityRequestBaseSchema
+  .omit({ slug: true, isPublished: true })
+  .extend({
+    currency: currencyCodeInputSchema.default("PLN"),
+    images: z.array(z.url()).default([]),
+    description: z.string().trim().max(1000).default(""),
+  });
 export type CreateFacilityRequest = z.infer<typeof createFacilityRequestSchema>;
 
 export const updateFacilityRequestSchema = facilityRequestBaseSchema
+  .omit({ isPublished: true })
   .partial()
   .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
 export type UpdateFacilityRequest = z.infer<typeof updateFacilityRequestSchema>;
 
+export const facilityReadinessResponseSchema = z.object({
+  ready: z.boolean(),
+  checks: z.array(
+    z.object({
+      key: facilityReadinessKeysSchema,
+      ok: z.boolean(),
+    }),
+  ),
+});
+export type FacilityReadinessResponse = z.infer<typeof facilityReadinessResponseSchema>;
 // Response
 export const facilityResponseSchema = facilityBaseSchema.extend({
   id: z.uuid(),

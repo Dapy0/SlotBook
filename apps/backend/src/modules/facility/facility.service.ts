@@ -1,6 +1,7 @@
 import type {
   CreateFacilityRequest,
   FacilityListQuery,
+  FacilityReadinessResponse,
   FacilityResponse,
   FacilityScheduleEntryResponse,
   UpdateFacilityRequest,
@@ -14,12 +15,15 @@ import {
   updateFacilityById,
   deleteFacilityById,
   findFacilityBySlug,
+  countReadinessFacts,
+  setFacilityPublished,
 } from "./facility.repository.ts";
-import { ConflictError, NotFoundError } from "../../lib/errors.ts";
+import { BadRequestError, ConflictError, NotFoundError } from "../../lib/errors.ts";
 import {
   deleteFacilityScheduleByFacilityId,
   findFacilitySchedule,
   findFacilityScheduleBySlug,
+  findSlugsStartingWith,
   insertFacilityScheduleByFacilityId,
 } from "./facilitySchedule.repository.ts";
 import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
@@ -27,6 +31,7 @@ import { assertFound } from "../utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
 import { assertFacilityOwner } from "../../lib/authz";
 import { slugifyStr } from "../../../../../packages/shared/src/utils/slug";
+import { findBookingsByFacilityId } from "../booking/booking.repository";
 export async function getFacilityBySlugOrThrow(
   db: DB,
   facilityId: string,
@@ -58,10 +63,13 @@ export async function getOwnFacilitiesByUserId(
   return findFacilitiesByOwnerId(db, userId);
 }
 export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest, userId: string) {
+  const slug = await generateUniqueSlug(db, data.name);
   try {
     return await insertFacility(db, {
       ...data,
       ownerId: userId,
+      slug: slug,
+      isPublished: false,
     });
   } catch (e: unknown) {
     if (getPgErrorCode(e) === PG.UNIQUE) {
@@ -80,16 +88,18 @@ export async function updateOwnedFacility(
 ): Promise<FacilityResponse> {
   await assertFacilityOwner(db, facilityId, userId);
 
-  const updatedFacility = await updateFacilityById(db, facilityId, data).catch((e) => {
+  try {
+    const updatedFacility = await updateFacilityById(db, facilityId, data);
+    if (!updatedFacility) {
+      throw new NotFoundError("Facility not found");
+    }
+    return updatedFacility;
+  } catch (e) {
     if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError(`Venue with such slug: ${data.slug} already exists. `);
     }
-  });
-
-  if (!updatedFacility) {
-    throw new NotFoundError("Facility not found");
+    throw e;
   }
-  return updatedFacility;
 }
 
 export async function removeOwnedFacilityById(
@@ -98,7 +108,10 @@ export async function removeOwnedFacilityById(
   userId: string,
 ): Promise<FacilityResponse> {
   await assertFacilityOwner(db, facilityId, userId);
-
+  const bookings = await findBookingsByFacilityId(db, facilityId);
+  if (bookings.length > 0) {
+    throw new ConflictError("You still have bookings so u can not delete your facility");
+  }
   const deletedFacility = await deleteFacilityById(db, facilityId);
   if (!deletedFacility) {
     throw new NotFoundError("Facility not found");
@@ -132,7 +145,6 @@ export async function changeFacilityWeekSchedule(
   newSchedule: ChangeWeekScheduleRequest,
 ): Promise<FacilityScheduleEntryResponse[]> {
   await assertFacilityOwner(db, facilityId, requestedUserId);
-
   const transaction = await db.transaction(async (tx) => {
     await deleteFacilityScheduleByFacilityId(tx, facilityId);
     return await insertFacilityScheduleByFacilityId(tx, facilityId, newSchedule);
@@ -142,18 +154,79 @@ export async function changeFacilityWeekSchedule(
   }
   return transaction;
 }
-export async function createFacilityDraft(
-  db: DB,
-  userId: string,
-  data: CreateFacilityRequest,
-): Promise<FacilityResponse> {
-  const base = slugifyStr(data.name);
 
-  const res = await insertFacility(db, { ...data, ownerId: userId, slug: base }).catch((e) => {
-    if (getPgErrorCode(e) === PG.UNIQUE) {
-      throw new ConflictError(`Venue with such slug: ${base} already exists. `);
-    }
-    throw e;
-  });
-  return res;
+export async function generateUniqueSlug(db: DB, name: string): Promise<string> {
+  const base = slugifyStr(name);
+  if (base.length === 0) {
+    throw new BadRequestError("Wrong name. So can not generate proper slug");
+  }
+  const taken = await findSlugsStartingWith(db, base);
+  let newName = base;
+  let i = 1;
+  while (taken.includes(newName)) {
+    newName = `${base}-${i}`;
+    i++;
+  }
+  return newName;
+}
+export async function getOwnedFacility(
+  db: DB,
+  id: string,
+  userId: string,
+): Promise<FacilityResponse> {
+  const facility = await assertFacilityOwner(db, id, userId);
+
+  return facility;
+}
+
+export async function getFacilityReadiness(
+  db: DB,
+  id: string,
+  userId: string,
+): Promise<FacilityReadinessResponse> {
+  const facility = await assertFacilityOwner(db, id, userId);
+  const facts = await countReadinessFacts(db, id);
+
+  const checks: FacilityReadinessResponse["checks"] = [
+    { key: "HAS_HOURS", ok: facts.hours > 0 },
+    { key: "HAS_ACTIVE_SERVICE", ok: facts.activeServices > 0 },
+    { key: "HAS_BOOKABLE_STAFF", ok: facts.bookableStaff > 0 },
+    { key: "HAS_LOCATION", ok: !(facility.latitude === 0 && facility.longitude === 0) },
+  ];
+
+  return {
+    ready: checks.every((obj) => obj.ok),
+    checks: checks,
+  };
+}
+export async function publishFacility(db: DB, id: string, userId: string) {
+  const facility = await assertFacilityOwner(db, id, userId);
+  const { ready } = await getFacilityReadiness(db, id, userId);
+  if (!ready) {
+    throw new ConflictError("Facility is not ready yet");
+  }
+  if (facility.isPublished) {
+    return facility;
+  }
+  const updatedFacility = await setFacilityPublished(db, id, true);
+  if (!updatedFacility) {
+    throw new ConflictError("Something went wrong");
+  }
+  return updatedFacility;
+}
+
+export async function unPublishFacility(db: DB, id: string, userId: string) {
+  const facility = await assertFacilityOwner(db, id, userId);
+  const { ready } = await getFacilityReadiness(db, id, userId);
+  if (!ready) {
+    throw new ConflictError("Facility is not ready yet");
+  }
+  if (facility.isPublished == false) {
+    return facility;
+  }
+  const updatedFacility = await setFacilityPublished(db, id, false);
+  if (!updatedFacility) {
+    throw new ConflictError("Something went wrong");
+  }
+  return updatedFacility;
 }

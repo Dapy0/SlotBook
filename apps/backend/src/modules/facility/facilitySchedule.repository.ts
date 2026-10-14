@@ -3,7 +3,7 @@ import {
   facilitySchedules,
   type FacilityScheduleEntity,
 } from "../../db/schema/facilitySchedule.ts";
-import { and, eq, getColumns } from "drizzle-orm";
+import { and, eq, getColumns, like } from "drizzle-orm";
 import type { ChangeWeekScheduleRequest, Weekday } from "@slotbook/shared";
 import { facilities } from "../../db/schema";
 export async function findFacilityScheduleBySlug(
@@ -66,4 +66,11 @@ export async function insertFacilityScheduleByFacilityId(
 
 export async function deleteFacilityScheduleByFacilityId(db: DB, facilityId: string) {
   return db.delete(facilitySchedules).where(eq(facilitySchedules.facilityId, facilityId));
+}
+export async function findSlugsStartingWith(db: DB, base: string): Promise<string[]> {
+  const res = await db
+    .select({ slug: facilities.name })
+    .from(facilities)
+    .where(like(facilities.slug, `%${base}%`));
+  return res.map((row) => row.slug);
 }
