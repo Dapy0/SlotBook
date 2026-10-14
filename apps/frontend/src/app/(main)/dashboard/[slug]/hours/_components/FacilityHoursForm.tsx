@@ -1,11 +1,17 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { ChangeWeekScheduleRequest, Weekday } from "@slotbook/shared";
+import {
+  changeWeekScheduleRequestSchema,
+  weekdaySchema,
+  type ChangeWeekScheduleRequest,
+  type Weekday,
+} from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
 import { Input as TextInput } from "@/components/ui/input";
 import { ApiError } from "@/lib/api";
 import { putFacilitySchedule } from "@/services/facilitySchedule";
+import z from "zod";
 
 const Form = "form"; // в проекте можно писать тег формы напрямую
 
@@ -18,11 +24,25 @@ const DAYS: { value: Weekday; label: string }[] = [
   { value: 6, label: "Saturday" },
   { value: 7, label: "Sunday" },
 ];
+const LAST_MINUTE = 23 * 60 + 59;
+
+const toMinutes = (t: string) => {
+  const [h = 0, m = 0] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+const fromMinutes = (min: number) =>
+  `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}:00`;
+
+const dayLabel = (day: Weekday) => DAYS.find((d) => d.value === day)?.label ?? `Day ${day}`;
+
+const scheduleConflictDetailsSchema = z.array(
+  z.object({ staffMemberId: z.string(), dayOfTheWeek: weekdaySchema }),
+);
 
 const MAX_INTERVALS_PER_DAY = 3;
 
-type Interval = { startTime: string; endTime: string }; // "HH:MM:SS", как в API
-type Week = Record<Weekday, Interval[]>; // пустой массив = выходной
+type Interval = { startTime: string; endTime: string };
+type Week = Record<Weekday, Interval[]>;
 
 type Props = {
   facilityId: string;
@@ -30,13 +50,20 @@ type Props = {
 };
 
 function toWeek(entries: ChangeWeekScheduleRequest): Week {
-  void entries;
-  return { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
-}
+  const grouped = Object.groupBy(entries, (e) => e.dayOfTheWeek);
+  const week: Week = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
 
+  for (const { value: day } of DAYS) {
+    week[day] = (grouped[day] ?? [])
+      .map(({ startTime, endTime }) => ({ startTime, endTime }))
+      .toSorted((a, b) => a.startTime.localeCompare(b.startTime));
+  }
+  return week;
+}
 function toEntries(week: Week): ChangeWeekScheduleRequest {
-  void week;
-  return [];
+  return DAYS.flatMap(({ value: day }) =>
+    week[day].map(({ startTime, endTime }) => ({ dayOfTheWeek: day, startTime, endTime })),
+  );
 }
 
 export function FacilityHoursForm({ facilityId, initialEntries }: Props) {
@@ -56,7 +83,27 @@ export function FacilityHoursForm({ facilityId, initialEntries }: Props) {
   }
 
   function addInterval(day: Weekday) {
-    void day;
+    setSaved(false);
+    setError(null);
+    const intervals = week[day];
+
+    if (intervals.length === 0) {
+      setWeek((prev) => ({ ...prev, [day]: [{ startTime: "09:00:00", endTime: "18:00:00" }] }));
+      return;
+    }
+
+    const latestEnd = Math.max(...intervals.map((iv) => toMinutes(iv.endTime)));
+    const start = latestEnd + 60;
+    if (start >= LAST_MINUTE) {
+      setError(`${dayLabel(day)}: no time left after ${fromMinutes(latestEnd).slice(0, 5)}`);
+      return;
+    }
+    const end = Math.min(start + 60, LAST_MINUTE);
+
+    setWeek((prev) => ({
+      ...prev,
+      [day]: [...prev[day], { startTime: fromMinutes(start), endTime: fromMinutes(end) }],
+    }));
   }
 
   function removeInterval(day: Weekday, index: number) {
@@ -70,19 +117,37 @@ export function FacilityHoursForm({ facilityId, initialEntries }: Props) {
     setError(null);
     setConflicts([]);
 
-    // TODO H5: проверить через changeWeekScheduleRequestSchema (пересечения, start < end)
-    //   до отправки и показать первую ошибку в setError.
-    // TODO H6: putFacilitySchedule(facilityId, toEntries(week)) → setSaved(true) → router.refresh().
-    // TODO H7: ApiError с code "SCHEDULE_CONFLICT" → в details список { staffMemberId, dayOfTheWeek }.
-    //   Сейчас ApiError не хранит details (см. README, правка lib/api.ts).
-    //   Покажи в setConflicts строки вида «Wednesday: a staff member works outside these hours».
-    //   Как показать имя сотрудника, если в details только id?
-    void putFacilitySchedule;
-    void toEntries;
-    void ApiError;
-    void router;
-    void facilityId;
-    setIsSubmitting(false);
+    const entries = toEntries(week);
+    const checked = changeWeekScheduleRequestSchema.safeParse(entries);
+    if (!checked.success) {
+      const issue = checked.error.issues[0];
+      const index = issue?.path[0];
+      const day = typeof index === "number" ? entries[index]?.dayOfTheWeek : undefined;
+      const message = issue?.message ?? "Check the hours";
+      setError(day ? `${dayLabel(day)}: ${message}` : message);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await putFacilitySchedule(facilityId, checked.data);
+      setSaved(true);
+      router.refresh();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const parsed = scheduleConflictDetailsSchema.safeParse(err);
+        if (parsed.success) {
+          const days = [...new Set(parsed.data.map((c) => c.dayOfTheWeek))].toSorted(
+            (a, b) => a - b,
+          );
+          setConflicts(days.map((d) => `${dayLabel(d)}: a staff member works outside these hours`));
+          return;
+        }
+      }
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
