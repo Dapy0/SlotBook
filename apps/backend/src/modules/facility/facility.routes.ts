@@ -48,6 +48,7 @@ import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
 import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
+import { toPublicBookingPolicy } from '../../lib/utils';
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -246,6 +247,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
         ...facility,
         staff: staff,
         services: servicesByFacilityId,
+        bookingPolicy: toPublicBookingPolicy(facility),
       };
     },
   );

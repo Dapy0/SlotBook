@@ -1,4 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
+import type { FacilityEntity } from '../db/schema';
+import type { PublicBookingPolicy } from '../../../../packages/shared/src/bookingPolicy';
 
 export function todayInTimeZone(timeZone: string, now = new Date()): string {
   return formatInTimeZone(now, timeZone, "yyyy-MM-dd");
@@ -30,4 +32,12 @@ export function mapBookingToContractFormat<T extends { timeRange: { start: Date;
   ...rest
 }: T): Omit<T, "timeRange"> & { startsAt: Date; endsAt: Date } {
   return { ...rest, startsAt: timeRange.start, endsAt: timeRange.end };
+}
+export function toPublicBookingPolicy(
+  facility: Pick<FacilityEntity, "confirmationMode" | "clientCancelCutoffMinutes">,
+): PublicBookingPolicy {
+  return {
+    confirmationMode: facility.confirmationMode,
+    clientCancelCutoffMinutes: facility.clientCancelCutoffMinutes,
+  };
 }

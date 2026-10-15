@@ -72,6 +72,7 @@ export async function insertBooking(
       },
       priceCents: data.priceCents,
       currency: data.currency,
+      cancelableUntil: data.startDatetime,
     })
     .returning();
 

@@ -32,18 +32,13 @@ import { getPgErrorCode, PG } from "../../lib/pgErrors";
 import { assertFacilityOwner } from "../../lib/authz";
 import { slugifyStr } from "../../../../../packages/shared/src/utils/slug";
 import { findBookingsByFacilityId } from "../booking/booking.repository";
-export async function getFacilityBySlugOrThrow(
-  db: DB,
-  facilityId: string,
-): Promise<FacilityResponse> {
-  const facility = await findFacilityBySlug(db, facilityId);
+import type { FacilityEntity } from "../../db/schema";
+export async function getFacilityBySlugOrThrow(db: DB, slug: string): Promise<FacilityEntity> {
+  const facility = await findFacilityBySlug(db, slug);
   assertFound(facility, "Facility not found");
   return facility;
 }
-export async function getFacilityByIdOrThrow(
-  db: DB,
-  facilityId: string,
-): Promise<FacilityResponse> {
+export async function getFacilityByIdOrThrow(db: DB, facilityId: string): Promise<FacilityEntity> {
   const facility = await findFacilityById(db, facilityId);
   assertFound(facility, "Facility not found");
   return facility;

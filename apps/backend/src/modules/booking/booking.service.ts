@@ -122,6 +122,7 @@ export async function createBookingForFacility(
     endDatetime: slot.end,
     priceCents: service.priceCents,
     currency: facility.currency,
+    
   }).catch((e: unknown) => {
     if (getPgErrorCode(e) === PG.EXCLUSION) {
       throw new ConflictError("This time slot is already booked");
