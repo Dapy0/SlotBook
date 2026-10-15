@@ -728,7 +728,7 @@ function buildSeedData() {
         serviceId: service.id,
         timeRange: range,
         status: plan.status,
-        // после миграции снимка цены (S1):
+        cancelableUntil: range.start,
         priceCents: service.priceCents,
         currency: facility.currency!,
       });

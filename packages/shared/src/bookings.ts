@@ -15,12 +15,26 @@ export const createBookingRequestSchema = z.object({
 });
 export type CreateBookingRequest = z.infer<typeof createBookingRequestSchema>;
 
-export const changeBookingStatusRequestSchema = z.object({
-  status: bookingStatusSchema.extract(["confirmed", "canceled"]),
-});
+export const CANCEL_REASON_PRESETS = [
+  "STAFF_UNAVAILABLE",
+  "VENUE_CLOSED",
+  "DOUBLE_BOOKING",
+  "CLIENT_REQUEST",
+] as const;
+
+export const changeBookingStatusRequestSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("confirmed") }),
+  z.object({
+    status: z.literal("canceled"),
+    reason: z.string().trim().min(1).max(200).optional(),
+  }),
+]);
 export type ChangeBookingStatusRequest = z.infer<typeof changeBookingStatusRequestSchema>;
 
 // Response
+export const CANCEL_ACTORS = ["client", "staff", "owner", "system"] as const;
+export const cancelActorSchema = z.enum(CANCEL_ACTORS);
+export type CancelActor = z.infer<typeof cancelActorSchema>;
 
 export const bookingResponseSchema = z.object({
   id: z.uuid(),
@@ -34,6 +48,10 @@ export const bookingResponseSchema = z.object({
   createdAt: instantSchema,
   priceCents: z.int().nonnegative(),
   currency: currencyCodeSchema,
+  cancelableUntil: instantSchema,
+  canceledAt: instantSchema.nullable(),
+  canceledBy: cancelActorSchema.nullable(),
+  cancelReason: z.string().trim().nullable(),
 });
 export type BookingResponse = z.infer<typeof bookingResponseSchema>;
 
@@ -65,7 +83,7 @@ export type MyBookingsQuery = z.infer<typeof myBookingsQuerySchema>;
 
 //
 
-export type Actors = "client" | "staff" | "owner";
+export type Actors = Exclude<CancelActor, "system">;
 
 export const TRANSITIONS: Record<
   BookingStatus,
@@ -87,4 +105,10 @@ export function checkTransition(
     return "invalid";
   }
   return actors.some((actor) => allowed.includes(actor)) ? "ok" : "forbidden";
+}
+export function canClientCancel(
+  booking: Pick<BookingResponse, "status" | "cancelableUntil">,
+  now: Date,
+): boolean {
+  return booking.status !== "canceled" && now < booking.cancelableUntil;
 }

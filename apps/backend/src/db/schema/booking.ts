@@ -14,6 +14,7 @@ import { facilities } from "./facility.ts";
 import { staffMembers } from "./staffMember.ts";
 import { services } from "./service.ts";
 import { sql } from "drizzle-orm";
+import { CANCEL_ACTORS } from "@slotbook/shared";
 
 type TimeRange = {
   start: Date;
@@ -76,6 +77,10 @@ export const bookings = pgTable(
     status: text("status", { enum: ["pending", "confirmed", "canceled"] })
       .notNull()
       .default("pending"),
+    cancelableUntil: timestamp("cancelable_until", { withTimezone: true, mode: "date" }).notNull(),
+    canceledAt: timestamp("canceled_at", { withTimezone: true, mode: "date" }),
+    canceledBy: text("canceled_by", { enum: CANCEL_ACTORS }),
+    cancelReason: text("cancel_reason"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => [
@@ -83,6 +88,18 @@ export const bookings = pgTable(
     index("bookings_clients_idx").on(table.clientId),
     index("bookings_staff_members_idx").on(table.staffMemberId),
     check("booking_status_check", sql`${table.status} IN ('pending','confirmed', 'canceled')`),
+    check(
+      "booking_cancellation_check",
+      sql`${table.status} = 'canceled' OR (${table.canceledAt} IS NULL AND ${table.canceledBy} IS NULL AND ${table.cancelReason} IS NULL)`,
+    ),
+    check(
+      "booking_canceled_by_check",
+      sql`${table.canceledBy} IS NULL OR ${table.canceledBy} IN ('client', 'staff', 'owner', 'system')`,
+    ),
+    check(
+      "booking_cancelable_until_before_start_check",
+      sql`${table.cancelableUntil} <= lower(${table.timeRange})`,
+    ),
   ],
 );
 

@@ -10,12 +10,15 @@ import {
   pgEnum,
   pgTable,
   integer,
+  check,
 } from "drizzle-orm/pg-core";
 import { users } from "./user.ts";
 import { FACILITY_CATEGORIES } from "@slotbook/shared";
+import { sql } from "drizzle-orm";
+import { CONFIRMATION_MODES } from '../../../../../packages/shared/src/bookingPolicy';
 
 export const facilityCategoryEnum = pgEnum("facility_category", FACILITY_CATEGORIES);
-
+export const facilityConfirmationMode = pgEnum("confirmation_mode", CONFIRMATION_MODES);
 export const facilities = pgTable(
   "facilities",
   {
@@ -40,6 +43,10 @@ export const facilities = pgTable(
     reviewsCount: integer("reviews_count").notNull().default(0),
     isPublished: boolean("is_published").notNull().default(false),
     timezone: text("timezone").notNull().default("Europe/Warsaw"),
+    confirmationMode: facilityConfirmationMode("confirmation_mode").default("manual").notNull(),
+    clientCancelCutoffMinutes: integer("client_cancel_cutoff_minutes").default(0).notNull(),
+    bookingLeadMinutes: integer("booking_lead_minutes").default(60).notNull(),
+    bookingHorizonDays: integer("booking_horizon_days").default(30).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     // telegram_chat_id
@@ -48,6 +55,16 @@ export const facilities = pgTable(
     index("facilities_city_idx").on(table.city),
     index("facilities_owner_idx").on(table.ownerId),
     index("facilities_category_idx").on(table.category),
+    check(
+      "facilities_confirmation_mode_check",
+      sql`${table.confirmationMode} IN ('auto', 'manual')`,
+    ),
+    check(
+      "client_cancel_cutoff_minutes_check",
+      sql`${table.clientCancelCutoffMinutes} BETWEEN 0 AND 10080 `,
+    ),
+    check("booking_lead_minutes_check", sql`${table.bookingLeadMinutes} BETWEEN 0 AND 10080 `),
+    check("booking_horizon_days_check", sql`${table.bookingHorizonDays} BETWEEN 1 AND 365 `),
   ],
 );
 export type FacilityEntity = typeof facilities.$inferSelect;
