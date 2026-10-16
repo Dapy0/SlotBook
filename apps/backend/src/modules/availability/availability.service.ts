@@ -8,9 +8,8 @@ import { getServiceForStaffMember } from "../service/service.service.ts";
 import { addDaysToIso } from "../../lib/utils.ts";
 import { NotFoundError } from "../../lib/errors";
 import { computeDaySlots, getBookingWindow } from "./slotEngine";
-import { BOOKING_RULES } from "./booking.rules";
 
-export async function getAvailableSlotsFor30days(
+export async function getAvailableSlots(
   db: DB,
   facilityId: string,
   staffId: string,
@@ -28,11 +27,16 @@ export async function getAvailableSlotsFor30days(
 
   const now = new Date();
   const tz = facility.timezone;
-  const window = getBookingWindow(tz, now);
+  const window = getBookingWindow(
+    tz,
+    now,
+    facility.bookingHorizonDays,
+    facility.bookingLeadMinutes,
+  );
 
   const busy = await findBusyRangesForStaff(db, facility.id, staffId, now, window.windowEnd);
 
-  const days = Array.from({ length: BOOKING_RULES.horizonDays }, (_, i) => {
+  const days = Array.from({ length: facility.bookingHorizonDays }, (_, i) => {
     const date = addDaysToIso(window.firstDate, i);
     const slots = computeDaySlots({
       localDate: date,

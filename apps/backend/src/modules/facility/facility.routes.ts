@@ -1,5 +1,6 @@
 import z from "zod";
 import {
+  bookingPolicyResponseSchema,
   createFacilityRequestSchema,
   facilityBookingDataResponseSchema,
   facilityBookingQuerySchema,
@@ -11,6 +12,7 @@ import {
   facilityResponseSchema,
   facilityScheduleEntryResponseSchema,
   facilityWithServicesResponseSchema,
+  updateBookingPolicyRequestSchema,
   updateFacilityRequestSchema,
 } from "@slotbook/shared";
 import { staffRoutes } from "../staff/staff.routes.ts";
@@ -20,7 +22,9 @@ import { reviewResponseSchema } from "@slotbook/shared";
 import {
   findAllFacilitiesByParams,
   findCitiesByCountry,
+  findFacilityBookingsPolicy,
   getAllCategories,
+  updateFacilityBookingsPolicy,
 } from "./facility.repository.ts";
 import {
   getServicesByFacilityIds,
@@ -48,7 +52,9 @@ import { changeWeekScheduleRequestSchema } from "@slotbook/shared";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
 import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
-import { toPublicBookingPolicy } from '../../lib/utils';
+import { toPublicBookingPolicy } from "../../lib/utils";
+import { assertFacilityOwner } from "../../lib/authz";
+import { NotFoundError } from "../../lib/errors";
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -189,26 +195,26 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     },
   );
 
-   fastify.post(
-     "/:id/unpublish",
-     {
-       onRequest: [fastify.authenticate],
-       schema: {
-         params: facilityParamsSchema,
-         response: {
-           200: facilityResponseSchema,
-         },
-       },
-     },
-     async (request, response) => {
-       const facility = await unPublishFacility(
-         request.server.drizzle,
-         request.params.id,
-         request.user.id,
-       );
-       return response.send(facility);
-     },
-   );
+  fastify.post(
+    "/:id/unpublish",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: facilityResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facility = await unPublishFacility(
+        request.server.drizzle,
+        request.params.id,
+        request.user.id,
+      );
+      return response.send(facility);
+    },
+  );
 
   fastify.get(
     "/by-slug/:slug",
@@ -410,6 +416,50 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       response.send(await findCitiesByCountry(request.server.drizzle, request.query.country));
     },
   );
+  fastify.get(
+    "/:id/booking-policy",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        params: facilityParamsSchema,
+        response: {
+          200: bookingPolicyResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
+      const facilityPolicies = await findFacilityBookingsPolicy(
+        request.server.drizzle,
+        request.params.id,
+      );
+      if (!facilityPolicies) throw new NotFoundError("No facility policies where found.");
+      return response.send(facilityPolicies);
+    },
+  );
+  fastify.patch(
+    "/:id/booking-policy",
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        body: updateBookingPolicyRequestSchema,
+        params: facilityParamsSchema,
+        response: {
+          200: bookingPolicyResponseSchema,
+        },
+      },
+    },
+    async (request, response) => {
+      const facilityPolicies = await updateFacilityBookingsPolicy(
+        request.server.drizzle,
+        request.params.id,
+        request.body,
+      );
+      if (!facilityPolicies) throw new NotFoundError("No facility policies where found and updated.");
+      return response.send(facilityPolicies);
+    },
+  );
+
   fastify.register(staffRoutes, { prefix: "/" });
   fastify.register(bookingRoutes, { prefix: "/:id/bookings" });
   fastify.register(availabilityRoutes, { prefix: "/" });

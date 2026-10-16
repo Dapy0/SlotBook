@@ -15,7 +15,7 @@ import {
 import { users } from "./user.ts";
 import { FACILITY_CATEGORIES } from "@slotbook/shared";
 import { sql } from "drizzle-orm";
-import { CONFIRMATION_MODES } from '../../../../../packages/shared/src/bookingPolicy';
+import { CONFIRMATION_MODES } from "@slotbook/shared";
 
 export const facilityCategoryEnum = pgEnum("facility_category", FACILITY_CATEGORIES);
 export const facilityConfirmationMode = pgEnum("confirmation_mode", CONFIRMATION_MODES);

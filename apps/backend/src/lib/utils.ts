@@ -1,6 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
-import type { FacilityEntity } from '../db/schema';
-import type { PublicBookingPolicy } from '../../../../packages/shared/src/bookingPolicy';
+import type { FacilityEntity } from "../db/schema";
+import type { PublicBookingPolicy } from "@slotbook/shared";
 
 export function todayInTimeZone(timeZone: string, now = new Date()): string {
   return formatInTimeZone(now, timeZone, "yyyy-MM-dd");

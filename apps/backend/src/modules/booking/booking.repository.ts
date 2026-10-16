@@ -57,6 +57,7 @@ export async function insertBooking(
     currency: string;
     startDatetime: Date;
     endDatetime: Date;
+    status: BookingStatus;
   },
 ): Promise<BookingEntity> {
   const [booking] = await db
@@ -73,6 +74,7 @@ export async function insertBooking(
       priceCents: data.priceCents,
       currency: data.currency,
       cancelableUntil: data.startDatetime,
+      status: data.status,
     })
     .returning();
 

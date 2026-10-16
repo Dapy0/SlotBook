@@ -7,9 +7,11 @@ import {
   type NewFacilityEntity,
 } from "../../db/schema/facility.ts";
 import type {
+  BookingPolicyResponse,
   FacilityCategoryCountResponse,
   FacilityListQuery,
   GeoCountryResponse,
+  UpdateBookingPolicyRequest,
   UpdateFacilityRequest,
 } from "@slotbook/shared";
 import { reviews } from "../../db/schema/reviews.ts";
@@ -213,4 +215,39 @@ export async function setFacilityPublished(
       .where(eq(facilities.id, facilityId))
       .returning()) ?? null;
   return res;
+}
+export async function findFacilityBookingsPolicy(
+  db: DB,
+  facilityId: string,
+): Promise<BookingPolicyResponse | null> {
+  const [res] = await db
+    .select({
+      confirmationMode: facilities.confirmationMode,
+      clientCancelCutoffMinutes: facilities.clientCancelCutoffMinutes,
+      bookingLeadMinutes: facilities.bookingLeadMinutes,
+      bookingHorizonDays: facilities.bookingHorizonDays,
+    })
+    .from(facilities)
+    .where(eq(facilities.id, facilityId));
+  return res ?? null;
+}
+
+export async function updateFacilityBookingsPolicy(
+  db: DB,
+  facilityId: string,
+  payload: UpdateBookingPolicyRequest,
+): Promise<BookingPolicyResponse | null> {
+  const [res] = await db
+    .update(facilities)
+    .set(payload)
+    .where(eq(facilities.id, facilityId))
+    .returning();
+  return res
+    ? {
+        confirmationMode: res.confirmationMode,
+        clientCancelCutoffMinutes: res.clientCancelCutoffMinutes,
+        bookingLeadMinutes: res.bookingLeadMinutes,
+        bookingHorizonDays: res.bookingHorizonDays,
+      }
+    : null;
 }

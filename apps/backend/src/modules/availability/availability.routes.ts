@@ -1,6 +1,6 @@
 import { availabilityParamSchema } from "./availability.schema.ts";
 import { availabilityQuerySchema, availabilityResponseSchema } from "@slotbook/shared";
-import { getAvailableSlotsFor30days } from "./availability.service.ts";
+import { getAvailableSlots } from "./availability.service.ts";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 
 export const availabilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
@@ -16,7 +16,7 @@ export const availabilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async function (request, response) {
-      const availableTime = await getAvailableSlotsFor30days(
+      const availableTime = await getAvailableSlots(
         request.server.drizzle,
         request.params.id,
         request.query.staffId,

@@ -30,7 +30,7 @@ import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
 import { assertFacilityOwner } from "../../lib/authz";
-import { slugifyStr } from "../../../../../packages/shared/src/utils/slug";
+import { slugifyStr } from "@slotbook/shared";
 import { findBookingsByFacilityId } from "../booking/booking.repository";
 import type { FacilityEntity } from "../../db/schema";
 export async function getFacilityBySlugOrThrow(db: DB, slug: string): Promise<FacilityEntity> {

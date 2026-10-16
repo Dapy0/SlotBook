@@ -89,7 +89,12 @@ export async function createBookingForFacility(
   await checkIfStaffMemberIsDoingService(db, staff.id, service.id);
 
   const tz = facility.timezone;
-  const window = getBookingWindow(tz, now);
+  const window = getBookingWindow(
+    tz,
+    now,
+    facility.bookingHorizonDays,
+    facility.bookingLeadMinutes,
+  );
 
   const date = formatInTimeZone(data.startsAt, tz, "yyyy-MM-dd");
   if (date < window.firstDate || date > window.lastDate) {
@@ -122,7 +127,7 @@ export async function createBookingForFacility(
     endDatetime: slot.end,
     priceCents: service.priceCents,
     currency: facility.currency,
-    
+    status: facility.confirmationMode === "auto" ? "confirmed" : "pending",
   }).catch((e: unknown) => {
     if (getPgErrorCode(e) === PG.EXCLUSION) {
       throw new ConflictError("This time slot is already booked");

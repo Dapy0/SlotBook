@@ -20,7 +20,6 @@ type DaySlotsInput = {
   earliestStart: Date;
 };
 export function computeDaySlots(input: DaySlotsInput): Interval[] {
-  // const date = addDaysToIso(firstDate, i);
   const {
     localDate,
     timeZone,
@@ -52,14 +51,18 @@ export function dayBounds(date: string, timeZone: string): Interval {
   };
 }
 
-// Всё про «окно бронирования» — в одном месте, чтобы GET и POST считали одинаково
-export function getBookingWindow(timeZone: string, now: Date) {
+export function getBookingWindow(
+  timeZone: string,
+  now: Date,
+  horizonDays: number,
+  leadMinutes: number,
+) {
   const firstDate = todayInTimeZone(timeZone, now);
-  const lastDate = addDaysToIso(firstDate, BOOKING_RULES.horizonDays - 1);
+  const lastDate = addDaysToIso(firstDate, horizonDays - 1);
   return {
     firstDate,
     lastDate,
-    earliestStart: new Date(now.getTime() + BOOKING_RULES.leadMinutes * 60_000),
+    earliestStart: new Date(now.getTime() + leadMinutes * 60_000),
     windowEnd: dayBounds(lastDate, timeZone).end,
   };
 }
