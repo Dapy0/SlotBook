@@ -8,7 +8,7 @@ import {
   timezoneSchema,
 } from "./common/primitives";
 import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
-import { bookingPolicySchema } from './bookingPolicy';
+import { bookingPolicySchema, publicBookingPolicySchema } from './bookingPolicy';
 
 export const FACILITY_READINESS_KEYS = [
   "HAS_HOURS",
@@ -144,9 +144,7 @@ export type FacilityBookingQuery = z.infer<typeof facilityBookingQuerySchema>;
 export const facilityBookingDataResponseSchema = facilityResponseSchema.extend({
   services: serviceWithStaffMemberIdsResponseSchema.array(),
   staff: staffMemberPublicResponseSchema.array(),
-  bookingPolicy: bookingPolicySchema.pick({
-    confirmationMode: true,
-    clientCancelCutoffMinutes: true,
-  }),
+  bookingPolicy: publicBookingPolicySchema,
 });
+
 export type FacilityDataForBookingResponse = z.infer<typeof facilityBookingDataResponseSchema>;

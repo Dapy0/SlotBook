@@ -2,6 +2,8 @@ import ScoreBadge from "@/components/layout/ScoreBadge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import type { PublicBookingPolicy } from "@slotbook/shared";
+import { BookingPolicyNote } from "@/components/bookings/BookingPolicyNote";
 
 type BookingSummaryProps = {
   businessName: string;
@@ -19,6 +21,7 @@ type BookingSummaryProps = {
   needsLogin?: boolean;
   onConfirm?: () => void;
   className?: string;
+  policy: PublicBookingPolicy;
 };
 
 export function confirmLabel(time: string | null, isSubmitting?: boolean) {
@@ -68,6 +71,7 @@ export default function BookingSummaryCard({
   needsLogin = false,
   onConfirm,
   className,
+  policy,
 }: BookingSummaryProps) {
   return (
     <section aria-label="Booking summary" className={cn("w-full", className)}>
@@ -110,11 +114,15 @@ export default function BookingSummaryCard({
         {isSubmitting && <Spinner />}
         {confirmLabel(time, isSubmitting)}
       </Button>
-      <p className="mt-3 text-sm text-muted-foreground">
-        {needsLogin
-          ? "You'll log in before confirming. Your choice is kept."
-          : "The venue confirms your booking. You can cancel any time before it starts."}
-      </p>
+      <div className="mt-3">
+        {needsLogin ? (
+          <p className="text-sm text-muted-foreground">
+            You&apos;ll log in before confirming. Your choice is kept.
+          </p>
+        ) : (
+          <BookingPolicyNote policy={policy} />
+        )}
+      </div>
     </section>
   );
 }

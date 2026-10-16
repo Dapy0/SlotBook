@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import { getMe } from "@/lib/session";
 import { FacilityForm } from "@/components/facility/FacilityForm";
 import { getManagedFacility } from "@/services/facilities.server";
+import { getBookingPolicy } from "@/services/bookingPolicy.server";
 import { PublicationCard } from "./_components/PublicationCard";
+import { BookingPolicyForm } from "./_components/BookingPolicyForm";
 import { DangerZone } from "./_components/DangerZone";
 
 export default async function FacilitySettingsPage({
@@ -16,7 +18,10 @@ export default async function FacilitySettingsPage({
   const owned = userAuth?.ownedFacilities.find((f) => f.slug === slug);
   if (!owned) notFound();
 
-  const facility = await getManagedFacility(owned.id);
+  const [facility, policy] = await Promise.all([
+    getManagedFacility(owned.id),
+    getBookingPolicy(owned.id),
+  ]);
 
   return (
     <div className="flex max-w-2xl flex-col gap-8">
@@ -30,7 +35,7 @@ export default async function FacilitySettingsPage({
         slug={facility.slug}
         isPublished={facility.isPublished}
       />
-
+      <BookingPolicyForm facilityId={facility.id} policy={policy} />
       <FacilityForm facility={facility} />
 
       <DangerZone facilityId={facility.id} facilityName={facility.name} />

@@ -21,6 +21,8 @@ import {
   type BookingQuery,
   type BookingResponse,
   type BookingWithDetailsResponse,
+  type CancelActor,
+  type ChangeBookingStatusRequest,
   type CreateBookingRequest,
   type FacilityBookingResponse,
   type MyBookingsQuery,
@@ -138,28 +140,53 @@ export async function createBookingForFacility(
   return mapBookingToContractFormat(booking);
 }
 
+function pickCancelActor(actors: Actors[]): CancelActor {
+  if (actors.includes("owner")) return "owner";
+  if (actors.includes("staff")) return "staff";
+  return "client";
+}
+
 export async function changeBookingStatus(
   db: DB,
   userId: string,
   bookingId: string,
-  to: "confirmed" | "canceled",
+  body: ChangeBookingStatusRequest,
   now = new Date(),
 ): Promise<BookingResponse> {
   const booking = await findBookingById(db, bookingId);
-  if (!booking) {
-    throw new NotFoundError("Booking not found");
-  }
+  if (!booking) throw new NotFoundError("Booking not found");
+
   const actors = await resolveBookingActors(db, booking, userId);
-  if (actors.length === 0) {
-    throw new NotFoundError("Booking not found.");
-  }
-  if (booking.timeRange.start <= now) {
-    throw new ConflictError("Booking already started");
-  }
-  const check = checkTransition(booking.status, to, actors);
-  if (check === "invalid") throw new ConflictError(`Cannot change ${booking.status} → ${to}`);
+  if (actors.length === 0) throw new NotFoundError("Booking not found");
+
+  if (booking.timeRange.start <= now) throw new ConflictError("Booking already started");
+
+  const check = checkTransition(booking.status, body.status, actors);
+  if (check === "invalid")
+    throw new ConflictError(`Cannot change ${booking.status} → ${body.status}`);
   if (check === "forbidden") throw new ForbiddenError("You cannot perform this action");
-  const updated = await updateBookingStatusIfCurrent(db, booking.id, booking.status, to);
+
+  let change: Parameters<typeof updateBookingStatusIfCurrent>[3] = { status: body.status };
+
+  if (body.status === "canceled") {
+    const canceledBy = pickCancelActor(actors);
+
+    if (canceledBy === "client" && now >= booking.cancelableUntil) {
+      throw new BadRequestError(`It's cancelable until ${booking.cancelableUntil}`);
+    }
+    if (canceledBy !== "client" && !body.reason) {
+      throw new BadRequestError();
+    }
+
+    change = {
+      status: "canceled",
+      canceledAt: now,
+      canceledBy,
+      cancelReason: body.reason ?? null,
+    };
+  }
+
+  const updated = await updateBookingStatusIfCurrent(db, booking.id, booking.status, change);
   if (!updated) throw new ConflictError("Booking was changed, reload and try again");
   return mapBookingToContractFormat(updated);
 }

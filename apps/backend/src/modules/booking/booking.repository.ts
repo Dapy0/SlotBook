@@ -83,21 +83,20 @@ export async function insertBooking(
   }
   return booking;
 }
+type StatusChange = Pick<BookingEntity, "status"> &
+  Partial<Pick<BookingEntity, "canceledAt" | "canceledBy" | "cancelReason">>;
 
 export async function updateBookingStatusIfCurrent(
   db: DB,
   bookingId: string,
   from: BookingStatus,
-  to: BookingStatus,
-): Promise<BookingEntity> {
+  change: StatusChange,
+): Promise<BookingEntity | undefined> {
   const [updatedBooking] = await db
     .update(bookings)
-    .set({
-      status: to,
-    })
+    .set(change)
     .where(and(eq(bookings.id, bookingId), eq(bookings.status, from)))
     .returning();
-
   return updatedBooking;
 }
 
@@ -163,7 +162,7 @@ export async function findBookingsWithDetails(
 export async function expireUnconfirmedBookings(db: DB, now: Date): Promise<number> {
   const res = await db
     .update(bookings)
-    .set({ status: "canceled" })
+    .set({ status: "canceled", canceledAt: now, canceledBy: "system" })
     .where(
       and(eq(bookings.status, "pending"), sql`lower(${bookings.timeRange})<= ${now.toISOString()}`),
     )

@@ -18,15 +18,18 @@ export default async function AppointmentsPage({
   const { scope: rawScope, booked } = await searchParams;
   const scope = rawScope === "past" ? "past" : "upcoming";
   const myBookings = await getMineBookings(scope);
+  const now = new Date();
+
+  const bookedStatus = myBookings.find((booking) => booking.id === booked)?.status;
   return (
     <div className="flex w-full flex-col gap-6">
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight">My appointments</h1>
         <p className="text-muted-foreground">
-          New bookings wait for the venue to confirm. You can cancel any time before the start.
+          Your bookings and their status. Cancellation rules depend on the venue.
         </p>
       </header>
-      {booked && <BookedBanner />}
+      {bookedStatus && <BookedBanner status={bookedStatus} />}
       <nav aria-label="Appointments" className="flex gap-6 border-b border-border">
         {TABS.map((tab) => {
           const isActive = tab.scope === scope;
@@ -67,7 +70,7 @@ export default async function AppointmentsPage({
         <ul className="flex flex-col gap-3">
           {myBookings.map((booking) => (
             <li key={booking.id}>
-              <AppointmentItem booking={booking} isHighlighted={booking.id === booked} />
+              <AppointmentItem booking={booking} now={now} isHighlighted={booking.id === booked} />
             </li>
           ))}
         </ul>

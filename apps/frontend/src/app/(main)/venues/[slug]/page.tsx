@@ -19,6 +19,9 @@ import { CategoryDot } from "@/app/(main)/_components/SmallFacilityPreviewCard";
 import Link from "next/link";
 import type { Route } from "next";
 import { buttonVariants } from "@/components/ui/button";
+import { BookingPolicyNote } from "@/components/bookings/BookingPolicyNote";
+import type { PublicBookingPolicy } from "@slotbook/shared";
+import { getBookingPolicy } from '@/services/bookingPolicy.server';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -50,6 +53,10 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     getStaffMembersByFacilityId(facilityId),
     getFacilityReviews(facilityId),
   ]);
+
+
+  const policy: PublicBookingPolicy | null = await getBookingPolicy(facilityId);
+
   return (
     <div className="w-full">
       <BreadCrumbs />
@@ -90,6 +97,12 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
         <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
           <CardWithMap address={address} latitude={latitude} longitude={longitude} />
           <WorkingHours hours={schedule} />
+          {policy && (
+            <section className="rounded-xl border border-border bg-card p-4">
+              <h2 className="mb-2 text-sm font-semibold">Booking rules</h2>
+              <BookingPolicyNote policy={policy} />
+            </section>
+          )}
           <ContactInfo phone={phone} email={email} />
         </aside>
       </div>

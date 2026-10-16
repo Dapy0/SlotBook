@@ -168,7 +168,9 @@ function BookForm({
         serviceId,
         startsAt: slot.startsAt,
       });
-      toast.add({ title: "Booking created! Waiting for confirmation." });
+      toast.add({
+        title: `Booking created! ${booking.status == "pending" ? "Waiting for the staff to approve" : "Your booking is automatically approved"}.`,
+      });
       router.push(`/account/appointments?booked=${booking.id}`);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
@@ -482,6 +484,7 @@ function BookForm({
           isSubmitting={isSubmitting}
           needsLogin={needsLogin}
           onConfirm={handleConfirm}
+          policy={bookingData.bookingPolicy}
         />
       </div>
 

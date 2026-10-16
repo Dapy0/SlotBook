@@ -1,13 +1,15 @@
 import { CancelBookingButton } from "@/app/(main)/account/appointments/_components/CancelBookingButton";
+import { CancellationInfo } from "@/components/bookings/CancellationInfo";
 import { StatusBadge } from "@/components/bookings/StatusBadge";
 import { formatTimeToTimezone, moneyFormatterFromCents } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { BookingWithDetailsResponse } from "@slotbook/shared";
+import { canClientCancel, type BookingWithDetailsResponse } from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
 
 type Props = {
   booking: BookingWithDetailsResponse;
+  now: Date;
   isHighlighted?: boolean;
 };
 
@@ -15,7 +17,7 @@ function datePart(date: Date, timeZone: string, part: Intl.DateTimeFormatOptions
   return new Intl.DateTimeFormat("en-GB", { timeZone, ...part }).format(date);
 }
 
-function AppointmentItem({ booking, isHighlighted = false }: Props) {
+function AppointmentItem({ booking, now, isHighlighted = false }: Props) {
   const {
     id,
     status,
@@ -30,8 +32,7 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
     currency,
   } = booking;
   const time = `${formatTimeToTimezone(startsAt, facilityTimezone)} – ${formatTimeToTimezone(endsAt, facilityTimezone)}`;
-  const now = new Date();
-  const isCancelable = status !== "canceled" && startsAt > now;
+  const isCancelable = canClientCancel(booking, now);
   const isCompleted = status === "confirmed" && endsAt <= now;
 
   return (
@@ -42,7 +43,6 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
         status === "canceled" && "bg-muted/50",
       )}
     >
-      {/* Date set like a page of an appointment book. */}
       <div
         className={cn(
           "flex w-16 shrink-0 flex-col items-center justify-center self-start rounded-lg border py-2",
@@ -86,13 +86,16 @@ function AppointmentItem({ booking, isHighlighted = false }: Props) {
             {" · with "}
             {staffMemberName}
           </p>
+          <CancellationInfo booking={booking} now={now} />
         </div>
 
         <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end">
           <span className="font-semibold whitespace-nowrap nums">
             {moneyFormatterFromCents(priceCents, currency)}
           </span>
-          {isCancelable && <CancelBookingButton bookingId={id} />}
+          {isCancelable && (
+            <CancelBookingButton bookingId={id} facilityTimezone={facilityTimezone} />
+          )}
         </div>
       </div>
     </article>

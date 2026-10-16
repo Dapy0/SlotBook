@@ -1,8 +1,8 @@
 import { api } from "@/lib/api";
 import {
   bookingResponseSchema,
+  type ChangeBookingStatusRequest,
   type CreateBookingRequest,
-  type MyBookingsQuery,
 } from "@slotbook/shared";
 
 export async function createBooking(facilityId: string, data: CreateBookingRequest) {
@@ -15,9 +15,9 @@ export async function getFacilityBookings(facilityId: string) {
   return await api(`/facilities/${facilityId}/bookings`, bookingResponseSchema);
 }
 
-export async function updateBookingStatus(bookingId: string, status: "confirmed" | "canceled") {
+export async function updateBookingStatus(bookingId: string, body: ChangeBookingStatusRequest) {
   return api(`/bookings/${bookingId}`, bookingResponseSchema, {
     method: "PATCH",
-    body: JSON.stringify({ status: status }),
+    body: JSON.stringify(body),
   });
 }

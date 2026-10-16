@@ -122,7 +122,7 @@ export const mineBookingsRoutes: FastifyPluginAsyncZod = async (fastify) => {
         request.server.drizzle,
         request.user.id,
         request.params.bookingId,
-        request.body.status,
+        request.body,
       );
       return response.send(patchedBooking);
     },

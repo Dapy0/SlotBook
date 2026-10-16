@@ -1,6 +1,7 @@
 import { formatInTimeZone } from "date-fns-tz";
-import { TRANSITIONS, type FacilityBookingResponse } from "@slotbook/shared";
+import { TRANSITIONS, type CancelActor, type FacilityBookingResponse } from "@slotbook/shared";
 import { moneyFormatterFromCents } from "@/lib/format";
+import { formatCancelReason } from "@/lib/cancelReasons";
 import { BookingActions } from "@/components/bookings/BookingActions";
 import { StatusBadge } from "@/components/bookings/StatusBadge";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,22 @@ type Props = {
   timeZone: string;
   showStaff?: boolean;
 };
+
+// Та же отмена, что видит клиент, но с точки зрения заведения.
+function canceledByText(canceledBy: CancelActor | null): string {
+  switch (canceledBy) {
+    case "client":
+      return "Canceled by the client";
+    case "staff":
+      return "Canceled by staff";
+    case "owner":
+      return "Canceled by the owner";
+    case "system":
+      return "Auto-canceled: not confirmed in time";
+    case null:
+      return "Canceled";
+  }
+}
 
 export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
   const {
@@ -22,10 +39,13 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
     client,
     priceCents,
     currency,
+    canceledBy,
+    cancelReason,
   } = booking;
 
   const isChangeable =
     (TRANSITIONS[status]["confirmed"] || TRANSITIONS[status]["canceled"]) && startsAt > new Date();
+  const reasonText = formatCancelReason(cancelReason);
 
   return (
     <div
@@ -57,14 +77,14 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
           )}
         </p>
         <p className="truncate text-sm text-muted-foreground">
-          {client.clientName} ·{" "}
-          <a
-            href={`mailto:${client.clientEmail}`}
-            className="hover:text-foreground hover:underline"
-          >
-            {client.clientEmail}
-          </a>
+          {client.clientName} · {client.clientEmail}
         </p>
+        {status === "canceled" && (
+          <p className="text-sm text-muted-foreground">
+            {canceledByText(canceledBy)}
+            {reasonText && ` · ${reasonText}`}
+          </p>
+        )}
       </div>
 
       <div className="col-span-2 flex flex-wrap items-center gap-3 sm:col-span-1 sm:justify-end">
@@ -72,7 +92,7 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
           {moneyFormatterFromCents(priceCents, currency)}
         </span>
         <StatusBadge status={status} short />
-        {isChangeable && <BookingActions bookingId={id} status={status} />}
+        {isChangeable && <BookingActions bookingId={id} status={status} clientName={client.clientName} />}
       </div>
     </div>
   );
