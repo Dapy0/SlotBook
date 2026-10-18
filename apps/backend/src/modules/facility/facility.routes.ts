@@ -53,7 +53,7 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
 import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
 import { toPublicBookingPolicy } from "../../lib/utils";
-import { assertFacilityOwner } from "../../lib/authz";
+// import { assertFacilityOwner } from "../../lib/authz";
 import { NotFoundError } from "../../lib/errors";
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
@@ -419,7 +419,6 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     "/:id/booking-policy",
     {
-      onRequest: [fastify.authenticate],
       schema: {
         params: facilityParamsSchema,
         response: {
@@ -428,7 +427,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, response) => {
-      await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
+      // await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
       const facilityPolicies = await findFacilityBookingsPolicy(
         request.server.drizzle,
         request.params.id,
