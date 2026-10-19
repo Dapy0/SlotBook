@@ -26,6 +26,9 @@ const envSchema = {
     UPLOAD_DIR: {
       type: "string",
     },
+    FRONTEND_URL: {
+      type: "string",
+    },
   },
 };
 // Must stay in sync with envSchema above (fastify-env validates it at startup).
@@ -35,6 +38,7 @@ export type EnvType = {
   JWT_SECRET_KEY: string;
   APP_HOST: string;
   UPLOAD_DIR: string;
+  FRONTEND_URL?: string;
 };
 
 export const fastifyEnvOptions: FastifyEnvOptions = {
@@ -46,13 +50,17 @@ export const fastifyEnvOptions: FastifyEnvOptions = {
 };
 
 // cors options
+const FRONTEND_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
 
 export const fastifyCorsOptions: FastifyCorsOptions = {
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+  origin: FRONTEND_ORIGINS,
   methods: "GET,PUT,POST,PATCH,DELETE",
   credentials: true,
 };
-
 // cookie
 export const fastifyCookieOptions: FastifyCookieOptions = {
   secret: process.env.JWT_SECRET_KEY!,

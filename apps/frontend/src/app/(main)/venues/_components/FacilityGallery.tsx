@@ -34,15 +34,15 @@ export function FacilityGallery({ images, name }: Props) {
   return (
     <section
       aria-label="Photos"
-      className={`grid gap-2 md:h-[28rem] md:grid-rows-1 ${
-        side.length > 0 ? "md:grid-cols-[2fr_1fr]" : ""
+      className={`grid gap-2 md:grid-rows-1 ${
+        side.length > 0 ? "md:h-[28rem] md:grid-cols-[2fr_1fr]" : "md:h-72"
       }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- решение D11 */}
       <img
         src={cover.url}
         alt={`${name}, photo 1`}
-        className="aspect-[16/9] w-full rounded-xl object-cover md:aspect-auto md:h-full"
+        className="aspect-[2/1] w-full rounded-xl object-cover md:aspect-auto md:h-full"
       />
 
       {side.length > 0 && (
