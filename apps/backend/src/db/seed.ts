@@ -1,4 +1,9 @@
 import "dotenv/config";
+import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
+import { copyFile, mkdir } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { sql } from "drizzle-orm";
@@ -16,11 +21,29 @@ import { bookings } from "./schema/booking.ts";
 import { reviews } from "./schema/reviews.ts";
 import { addDaysToIso, getIsoWeekDay, todayInTimeZone } from "../lib/utils.ts";
 import type { FacilityCategory, Weekday } from "@slotbook/shared";
+import {
+  COUNTRIES,
+  FACILITY_SEEDS,
+  type CountryCode,
+  type FacilitySeed,
+} from "./seed-data/facilities.ts";
+import {
+  KIND_CATEGORY,
+  KIND_HOURS,
+  MON_FRI,
+  MON_SAT,
+  ALL_WEEK,
+  SERVICE_TEMPLATES,
+  type HoursBlock,
+  type ServiceTemplate,
+} from "./seed-data/kinds.ts";
+import { REVIEW_COUNTS, REVIEW_POOL, REVIEWERS } from "./seed-data/reviews.ts";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ─── типы ─────────────────────────────────────────────────────────────
 
 type ScheduleRow = { dayOfTheWeek: Weekday; startTime: string; endTime: string };
-type HoursBlock = { days: Weekday[]; startTime: string; endTime: string };
 type StaffPattern = "full" | "split" | "none";
 type Interval = { start: Date; end: Date };
 type BookingStatus = "pending" | "confirmed" | "canceled";
@@ -35,7 +58,7 @@ type ReviewRow = typeof reviews.$inferInsert;
 // ─── id ───────────────────────────────────────────────────────────────
 
 // Детерминированные uuid v4-формата: при повторном запуске onConflictDoNothing ничего не дублирует
-const KIND = { USER: 1, SERVICE: 2, STAFF_MEMBER: 3, BOOKING: 4, REVIEW: 5 } as const;
+const KIND = { USER: 1, SERVICE: 2, STAFF_MEMBER: 3, BOOKING: 4, REVIEW: 5, FACILITY: 6 } as const;
 
 function seedId(kind: number, index: number): string {
   const k = kind.toString(16).padStart(4, "0");
@@ -69,169 +92,101 @@ const BASE_USERS: Array<Omit<UserRow, "passwordHash">> = [
   },
 ];
 
+const COUNTRY_CODES = Object.keys(COUNTRIES) as CountryCode[];
+
+// Новые заведения каждой страны принадлежат своему владельцу, чтобы дашборд Olena не разрастался
+const COUNTRY_OWNER_ID = Object.fromEntries(
+  COUNTRY_CODES.map((code, i) => [code, seedId(KIND.USER, 10 + i)]),
+) as Record<CountryCode, string>;
+
+const COUNTRY_OWNERS: Array<Omit<UserRow, "passwordHash">> = COUNTRY_CODES.map((code) => ({
+  id: COUNTRY_OWNER_ID[code],
+  name: COUNTRIES[code].owner.name,
+  email: COUNTRIES[code].owner.email,
+  timezone: COUNTRIES[code].timezone,
+}));
+
+const REVIEWER_IDS = REVIEWERS.map((_, i) => seedId(KIND.USER, 30 + i));
+const REVIEWER_USERS: Array<Omit<UserRow, "passwordHash">> = REVIEWERS.map((r, i) => ({
+  id: REVIEWER_IDS[i],
+  ...r,
+}));
+
 // ─── заведения ────────────────────────────────────────────────────────
 
-const FACILITIES: FacilityRow[] = [
-  {
-    id: "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
-    ownerId: OWNER_ID,
-    name: "Test Barbershop",
-    slug: "test-barbershop",
-    description: "A test barbershop for SlotBook",
-    category: "BEAUTY",
-    city: "Warsaw",
-    country: "PL",
-    currency: "PLN",
-    address: "Test street 1",
-    phone: "+48000000000",
-    email: "shop@test.com",
-    timezone: "Europe/Warsaw",
+// Телефон из индекса: детерминированно и без совпадений между заведениями
+function fakePhone(prefix: string, digits: number, index: number): string {
+  const first = 10 ** (digits - 1);
+  return `${prefix}${first + ((index * 7_919_993) % (9 * first))}`;
+}
+
+function toFacilityRow(seed: FacilitySeed, index: number): FacilityRow {
+  const country = COUNTRIES[seed.country];
+  const legacy = seed.legacy;
+  return {
+    id: legacy?.id ?? seedId(KIND.FACILITY, index + 1),
+    ownerId: legacy
+      ? legacy.owner === "main"
+        ? OWNER_ID
+        : OWNER2_ID
+      : COUNTRY_OWNER_ID[seed.country],
+    name: seed.name,
+    slug: seed.slug,
+    description: seed.description,
+    category: KIND_CATEGORY[seed.kind],
+    city: seed.city,
+    country: seed.country,
+    currency: country.currency,
+    address: seed.address,
+    phone: legacy?.phone ?? fakePhone(country.phonePrefix, country.phoneDigits, index + 1),
+    email: legacy?.email ?? `${seed.slug}@slotbook.test`,
+    timezone: seed.timezone ?? country.timezone,
     images: [],
-    isPublished: true,
-    latitude: 52.2297,
-    longitude: 21.0122,
-  },
-  {
-    id: "bbbbbbbb-bbbb-4bbb-abbb-bbbbbbbbbbbb",
-    ownerId: OWNER_ID,
-    name: "Wawel Nails Studio",
-    slug: "wawel-nails-studio",
-    description: "Manicure, pedicure and nail art in the Old Town",
-    category: "BEAUTY",
-    city: "Krakow",
-    country: "PL",
-    currency: "PLN",
-    address: "Grodzka 12",
-    phone: "+48111222333",
-    email: "hello@wawelnails.pl",
-    timezone: "Europe/Warsaw",
-    images: [],
-    isPublished: true,
-    latitude: 50.0568,
-    longitude: 19.9376,
-  },
-  {
-    id: "cccccccc-cccc-4ccc-accc-cccccccccccc",
-    ownerId: OWNER_ID,
-    name: "Vltava Dental Clinic",
-    slug: "vltava-dental-clinic",
-    description: "Dentistry and hygiene appointments near the river",
-    category: "MEDICAL",
-    city: "Prague",
-    country: "CZ",
-    currency: "CZK",
-    address: "Karlova 8",
-    phone: "+420601234567",
-    email: "info@vltavadental.cz",
-    timezone: "Europe/Prague",
-    images: [],
-    isPublished: true,
-    latitude: 50.0862,
-    longitude: 14.4184,
-  },
-  {
-    id: "dddddddd-dddd-4ddd-addd-dddddddddddd",
-    ownerId: OWNER_ID,
-    name: "Camden Strength Gym",
-    slug: "camden-strength-gym",
-    description: "Personal training and small group fitness sessions",
-    category: "SPORT_FITNESS",
-    city: "London",
-    country: "GB",
-    currency: "GBP",
-    address: "Kentish Town Road 44",
-    phone: "+442079460000",
-    email: "train@camdenstrength.co.uk",
-    timezone: "Europe/London",
-    images: [],
-    isPublished: true,
-    latitude: 51.539,
-    longitude: -0.1426,
-  },
-  {
-    id: "eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee",
-    ownerId: OWNER_ID,
-    name: "Podil Language Lab",
-    slug: "podil-language-lab",
-    description: "Private English and German lessons, online and offline",
-    category: "EDUCATION",
-    city: "Kyiv",
-    country: "UA",
-    currency: "UAH",
-    address: "Naberezhno-Khreshchatytska 5",
-    phone: "+380441234567",
-    email: "study@podillab.ua",
-    timezone: "Europe/Kyiv",
-    images: [],
-    isPublished: true,
-    latitude: 50.466,
-    longitude: 30.519,
-  },
-  {
-    id: "ffffffff-ffff-4fff-afff-ffffffffffff",
-    ownerId: OWNER2_ID, // чужой владелец — для проверок IDOR
-    name: "Brooklyn Auto Detailing",
-    slug: "brooklyn-auto-detailing",
-    description: "Ceramic coating, polishing and interior detailing",
-    category: "AUTO",
-    city: "New York",
-    country: "US",
-    currency: "USD",
-    address: "Bedford Ave 301",
-    phone: "+12125550147",
-    email: "book@bkdetailing.com",
-    timezone: "America/New_York",
-    images: [],
-    isPublished: true,
-    latitude: 40.7108,
-    longitude: -73.963,
-  },
-  {
-    id: "22222222-2222-4222-a222-222222222222",
-    ownerId: OWNER_ID,
-    name: "Shibuya Hair Atelier",
-    slug: "shibuya-hair-atelier",
-    description: "Cuts, colour and head spa treatments",
-    category: "BEAUTY",
-    city: "Tokyo",
-    country: "JP",
-    currency: "JPY",
-    address: "Jinnan 1-14-5",
-    phone: "+81355551234",
-    email: "yoyaku@shibuyahair.jp",
-    timezone: "Asia/Tokyo",
-    images: [],
-    isPublished: true,
-    latitude: 35.6627,
-    longitude: 139.6982,
-  },
-  {
-    id: "33333333-3333-4333-a333-333333333333",
-    ownerId: OWNER_ID,
-    name: "Bandra Yoga Space",
-    slug: "bandra-yoga-space",
-    description: "Hatha and vinyasa classes, draft listing",
-    category: "OTHER",
-    city: "Mumbai",
-    country: "IN",
-    currency: "INR",
-    address: "Hill Road 27",
-    phone: "+912226001234",
-    email: "namaste@bandrayoga.in",
-    timezone: "Asia/Kolkata",
-    images: [],
-    isPublished: false, // черновик — не должен быть виден публично (S10)
-    latitude: 19.0544,
-    longitude: 72.8402,
-  },
-];
+    isPublished: seed.isPublished ?? true,
+    latitude: seed.latitude,
+    longitude: seed.longitude,
+  };
+}
+
+const FACILITIES: FacilityRow[] = FACILITY_SEEDS.map(toFacilityRow);
+const SEED_BY_SLUG = new Map(FACILITY_SEEDS.map((f) => [f.slug, f]));
+
+// ─── картинки (S12) ───────────────────────────────────────────────────
+
+// Готовые превью лежат рядом с seed: seed-data/images/<slug>.webp
+const SEED_IMAGES_DIR = path.join(__dirname, "seed-data", "images");
+
+// uuid из slug: при повторном запуске ключ тот же, файл просто перезапишется
+function stableUuid(text: string): string {
+  const h = createHash("sha1").update(text).digest("hex");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`;
+}
+
+type SeedImage = { facilityId: string; key: string; source: string };
+
+function collectSeedImages(): SeedImage[] {
+  return FACILITIES.flatMap((f) => {
+    const source = path.join(SEED_IMAGES_DIR, `${f.slug}.webp`);
+    if (!existsSync(source)) return [];
+    return [{ facilityId: f.id, key: `facilities/${f.id}/${stableUuid(f.slug)}.webp`, source }];
+  });
+}
+
+// Тот же корень, что у storage-плагина: apps/backend/<UPLOAD_DIR>
+async function copySeedImages(images: SeedImage[]): Promise<void> {
+  const uploadDir = process.env.UPLOAD_DIR;
+  if (!uploadDir) throw new Error("UPLOAD_DIR is not set");
+  const root = path.resolve(__dirname, "../..", uploadDir);
+  for (const image of images) {
+    const target = path.join(root, image.key);
+    await mkdir(path.dirname(target), { recursive: true });
+    await copyFile(image.source, target);
+  }
+}
 
 // ─── часы работы заведений ────────────────────────────────────────────
 
-const MON_FRI: Weekday[] = [1, 2, 3, 4, 5];
-const MON_SAT: Weekday[] = [1, 2, 3, 4, 5, 6];
-const ALL_WEEK: Weekday[] = [1, 2, 3, 4, 5, 6, 7];
-
+// Особые часы первых заведений; остальные берут часы своего вида (KIND_HOURS)
 const FACILITY_HOURS: Record<string, HoursBlock[]> = {
   "test-barbershop": [
     { days: MON_FRI, startTime: "09:00:00", endTime: "19:00:00" },
@@ -255,164 +210,7 @@ const FACILITY_HOURS: Record<string, HoursBlock[]> = {
   ],
 };
 
-// ─── услуги (цены в PLN, конвертируются в валюту заведения) ──────────
-
-type ServiceTemplate = {
-  name: string;
-  description: string;
-  category: string;
-  durationMinutes: number;
-  pricePln: number;
-  isActive?: boolean;
-};
-
-const SERVICE_TEMPLATES: Record<FacilityCategory, ServiceTemplate[]> = {
-  BEAUTY: [
-    {
-      name: "Men's haircut",
-      description: "Classic cut with styling",
-      category: "haircut",
-      durationMinutes: 45,
-      pricePln: 80,
-    },
-    {
-      name: "Beard trim",
-      description: "Shaping and hot towel finish",
-      category: "beard",
-      durationMinutes: 30,
-      pricePln: 50,
-    },
-    {
-      name: "Women's haircut",
-      description: "Cut, wash and blow dry",
-      category: "haircut",
-      durationMinutes: 60,
-      pricePln: 120,
-    },
-    {
-      name: "Colouring",
-      description: "Full colour with care treatment",
-      category: "colour",
-      durationMinutes: 120,
-      pricePln: 250,
-    },
-  ],
-  SPORT_FITNESS: [
-    {
-      name: "Personal training",
-      description: "One-on-one session with a coach",
-      category: "training",
-      durationMinutes: 60,
-      pricePln: 150,
-    },
-    {
-      name: "Group class",
-      description: "Small group functional workout",
-      category: "training",
-      durationMinutes: 45,
-      pricePln: 60,
-    },
-    {
-      name: "Fitness assessment",
-      description: "Body composition and plan",
-      category: "consultation",
-      durationMinutes: 30,
-      pricePln: 90,
-    },
-  ],
-  MEDICAL: [
-    {
-      name: "Consultation",
-      description: "Initial specialist consultation",
-      category: "consultation",
-      durationMinutes: 30,
-      pricePln: 200,
-    },
-    {
-      name: "Dental hygiene",
-      description: "Scaling, polishing and fluoride",
-      category: "hygiene",
-      durationMinutes: 45,
-      pricePln: 300,
-    },
-    {
-      name: "Annual check-up",
-      description: "Full examination with report",
-      category: "checkup",
-      durationMinutes: 60,
-      pricePln: 250,
-    },
-  ],
-  AUTO: [
-    {
-      name: "Interior detailing",
-      description: "Deep clean of the cabin",
-      category: "detailing",
-      durationMinutes: 180,
-      pricePln: 400,
-    },
-    {
-      name: "Paint polishing",
-      description: "Single stage machine polish",
-      category: "detailing",
-      durationMinutes: 240,
-      pricePln: 800,
-    },
-    {
-      name: "Ceramic coating",
-      description: "Two layer coating with cure",
-      category: "coating",
-      durationMinutes: 300,
-      pricePln: 2000,
-    },
-  ],
-  EDUCATION: [
-    {
-      name: "Trial lesson",
-      description: "Level check and study plan",
-      category: "lesson",
-      durationMinutes: 30,
-      pricePln: 30,
-    },
-    {
-      name: "Individual lesson",
-      description: "One-on-one lesson with a tutor",
-      category: "lesson",
-      durationMinutes: 60,
-      pricePln: 100,
-    },
-    {
-      name: "Exam preparation",
-      description: "Focused prep with mock test",
-      category: "exam",
-      durationMinutes: 90,
-      pricePln: 150,
-    },
-  ],
-  OTHER: [
-    {
-      name: "Hatha class",
-      description: "Slow paced group practice",
-      category: "class",
-      durationMinutes: 60,
-      pricePln: 50,
-    },
-    {
-      name: "Vinyasa class",
-      description: "Dynamic flow for all levels",
-      category: "class",
-      durationMinutes: 75,
-      pricePln: 60,
-    },
-    {
-      name: "Private session",
-      description: "Individual practice with a teacher",
-      category: "private",
-      durationMinutes: 60,
-      pricePln: 200,
-    },
-  ],
-};
+// ─── услуги (шаблоны по видам — в seed-data/kinds.ts) ─────────────────
 
 // Неактивная услуга — чтобы проверять, что публичные списки её прячут (S6)
 const EXTRA_SERVICES: Record<string, ServiceTemplate[]> = {
@@ -497,6 +295,19 @@ const STAFF: Record<string, StaffSeed[]> = {
   ],
 };
 
+// Новым заведениям — два мастера из списка имён их страны: один на полный день, второй «split»
+function staffFor(seed: FacilitySeed, usedNames: Map<CountryCode, number>): StaffSeed[] {
+  const fixed = STAFF[seed.slug];
+  if (fixed) return fixed;
+  const names = COUNTRIES[seed.country].staffNames;
+  const used = usedNames.get(seed.country) ?? 0;
+  usedNames.set(seed.country, used + 2);
+  return [
+    { name: names[used % names.length], pattern: "full" },
+    { name: names[(used + 1) % names.length], pattern: "split" },
+  ];
+}
+
 // ─── время ────────────────────────────────────────────────────────────
 
 function toMinutes(time: string): number {
@@ -578,6 +389,17 @@ const BOOKING_PLAN: BookingPlan[] = [
 
 const BOOKED_FACILITIES = ["test-barbershop", "shibuya-hair-atelier", "vltava-dental-clinic"];
 
+// Остальным опубликованным заведениям — только прошедшие брони с отзывами, чтобы у карточек был рейтинг
+function reviewPlan(facilityIndex: number): BookingPlan[] {
+  const count = REVIEW_COUNTS[facilityIndex % REVIEW_COUNTS.length];
+  return Array.from({ length: count }, (_, j) => ({
+    dayOffset: -4 - 3 * j,
+    status: "confirmed",
+    clientId: REVIEWER_IDS[(facilityIndex + j) % REVIEWER_IDS.length],
+    review: REVIEW_POOL[(facilityIndex * 3 + j) % REVIEW_POOL.length],
+  }));
+}
+
 // Ближайшая к today+offset дата (в сторону от сегодня), в которую мастер работает
 function findWorkingDate(timeZone: string, offset: number, rows: ScheduleRow[]): string | null {
   const today = todayInTimeZone(timeZone);
@@ -614,7 +436,11 @@ function pickInterval(
 type StaffContext = { id: string; rows: ScheduleRow[]; serviceIds: string[] };
 
 function buildSeedData() {
-  const userRows: Array<Omit<UserRow, "passwordHash">> = [...BASE_USERS];
+  const userRows: Array<Omit<UserRow, "passwordHash">> = [
+    ...BASE_USERS,
+    ...COUNTRY_OWNERS,
+    ...REVIEWER_USERS,
+  ];
   const facilityScheduleRows: Array<typeof facilitySchedules.$inferInsert> = [];
   const serviceRows: ServiceRow[] = [];
   const staffMemberRows: StaffMemberRow[] = [];
@@ -628,21 +454,17 @@ function buildSeedData() {
 
   let serviceIndex = 0;
   let staffIndex = 0;
+  const usedStaffNames = new Map<CountryCode, number>();
 
   for (const facility of FACILITIES) {
+    const seed = SEED_BY_SLUG.get(facility.slug)!;
+
     // часы заведения
-    const facilityRows = expandHours(
-      FACILITY_HOURS[facility.slug] ?? [
-        { days: MON_FRI, startTime: "09:00:00", endTime: "18:00:00" },
-      ],
-    );
+    const facilityRows = expandHours(FACILITY_HOURS[facility.slug] ?? KIND_HOURS[seed.kind]);
     for (const row of facilityRows) facilityScheduleRows.push({ facilityId: facility.id, ...row });
 
     // услуги
-    const templates = [
-      ...SERVICE_TEMPLATES[facility.category],
-      ...(EXTRA_SERVICES[facility.slug] ?? []),
-    ];
+    const templates = [...SERVICE_TEMPLATES[seed.kind], ...(EXTRA_SERVICES[facility.slug] ?? [])];
     const facilityServices = templates.map((t): ServiceRow => ({
       id: seedId(KIND.SERVICE, ++serviceIndex),
       facilityId: facility.id,
@@ -661,7 +483,7 @@ function buildSeedData() {
 
     // мастера
     const staffContexts: StaffContext[] = [];
-    (STAFF[facility.slug] ?? []).forEach((person, position) => {
+    staffFor(seed, usedStaffNames).forEach((person, position) => {
       staffIndex++;
       const userId = seedId(KIND.USER, 100 + staffIndex);
       const staffMemberId = seedId(KIND.STAFF_MEMBER, staffIndex);
@@ -694,14 +516,13 @@ function buildSeedData() {
   const takenByStaff = new Map<string, Interval[]>();
   let bookingIndex = 0;
 
-  for (const slug of BOOKED_FACILITIES) {
-    const facility = FACILITIES.find((f) => f.slug === slug)!;
-    const workingStaff = (staffBySlug.get(slug) ?? []).filter(
+  function addBookings(facility: FacilityRow, plans: BookingPlan[]) {
+    const workingStaff = (staffBySlug.get(facility.slug) ?? []).filter(
       (s) => s.rows.length > 0 && s.serviceIds.length > 0,
     );
-    if (workingStaff.length === 0) continue;
+    if (workingStaff.length === 0) return;
 
-    BOOKING_PLAN.forEach((plan, i) => {
+    plans.forEach((plan, i) => {
       const staff = workingStaff[i % workingStaff.length];
       const service = servicesById.get(staff.serviceIds[i % staff.serviceIds.length])!;
       const date = findWorkingDate(facility.timezone!, plan.dayOffset, staff.rows);
@@ -739,6 +560,11 @@ function buildSeedData() {
     });
   }
 
+  FACILITIES.forEach((facility, index) => {
+    if (BOOKED_FACILITIES.includes(facility.slug)) addBookings(facility, BOOKING_PLAN);
+    else if (facility.isPublished) addBookings(facility, reviewPlan(index));
+  });
+
   return {
     userRows,
     facilityScheduleRows,
@@ -764,13 +590,27 @@ async function seed() {
   const passwordHash = await bcrypt.hash(PASSWORD, 10);
   const data = buildSeedData();
 
+  // сначала файлы, потом ключи в БД — чтобы в базе не оказалось ключа без файла
+  const images = collectSeedImages();
+  await copySeedImages(images);
+  const imageKeys = new Map(images.map((img) => [img.facilityId, [img.key]]));
+  const facilityRows = FACILITIES.map((f) => ({ ...f, images: imageKeys.get(f.id) ?? [] }));
+
   try {
     await db.transaction(async (tx) => {
       await tx
         .insert(users)
         .values(data.userRows.map((u) => ({ ...u, passwordHash })))
         .onConflictDoNothing();
-      await tx.insert(facilities).values(FACILITIES).onConflictDoNothing();
+      // Повторный запуск дописывает превью только тем, у кого фото ещё нет: загруженные руками не трогаем
+      await tx
+        .insert(facilities)
+        .values(facilityRows)
+        .onConflictDoUpdate({
+          target: facilities.id,
+          set: { images: sql`excluded.images` },
+          setWhere: sql`${facilities.images} = '[]'::jsonb`,
+        });
       await tx.insert(facilitySchedules).values(data.facilityScheduleRows).onConflictDoNothing();
       await tx.insert(services).values(data.serviceRows).onConflictDoNothing();
       await tx.insert(staffMembers).values(data.staffMemberRows).onConflictDoNothing();
@@ -807,12 +647,16 @@ async function seed() {
     `Seeded: ${data.userRows.length} users, ${FACILITIES.length} facilities, ` +
       `${data.serviceRows.length} services, ${data.staffMemberRows.length} staff, ` +
       `${data.staffScheduleRows.length} staff schedule rows, ${data.bookingRows.length} bookings, ` +
-      `${data.reviewRows.length} reviews`,
+      `${data.reviewRows.length} reviews, ${images.length} images`,
   );
   // eslint-disable-next-line no-console
   console.table([
     { role: "owner", email: "owner@slotbook.test" },
     { role: "owner (Brooklyn)", email: "owner2@slotbook.test" },
+    ...COUNTRY_OWNERS.map((o) => ({
+      role: `owner (${o.email.slice(6, 8).toUpperCase()})`,
+      email: o.email,
+    })),
     { role: "client", email: "client@slotbook.test" },
     { role: "client", email: "client2@slotbook.test" },
     { role: "staff (full)", email: "staff1@slotbook.test" },
