@@ -156,6 +156,10 @@ const SEED_BY_SLUG = new Map(FACILITY_SEEDS.map((f) => [f.slug, f]));
 // Готовые превью лежат рядом с seed: seed-data/images/<slug>.webp
 const SEED_IMAGES_DIR = path.join(__dirname, "seed-data", "images");
 
+// Поднимай версию, когда перерисовываешь картинки: /uploads отдаётся с immutable на год,
+// и без нового ключа браузеры продолжат показывать старый файл
+const SEED_IMAGES_VERSION = 2;
+
 // uuid из slug: при повторном запуске ключ тот же, файл просто перезапишется
 function stableUuid(text: string): string {
   const h = createHash("sha1").update(text).digest("hex");
@@ -168,7 +172,13 @@ function collectSeedImages(): SeedImage[] {
   return FACILITIES.flatMap((f) => {
     const source = path.join(SEED_IMAGES_DIR, `${f.slug}.webp`);
     if (!existsSync(source)) return [];
-    return [{ facilityId: f.id, key: `facilities/${f.id}/${stableUuid(f.slug)}.webp`, source }];
+    return [
+      {
+        facilityId: f.id,
+        key: `facilities/${f.id}/${stableUuid(`${f.slug}@${SEED_IMAGES_VERSION}`)}.webp`,
+        source,
+      },
+    ];
   });
 }
 
