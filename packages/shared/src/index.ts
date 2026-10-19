@@ -17,3 +17,4 @@ export * from "./scheduleRequests";
 export * from "./bookingPolicy";
 export * from "./utils/slug";
 export * from "./utils/dates";
+export * from "./facilityImage";

@@ -21,14 +21,16 @@ export async function api<T extends z.ZodType>(
   options: RequestInit = {},
 ): Promise<z.infer<T>> {
   const url = `${BACKEND_URL}${endpoint}`;
+  const isFormData = options.body instanceof FormData;
   const config: RequestInit = {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...options.headers,
     },
     credentials: "include",
   };
+
   const response = await fetch(url, config);
 
   if (!response.ok) {

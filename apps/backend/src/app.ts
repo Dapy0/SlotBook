@@ -14,6 +14,7 @@ import {
 import drizzlePlugin from "./db/drizzlePlugin.ts";
 import fastifyJwt from "@fastify/jwt";
 import jwtVerification from "./plugins/jwtVerification.ts";
+import storagePlugin from "./plugins/storage";
 import { facilityRoutes } from "./modules/facility/facility.routes.ts";
 import { serviceRoutes } from "./modules/service/service.routes.ts";
 import {
@@ -29,9 +30,16 @@ import { mineBookingsRoutes } from "./modules/booking/booking.routes.ts";
 import { geoRoutes } from "./modules/geoLocation.ts";
 import bookingExpiry from "./plugins/bookingExpiry";
 import { staffMeRoutes } from "./modules/staff/staffMe.routes";
-import { scheduleRequestMeRoutes, scheduleRequestRoutes } from './modules/scheduleRequest/scheduleRequest.routes';
+import {
+  scheduleRequestMeRoutes,
+  scheduleRequestRoutes,
+} from "./modules/scheduleRequest/scheduleRequest.routes";
+import fastifyMultipart from "@fastify/multipart";
+import { FACILITY_IMAGE_MAX_BYTES } from "../../../packages/shared/src/facilityImage";
+import type { FileStorage } from "./lib/storage/FileStorage";
+import { facilityImageRoutes } from './modules/facilityImage/facilityImage.routes';
 const isDev = process.env.NODE_ENV !== "production";
-export async function createServer() {
+export async function createServer(opts: { storage?: FileStorage } = {}) {
   const app = Fastify({
     logger: isDev
       ? {
@@ -92,6 +100,14 @@ export async function createServer() {
 
   // Plugins
   await app.register(fastifyEtag);
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: FACILITY_IMAGE_MAX_BYTES,
+      files: 1,
+      fields: 0,
+    },
+  });
+
   await app.register(fastifyCaching, {
     privacy: fastifyCaching.privacy.NOCACHE,
   });
@@ -101,8 +117,8 @@ export async function createServer() {
   await app.register(fastifyJwt, fastifyJwtOptions);
   await app.register(drizzlePlugin);
   await app.register(jwtVerification);
+  await app.register(storagePlugin, { storage: opts.storage });
   await app.register(bookingExpiry);
-  // await app.register(geoLocation);
   // routes
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(facilityRoutes, { prefix: "/facilities" });
@@ -111,6 +127,7 @@ export async function createServer() {
   await app.register(mineBookingsRoutes, { prefix: "/bookings" });
   await app.register(scheduleRequestRoutes, { prefix: "/facilities" });
   await app.register(scheduleRequestMeRoutes, { prefix: "/staff/me/schedule-requests" });
+  await app.register(facilityImageRoutes, { prefix: "/facilities" });
   await app.register(geoRoutes);
 
   return app;

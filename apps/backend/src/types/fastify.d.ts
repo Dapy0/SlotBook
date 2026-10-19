@@ -4,10 +4,12 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import "@fastify/jwt";
 import type { DB } from "../db/drizzlePlugin.ts";
 import type { EnvType } from "../app.config.ts";
+import type FileStorage  from '../lib/storage/FileStorage'
 declare module "fastify" {
   interface FastifyInstance {
     config: EnvType;
     drizzle: DB;
+    storage: FileStorage;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }

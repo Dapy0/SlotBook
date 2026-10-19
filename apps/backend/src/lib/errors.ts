@@ -38,3 +38,20 @@ export class BadRequestError extends AppError {
     super(400, "BAD_REQUEST", message);
   }
 }
+
+// Files 
+export class FileTooLargeError extends AppError {
+  constructor(message = "File is too large") {
+    super(413, "FILE_TOO_LARGE", message);
+  }
+}
+export class UnsupportedImageTypeError extends AppError {
+  constructor(message = "Only JPEG, PNG and WebP images are allowed") {
+    super(415, "UNSUPPORTED_IMAGE_TYPE", message);
+  }
+}
+export class ImageLimitReachedError extends AppError {
+  constructor(message = "Image limit reached") {
+    super(409, "IMAGE_LIMIT_REACHED", message);
+  }
+}

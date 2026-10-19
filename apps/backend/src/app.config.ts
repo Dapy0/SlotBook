@@ -23,6 +23,9 @@ const envSchema = {
     APP_HOST: {
       type: "string",
     },
+    UPLOAD_DIR: {
+      type: "string",
+    },
   },
 };
 // Must stay in sync with envSchema above (fastify-env validates it at startup).
@@ -31,6 +34,7 @@ export type EnvType = {
   DATABASE_URL: string;
   JWT_SECRET_KEY: string;
   APP_HOST: string;
+  UPLOAD_DIR: string;
 };
 
 export const fastifyEnvOptions: FastifyEnvOptions = {

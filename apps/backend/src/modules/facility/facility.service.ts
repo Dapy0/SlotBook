@@ -32,6 +32,7 @@ import { getPgErrorCode, PG } from "../../lib/pgErrors";
 import { assertFacilityOwner } from "../../lib/authz";
 import { slugifyStr } from "@slotbook/shared";
 import { findBookingsByFacilityId } from "../booking/booking.repository";
+import { toFacilityResponse } from "./facility.mapper";
 import type { FacilityEntity } from "../../db/schema";
 export async function getFacilityBySlugOrThrow(db: DB, slug: string): Promise<FacilityEntity> {
   const facility = await findFacilityBySlug(db, slug);
@@ -48,24 +49,34 @@ export async function getAllPublicFacilities(
   db: DB,
   query: FacilityListQuery,
 ): Promise<FacilityResponse[]> {
-  return findAllFacilitiesByParams(db, query);
+  return (await findAllFacilitiesByParams(db, query)).map((facility) =>
+    toFacilityResponse(facility),
+  );
 }
 
 export async function getOwnFacilitiesByUserId(
   db: DB,
   userId: string,
 ): Promise<FacilityResponse[]> {
-  return findFacilitiesByOwnerId(db, userId);
+  return (await findFacilitiesByOwnerId(db, userId)).map((facility) =>
+    toFacilityResponse(facility),
+  );
 }
-export async function createFacilityByUserId(db: DB, data: CreateFacilityRequest, userId: string) {
+export async function createFacilityByUserId(
+  db: DB,
+  data: CreateFacilityRequest,
+  userId: string,
+): Promise<FacilityResponse> {
   const slug = await generateUniqueSlug(db, data.name);
   try {
-    return await insertFacility(db, {
-      ...data,
-      ownerId: userId,
-      slug: slug,
-      isPublished: false,
-    });
+    return toFacilityResponse(
+      await insertFacility(db, {
+        ...data,
+        ownerId: userId,
+        slug: slug,
+        isPublished: false,
+      }),
+    );
   } catch (e: unknown) {
     if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("Slug already exists");
@@ -88,7 +99,7 @@ export async function updateOwnedFacility(
     if (!updatedFacility) {
       throw new NotFoundError("Facility not found");
     }
-    return updatedFacility;
+    return toFacilityResponse(updatedFacility);
   } catch (e) {
     if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError(`Venue with such slug: ${data.slug} already exists. `);
@@ -111,7 +122,7 @@ export async function removeOwnedFacilityById(
   if (!deletedFacility) {
     throw new NotFoundError("Facility not found");
   }
-  return deletedFacility;
+  return toFacilityResponse(deletedFacility);
 }
 export async function getFacilityScheduleBySlug(
   db: DB,
@@ -170,7 +181,6 @@ export async function getOwnedFacility(
   userId: string,
 ): Promise<FacilityResponse> {
   const facility = await assertFacilityOwner(db, id, userId);
-
   return facility;
 }
 
@@ -194,7 +204,11 @@ export async function getFacilityReadiness(
     checks: checks,
   };
 }
-export async function publishFacility(db: DB, id: string, userId: string) {
+export async function publishFacility(
+  db: DB,
+  id: string,
+  userId: string,
+): Promise<FacilityResponse> {
   const facility = await assertFacilityOwner(db, id, userId);
   const { ready } = await getFacilityReadiness(db, id, userId);
   if (!ready) {
@@ -207,10 +221,14 @@ export async function publishFacility(db: DB, id: string, userId: string) {
   if (!updatedFacility) {
     throw new ConflictError("Something went wrong");
   }
-  return updatedFacility;
+  return toFacilityResponse(updatedFacility);
 }
 
-export async function unPublishFacility(db: DB, id: string, userId: string) {
+export async function unPublishFacility(
+  db: DB,
+  id: string,
+  userId: string,
+): Promise<FacilityResponse> {
   const facility = await assertFacilityOwner(db, id, userId);
   const { ready } = await getFacilityReadiness(db, id, userId);
   if (!ready) {
@@ -223,5 +241,5 @@ export async function unPublishFacility(db: DB, id: string, userId: string) {
   if (!updatedFacility) {
     throw new ConflictError("Something went wrong");
   }
-  return updatedFacility;
+  return toFacilityResponse(updatedFacility);
 }

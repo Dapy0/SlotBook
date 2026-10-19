@@ -25,6 +25,7 @@ import { resolveDateRange } from "../../lib/scheduleHelpers";
 import { getFacilityByIdOrThrow } from "../facility/facility.service";
 import { findBookingsWithDetails } from "../booking/booking.repository";
 import { mapBookingToContractFormat } from "../../lib/utils";
+import { toFacilityResponse } from '../facility/facility.mapper';
 
 export async function addNewStaffMembersToFacilityById(
   db: DB,
@@ -114,7 +115,7 @@ export async function getStaffBookings(
 ): Promise<FacilityBookingResponse[]> {
   const staffMember = await requireStaffMember(db, userId);
   const facilityData = await getFacilityByIdOrThrow(db, staffMember.facilityId);
-  const overlaps = resolveDateRange(facilityData, query);
+  const overlaps = resolveDateRange(toFacilityResponse(facilityData), query);
 
   const facilityBookings = await findBookingsWithDetails(db, {
     order: "asc",

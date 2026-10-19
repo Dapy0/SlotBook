@@ -8,7 +8,8 @@ import {
   timezoneSchema,
 } from "./common/primitives";
 import { ANY_FIELD_MESSAGE, hasAnyField } from "./common/refinements";
-import { bookingPolicySchema, publicBookingPolicySchema } from './bookingPolicy';
+import { publicBookingPolicySchema } from "./bookingPolicy";
+import { facilityImageSchema } from "./facilityImage";
 
 export const FACILITY_READINESS_KEYS = [
   "HAS_HOURS",
@@ -65,7 +66,6 @@ const facilityBaseSchema = z.object({
   timezone: timezoneSchema,
   category: facilityCategorySchema,
   description: z.string().trim().max(1000),
-  images: z.array(z.url()),
   isPublished: z.boolean(),
   latitude: z.number(),
   longitude: z.number(),
@@ -79,7 +79,6 @@ export const createFacilityRequestSchema = facilityRequestBaseSchema
   .omit({ slug: true, isPublished: true })
   .extend({
     currency: currencyCodeInputSchema.default("PLN"),
-    images: z.array(z.url()).default([]),
     description: z.string().trim().max(1000).default(""),
   });
 export type CreateFacilityRequest = z.infer<typeof createFacilityRequestSchema>;
@@ -106,6 +105,7 @@ export const facilityResponseSchema = facilityBaseSchema.extend({
   ownerId: z.uuid(),
   score: z.number().min(0).max(5).nullable(),
   reviewsCount: z.int().nonnegative(),
+  images: z.array(facilityImageSchema),
   createdAt: instantSchema,
   updatedAt: instantSchema,
 });

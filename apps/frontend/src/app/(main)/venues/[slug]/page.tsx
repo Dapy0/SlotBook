@@ -22,6 +22,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { BookingPolicyNote } from "@/components/bookings/BookingPolicyNote";
 import type { PublicBookingPolicy } from "@slotbook/shared";
 import { getBookingPolicy } from '@/services/bookingPolicy.server';
+import { FacilityGallery } from '@/app/(main)/venues/_components/FacilityGallery';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -45,6 +46,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     longitude,
     phone,
     email,
+    images,
   } = facility;
   const meta = CATEGORY_METADATA[category];
 
@@ -62,6 +64,7 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
       <BreadCrumbs />
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
         <div className="flex min-w-0 flex-col gap-8">
+          <FacilityGallery images={images} name={name} />
           <header className="flex flex-col gap-3">
             <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <CategoryDot color={meta.color} />

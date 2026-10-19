@@ -53,8 +53,9 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
 import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
 import { toPublicBookingPolicy } from "../../lib/utils";
-// import { assertFacilityOwner } from "../../lib/authz";
+import { assertFacilityOwner } from "../../lib/authz";
 import { NotFoundError } from "../../lib/errors";
+import { toFacilityResponse } from "./facility.mapper";
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
@@ -97,7 +98,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       );
 
       return facilities.map((facility) => ({
-        ...facility,
+        ...toFacilityResponse(facility),
         services: groupedServicesWithFacilities[facility.id] ?? [],
       }));
     },
@@ -131,7 +132,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, response) => {
       const facility = await getFacilityByIdOrThrow(request.server.drizzle, request.params.id);
       response.header("Cache-Control", "public, no-cache");
-      return response.send(facility);
+      return response.send(toFacilityResponse(facility));
     },
   );
   fastify.get(
@@ -229,7 +230,7 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
     async (request, response) => {
       const facility = await getFacilityBySlugOrThrow(request.server.drizzle, request.params.slug);
       response.header("Cache-Control", "public, no-cache");
-      return response.send(facility);
+      return response.send(toFacilityResponse(facility));
     },
   );
   fastify.get(
@@ -250,8 +251,8 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       const staff = await findStaffByFacilityIdPublic(request.server.drizzle, facility.id);
 
       return {
-        ...facility,
-        staff: staff,
+        ...toFacilityResponse(facility),
+        staff,
         services: servicesByFacilityId,
         bookingPolicy: toPublicBookingPolicy(facility),
       };
@@ -427,7 +428,6 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, response) => {
-      // await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
       const facilityPolicies = await findFacilityBookingsPolicy(
         request.server.drizzle,
         request.params.id,
@@ -449,12 +449,14 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, response) => {
+      await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
       const facilityPolicies = await updateFacilityBookingsPolicy(
         request.server.drizzle,
         request.params.id,
         request.body,
       );
-      if (!facilityPolicies) throw new NotFoundError("No facility policies where found and updated.");
+      if (!facilityPolicies)
+        throw new NotFoundError("No facility policies where found and updated.");
       return response.send(facilityPolicies);
     },
   );
@@ -463,3 +465,4 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.register(bookingRoutes, { prefix: "/:id/bookings" });
   fastify.register(availabilityRoutes, { prefix: "/" });
 };
+export { removeOwnedFacilityById };

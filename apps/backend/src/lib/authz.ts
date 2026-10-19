@@ -13,6 +13,7 @@ import {
   findStaffMemberByUserIdWithFacilityData,
 } from "../modules/staff/staff.repository";
 import { findServicesIds } from "../modules/service/service.repository";
+import { toFacilityResponse } from '../modules/facility/facility.mapper';
 
 export async function assertFacilityOwner(
   db: DB,
@@ -24,7 +25,7 @@ export async function assertFacilityOwner(
   if (userId !== facility.ownerId) {
     throw new ForbiddenError("Not owned facility");
   }
-  return facility;
+  return toFacilityResponse(facility);
 }
 
 export async function assertFacilityStaffMember(

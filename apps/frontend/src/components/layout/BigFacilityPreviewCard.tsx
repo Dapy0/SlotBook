@@ -6,7 +6,7 @@ import { durationFormatter, moneyFormatterFromCents } from "@/lib/format";
 import { createParams } from "@/lib/queryStrings";
 import { cn, convertMinutesToTime } from "@/lib/utils";
 import type { FacilityWithServicesResponse } from "@slotbook/shared";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight, ImageOff, MapPin } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 
@@ -15,13 +15,44 @@ function BigFacilityPreviewCard({
 }: {
   facilityWithServices: FacilityWithServicesResponse;
 }) {
-  const { name, address, city, slug, score, reviewsCount, description, services, category } =
-    facilityWithServices;
+  const {
+    name,
+    address,
+    city,
+    slug,
+    score,
+    reviewsCount,
+    description,
+    services,
+    category,
+    images,
+  } = facilityWithServices;
   const meta = CATEGORY_METADATA[category];
   const venueHref = `/venues/${slug}` as Route;
+  const cover = images[0];
 
   return (
-    <article className="grid w-full overflow-hidden rounded-xl border border-border bg-card md:grid-cols-[1fr_minmax(260px,320px)]">
+    <article className="grid w-full overflow-hidden rounded-xl border border-border bg-card md:grid-cols-[1fr_minmax(260px,320px)] lg:grid-cols-[300px_1fr_minmax(260px,320px)]">
+      <Link
+        href={venueHref}
+        tabIndex={-1}
+        aria-hidden
+        className="group relative block overflow-hidden bg-muted md:col-span-2 lg:col-span-1 lg:m-3 lg:mr-0 lg:min-h-56 lg:rounded-lg"
+      >
+        {cover ? (
+          <img
+            src={cover.url}
+            alt=""
+            loading="lazy"
+            className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] md:aspect-[21/9] lg:absolute lg:inset-0 lg:aspect-auto lg:size-full"
+          />
+        ) : (
+          <div className="flex aspect-[16/9] w-full items-center justify-center text-muted-foreground md:aspect-[21/9] lg:absolute lg:inset-0 lg:aspect-auto lg:size-full">
+            <ImageOff aria-hidden className="size-6" />
+          </div>
+        )}
+      </Link>
+
       <div className="flex min-w-0 flex-col gap-4 p-5">
         <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <CategoryDot color={meta.color} />

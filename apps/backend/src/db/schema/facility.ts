@@ -38,7 +38,10 @@ export const facilities = pgTable(
     longitude: numeric({ precision: 9, scale: 6, mode: "number" }).notNull(),
     phone: varchar({ length: 32 }).notNull(),
     email: varchar({ length: 255 }).notNull(),
-    images: jsonb().$type<string[]>().notNull(),
+    images: jsonb()
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     score: numeric({ precision: 3, scale: 1, mode: "number" }),
     reviewsCount: integer("reviews_count").notNull().default(0),
     isPublished: boolean("is_published").notNull().default(false),
@@ -63,8 +66,15 @@ export const facilities = pgTable(
       "client_cancel_cutoff_minutes_check",
       sql`${table.clientCancelCutoffMinutes} BETWEEN 0 AND 10080 `,
     ),
-    check("booking_lead_minutes_check", sql`${table.bookingLeadMinutes} BETWEEN 0 AND 10080 `),
-    check("booking_horizon_days_check", sql`${table.bookingHorizonDays} BETWEEN 1 AND 365 `),
+    check(
+      "facilities_booking_lead_minutes_check",
+      sql`${table.bookingLeadMinutes} BETWEEN 0 AND 10080 `,
+    ),
+    check(
+      "facilities_booking_horizon_days_check",
+      sql`${table.bookingHorizonDays} BETWEEN 1 AND 365 `,
+    ),
+    check("facilities_images_max_check", sql`jsonb_array_length(${table.images}) <= 10`),
   ],
 );
 export type FacilityEntity = typeof facilities.$inferSelect;

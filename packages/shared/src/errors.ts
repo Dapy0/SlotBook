@@ -12,6 +12,9 @@ export const API_ERROR_CODES = [
   "OUTSIDE_BOOKING_WINDOW",
   "CANNOT_BOOK_YOURSELF",
   "BOOKING_NOT_FOUND",
+  "FILE_TOO_LARGE", // 413
+  "UNSUPPORTED_IMAGE_TYPE", // 415
+  "IMAGE_LIMIT_REACHED", // 409
 ] as const;
 export const apiErrorCodeSchema = z.enum(API_ERROR_CODES);
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;
