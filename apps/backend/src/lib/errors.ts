@@ -39,7 +39,7 @@ export class BadRequestError extends AppError {
   }
 }
 
-// Files 
+// Files
 export class FileTooLargeError extends AppError {
   constructor(message = "File is too large") {
     super(413, "FILE_TOO_LARGE", message);

@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-
 export function ListPageSkeleton({ rows = 4 }: { rows?: number }) {
   return (
     <div className="flex flex-col gap-6" aria-busy="true">

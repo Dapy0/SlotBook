@@ -3,7 +3,7 @@ import { getMe } from "@/lib/session";
 import { formatDayShifts, WEEKDAYS } from "@/lib/schedule";
 import { ScheduleRequestStatusBadge } from "@/components/schedule/ScheduleRequestStatusBadge";
 import { ReviewActions } from "./_components/ReviewActions";
-import { getFacilityScheduleRequest } from '@/services/scheduleRequests.server';
+import { getFacilityScheduleRequest } from "@/services/scheduleRequests.server";
 
 export default async function ScheduleRequestDetailPage({
   params,

@@ -12,8 +12,8 @@ import { WeeklyScheduleForm } from "@/components/schedule/WeeklyScheduleForm";
 import { submitMyScheduleRequests } from "@/services/scheduleRequests";
 import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api";
-import { PendingRequestCard } from '@/app/(main)/work/schedule/_components/PendingRequestCard';
-import { RequestHistory } from '@/app/(main)/work/schedule/_components/RequestHistory';
+import { PendingRequestCard } from "@/app/(main)/work/schedule/_components/PendingRequestCard";
+import { RequestHistory } from "@/app/(main)/work/schedule/_components/RequestHistory";
 
 type Props = {
   currentSchedule: StaffScheduleEntryResponse[];

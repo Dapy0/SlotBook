@@ -92,7 +92,9 @@ export function BookingRow({ booking, timeZone, showStaff = true }: Props) {
           {moneyFormatterFromCents(priceCents, currency)}
         </span>
         <StatusBadge status={status} short />
-        {isChangeable && <BookingActions bookingId={id} status={status} clientName={client.clientName} />}
+        {isChangeable && (
+          <BookingActions bookingId={id} status={status} clientName={client.clientName} />
+        )}
       </div>
     </div>
   );

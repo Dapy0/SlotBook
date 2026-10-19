@@ -84,7 +84,7 @@ export async function publishFacility(id: string) {
 export async function unpublishFacility(id: string) {
   return await api(`/facilities/${id}/unpublish`, facilityResponseSchema, {
     method: "POST",
-    body: JSON.stringify(''),
+    body: JSON.stringify(""),
   });
 }
 

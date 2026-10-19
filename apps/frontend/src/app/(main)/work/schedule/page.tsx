@@ -1,8 +1,8 @@
 import { getStaffMe } from "@/services/staffMe.server";
 import { moneyFormatterFromCents } from "@/lib/format";
 import { formatDayShifts, WEEKDAYS } from "@/lib/schedule";
-import { getMyScheduleRequests } from '@/services/scheduleRequests.server';
-import { ScheduleRequestSection } from '@/app/(main)/work/schedule/_components/ScheduleRequestSection';
+import { getMyScheduleRequests } from "@/services/scheduleRequests.server";
+import { ScheduleRequestSection } from "@/app/(main)/work/schedule/_components/ScheduleRequestSection";
 
 function formatMinutes(total: number) {
   const h = Math.floor(total / 60);

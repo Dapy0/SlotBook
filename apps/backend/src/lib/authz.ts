@@ -13,7 +13,7 @@ import {
   findStaffMemberByUserIdWithFacilityData,
 } from "../modules/staff/staff.repository";
 import { findServicesIds } from "../modules/service/service.repository";
-import { toFacilityResponse } from '../modules/facility/facility.mapper';
+import { toFacilityResponse } from "../modules/facility/facility.mapper";
 
 export async function assertFacilityOwner(
   db: DB,

@@ -45,7 +45,7 @@ export async function setFacilityImagesOrder(
   facilityId: string,
   keys: string[],
 ): Promise<string[] | null> {
-   const newImages = sql`${JSON.stringify(keys)}::jsonb`;
+  const newImages = sql`${JSON.stringify(keys)}::jsonb`;
 
   const [res] = await db
     .update(facilities)

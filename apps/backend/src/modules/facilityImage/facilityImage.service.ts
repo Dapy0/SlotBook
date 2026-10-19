@@ -16,7 +16,7 @@ import {
   setFacilityImagesOrder,
 } from "./facilityImage.repository";
 import { toFacilityImages } from "../facility/facility.mapper";
-import type { FastifyBaseLogger } from 'fastify';
+import type { FastifyBaseLogger } from "fastify";
 async function deleteQuietly(storage: FileStorage, key: string, log: FastifyBaseLogger) {
   try {
     await storage.delete(key);

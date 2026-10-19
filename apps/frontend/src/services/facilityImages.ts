@@ -30,6 +30,6 @@ export async function reorderFacilityImages(
 ): Promise<FacilityImagesResponse> {
   return api(`/facilities/${facilityId}/images`, facilityImagesResponseSchema, {
     method: "PUT",
-    body: JSON.stringify({keys}),
+    body: JSON.stringify({ keys }),
   });
 }

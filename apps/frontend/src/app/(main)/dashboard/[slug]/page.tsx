@@ -7,8 +7,8 @@ import { moneyFormatterFromCents } from "../../../../lib/format";
 import { formatInTimeZone } from "date-fns-tz";
 import { ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { getFacilityReadiness } from '@/services/facilities.server';
-import { ReadinessCard } from '@/app/(main)/dashboard/_components/ReadinessCard';
+import { getFacilityReadiness } from "@/services/facilities.server";
+import { ReadinessCard } from "@/app/(main)/dashboard/_components/ReadinessCard";
 
 function SectionHeader({
   title,

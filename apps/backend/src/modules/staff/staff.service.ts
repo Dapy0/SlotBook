@@ -25,7 +25,7 @@ import { resolveDateRange } from "../../lib/scheduleHelpers";
 import { getFacilityByIdOrThrow } from "../facility/facility.service";
 import { findBookingsWithDetails } from "../booking/booking.repository";
 import { mapBookingToContractFormat } from "../../lib/utils";
-import { toFacilityResponse } from '../facility/facility.mapper';
+import { toFacilityResponse } from "../facility/facility.mapper";
 
 export async function addNewStaffMembersToFacilityById(
   db: DB,

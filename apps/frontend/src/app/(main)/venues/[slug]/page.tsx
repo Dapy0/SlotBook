@@ -21,8 +21,8 @@ import type { Route } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import { BookingPolicyNote } from "@/components/bookings/BookingPolicyNote";
 import type { PublicBookingPolicy } from "@slotbook/shared";
-import { getBookingPolicy } from '@/services/bookingPolicy.server';
-import { FacilityGallery } from '@/app/(main)/venues/_components/FacilityGallery';
+import { getBookingPolicy } from "@/services/bookingPolicy.server";
+import { FacilityGallery } from "@/app/(main)/venues/_components/FacilityGallery";
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -55,7 +55,6 @@ async function Page({ params }: { params: Promise<{ slug: string }> }) {
     getStaffMembersByFacilityId(facilityId),
     getFacilityReviews(facilityId),
   ]);
-
 
   const policy: PublicBookingPolicy | null = await getBookingPolicy(facilityId);
 

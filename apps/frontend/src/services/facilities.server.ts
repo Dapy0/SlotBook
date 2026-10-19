@@ -11,4 +11,3 @@ export async function getFacilityReadiness(id: string) {
 // export async function getManagedFacilitySchedule(id: string) {
 //   return await apiWithAuth(`/facilities/${id}/readiness`, facilityReadinessResponseSchema);
 // }
-

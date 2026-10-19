@@ -44,6 +44,6 @@ export type ScheduleRequestResponse = z.infer<typeof scheduleRequestResponseSche
 
 export const scheduleRequestDetailResponseSchema = scheduleRequestResponseSchema.extend({
   currentSchedule: staffScheduleEntryResponseSchema.array(),
-  staffName: z.string().trim()
+  staffName: z.string().trim(),
 });
 export type ScheduleRequestDetailResponse = z.infer<typeof scheduleRequestDetailResponseSchema>;

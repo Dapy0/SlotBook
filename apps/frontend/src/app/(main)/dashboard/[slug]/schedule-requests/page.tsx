@@ -16,7 +16,7 @@ export default async function ScheduleRequestsPage({
   if (!facility) notFound();
 
   const requests = await getFacilityScheduleRequests(facility.id, { status: "pending" });
-  
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="font-heading text-2xl font-bold">Schedule requests</h1>

@@ -47,7 +47,7 @@ export function FacilityImagesManager({ facilityId, initialImages }: Props) {
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    e.target.value = ""; 
+    e.target.value = "";
     if (!file) return;
 
     const problem = validateImageFile(file);

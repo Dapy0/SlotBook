@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { staffSchedules, type StaffScheduleEntity } from "../../db/schema/staffSchedule.ts";
-import type { ScheduleEntryInput } from '@slotbook/shared';
+import type { ScheduleEntryInput } from "@slotbook/shared";
 
 export async function findScheduleByStaffId(
   db: DB,

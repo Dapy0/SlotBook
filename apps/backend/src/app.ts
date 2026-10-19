@@ -37,7 +37,7 @@ import {
 import fastifyMultipart from "@fastify/multipart";
 import { FACILITY_IMAGE_MAX_BYTES } from "../../../packages/shared/src/facilityImage";
 import type { FileStorage } from "./lib/storage/FileStorage";
-import { facilityImageRoutes } from './modules/facilityImage/facilityImage.routes';
+import { facilityImageRoutes } from "./modules/facilityImage/facilityImage.routes";
 const isDev = process.env.NODE_ENV !== "production";
 export async function createServer(opts: { storage?: FileStorage } = {}) {
   const app = Fastify({

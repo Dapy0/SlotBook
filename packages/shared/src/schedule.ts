@@ -78,7 +78,6 @@ export const staffScheduleEntryResponseSchema = scheduleEntryResponseBaseSchema.
 });
 export type StaffScheduleEntryResponse = z.infer<typeof staffScheduleEntryResponseSchema>;
 
-
 export type ScheduleEntryInput = Pick<
   ScheduleEntryRequest,
   "dayOfTheWeek" | "startTime" | "endTime"
