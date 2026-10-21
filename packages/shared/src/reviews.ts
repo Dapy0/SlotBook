@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 import type { BookingResponse } from "./bookings";
-import { addDays } from 'date-fns';
 
 export const REVIEW_WINDOW_DAYS = 30;
 
@@ -35,13 +34,12 @@ export const myReviewSchema = reviewResponseSchema.pick({
 });
 export type MyReview = z.infer<typeof myReviewSchema>;
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 export function canClientReview(
   booking: Pick<BookingResponse, "status" | "endsAt">,
   now: Date,
 ): boolean {
-  return (
-    booking.status === "confirmed" &&
-    now > booking.endsAt &&
-    now < addDays(booking.endsAt, REVIEW_WINDOW_DAYS)
-  );
+  const windowEnd = booking.endsAt.getTime() + REVIEW_WINDOW_DAYS * DAY_MS;
+  return booking.status === "confirmed" && booking.endsAt <= now && now.getTime() < windowEnd;
 }

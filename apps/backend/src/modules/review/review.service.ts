@@ -26,16 +26,19 @@ export async function createReviewForBooking(
   }
 
   if (!canClientReview({ status: booking.status, endsAt: booking.timeRange.end }, now))
-    throw new ConflictError("You missed the gap for leaving review.");
-  const review = await insertReview(db, bookingId, reviewData).catch((e) => {
-    if (getPgErrorCode(e) === PG.UNIQUE) {
-      throw new ConflictError("You already reviewed this booking");
-    }
-
-    throw e;
-  });
-  await updateFacilityScore(db, facilityId);
-  return review;
+    throw new ConflictError("This visit can't be reviewed now");
+  return await db
+    .transaction(async (tx) => {
+      const review = await insertReview(tx, bookingId, reviewData);
+      await updateFacilityScore(tx, facilityId);
+      return review;
+    })
+    .catch((e) => {
+      if (getPgErrorCode(e) === PG.UNIQUE) {
+        throw new ConflictError("You already reviewed this booking");
+      }
+      throw e;
+    });
 }
 export async function getAllFacilityReviews(db: DB, facilityId: string): Promise<ReviewResponse[]> {
   const reviews = await findReviewsByFacilityId(db, facilityId);
