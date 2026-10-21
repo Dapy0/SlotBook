@@ -1,4 +1,4 @@
-import type { CreateReviewRequest, ReviewResponse } from "@slotbook/shared";
+import { canClientReview, type CreateReviewRequest, type ReviewResponse } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { findBookingById } from "../booking/booking.repository.ts";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../lib/errors.ts";
@@ -12,6 +12,7 @@ export async function createReviewForBooking(
   bookingId: string,
   facilityId: string,
   reviewData: CreateReviewRequest,
+  now = new Date(),
 ) {
   const booking = await findBookingById(db, bookingId);
   if (!booking) {
@@ -23,13 +24,10 @@ export async function createReviewForBooking(
   if (booking.clientId !== userId) {
     throw new ForbiddenError();
   }
-  if (booking.status !== "confirmed") {
-    throw new ConflictError("Booking is not confirmed");
-  }
-  // if (new Date(parseTsRangeLiteral(booking.timeRange).end!) > new Date()) {
-  //   throw new ConflictError("Service has not happened yet");
-  // }
-  await insertReview(db, bookingId, reviewData).catch((e) => {
+
+  if (!canClientReview({ status: booking.status, endsAt: booking.timeRange.end }, now))
+    throw new ConflictError("You missed the gap for leaving review.");
+  const review = await insertReview(db, bookingId, reviewData).catch((e) => {
     if (getPgErrorCode(e) === PG.UNIQUE) {
       throw new ConflictError("You already reviewed this booking");
     }
@@ -37,7 +35,7 @@ export async function createReviewForBooking(
     throw e;
   });
   await updateFacilityScore(db, facilityId);
-  return;
+  return review;
 }
 export async function getAllFacilityReviews(db: DB, facilityId: string): Promise<ReviewResponse[]> {
   const reviews = await findReviewsByFacilityId(db, facilityId);

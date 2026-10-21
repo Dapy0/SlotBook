@@ -2,7 +2,7 @@ import type { BookingStatus } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { bookings, type BookingEntity } from "../../db/schema/booking.ts";
 import { eq, and, sql, inArray, type SQL, getColumns, asc, desc } from "drizzle-orm";
-import { facilities, services, staffMembers, users } from "../../db/schema";
+import { facilities, reviews, services, staffMembers, users, type ReviewEntity } from "../../db/schema";
 import { alias } from "drizzle-orm/pg-core";
 import type { BookingsFilter } from "./booking.schema";
 
@@ -111,6 +111,7 @@ type BookingEntityWithDetails = BookingEntity & {
   serviceName: string;
   staffMemberName: string;
   client: { clientName: string; clientEmail: string };
+  review: Pick<ReviewEntity, "id" | "rating" | "comment" | "createdAt"> | null;
 };
 const clientUser = alias(users, "client_user");
 const staffUser = alias(users, "staff_user");
@@ -141,6 +142,12 @@ export async function findBookingsWithDetails(
         clientName: clientUser.name,
         clientEmail: clientUser.email,
       },
+      review: {
+        id: reviews.id,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+      },
       ...getColumns(bookings),
     })
     .from(bookings)
@@ -149,6 +156,7 @@ export async function findBookingsWithDetails(
     .innerJoin(staffMembers, eq(bookings.staffMemberId, staffMembers.id))
     .innerJoin(clientUser, eq(bookings.clientId, clientUser.id))
     .innerJoin(staffUser, eq(staffMembers.userId, staffUser.id))
+    .leftJoin(reviews, eq(reviews.bookingId, bookings.id))
     .where(and(...filters))
     .orderBy(filter.order === "asc" ? asc(bookings.timeRange) : desc(bookings.timeRange))
     .$dynamic();

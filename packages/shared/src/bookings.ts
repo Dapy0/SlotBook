@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 import { currencyCodeSchema } from "./common/primitives";
+import { myReviewSchema } from './reviews';
 
 export const BOOKING_STATUSES = ["pending", "confirmed", "canceled"] as const;
 export const bookingStatusSchema = z.enum(BOOKING_STATUSES);
@@ -80,6 +81,12 @@ export const myBookingsQuerySchema = z.object({
   scope: z.literal(["upcoming", "past"]).default("upcoming"),
 });
 export type MyBookingsQuery = z.infer<typeof myBookingsQuerySchema>;
+
+export const clientBookingResponseSchema = bookingWithDetailsResponseSchema.extend({
+  review: myReviewSchema.nullable(),
+});
+export type ClientBookingResponse = z.infer<typeof clientBookingResponseSchema>;
+
 
 //
 

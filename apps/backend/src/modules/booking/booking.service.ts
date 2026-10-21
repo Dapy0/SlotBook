@@ -20,9 +20,9 @@ import {
   type Actors,
   type BookingQuery,
   type BookingResponse,
-  type BookingWithDetailsResponse,
   type CancelActor,
   type ChangeBookingStatusRequest,
+  type ClientBookingResponse,
   type CreateBookingRequest,
   type FacilityBookingResponse,
   type MyBookingsQuery,
@@ -196,7 +196,7 @@ export async function getMineBookings(
   userId: string,
   scope: MyBookingsQuery["scope"],
   now = new Date(),
-): Promise<BookingWithDetailsResponse[]> {
+): Promise<ClientBookingResponse[]> {
   const filters: BookingsFilter =
     scope === "upcoming"
       ? {

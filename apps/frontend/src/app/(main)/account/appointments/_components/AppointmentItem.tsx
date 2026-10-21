@@ -1,14 +1,21 @@
 import { CancelBookingButton } from "@/app/(main)/account/appointments/_components/CancelBookingButton";
+import { MyReviewSummary } from "@/app/(main)/account/appointments/_components/MyReviewSummary";
+import { ReviewDialog } from "@/app/(main)/account/appointments/_components/ReviewDialog";
 import { CancellationInfo } from "@/components/bookings/CancellationInfo";
 import { StatusBadge } from "@/components/bookings/StatusBadge";
 import { formatTimeToTimezone, moneyFormatterFromCents } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { canClientCancel, type BookingWithDetailsResponse } from "@slotbook/shared";
+import {
+  canClientCancel,
+  canClientReview,
+  type BookingWithDetailsResponse,
+  type ClientBookingResponse,
+} from "@slotbook/shared";
 import type { Route } from "next";
 import Link from "next/link";
 
 type Props = {
-  booking: BookingWithDetailsResponse;
+  booking: ClientBookingResponse;
   now: Date;
   isHighlighted?: boolean;
 };
@@ -34,7 +41,7 @@ function AppointmentItem({ booking, now, isHighlighted = false }: Props) {
   const time = `${formatTimeToTimezone(startsAt, facilityTimezone)} – ${formatTimeToTimezone(endsAt, facilityTimezone)}`;
   const isCancelable = canClientCancel(booking, now);
   const isCompleted = status === "confirmed" && endsAt <= now;
-
+  const canReview = booking.review === null && canClientReview(booking, now);
   return (
     <article
       className={cn(
@@ -87,6 +94,7 @@ function AppointmentItem({ booking, now, isHighlighted = false }: Props) {
             {staffMemberName}
           </p>
           <CancellationInfo booking={booking} now={now} />
+          {booking.review && <MyReviewSummary review={booking.review} />}
         </div>
 
         <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end">
@@ -95,6 +103,14 @@ function AppointmentItem({ booking, now, isHighlighted = false }: Props) {
           </span>
           {isCancelable && (
             <CancelBookingButton bookingId={id} facilityTimezone={facilityTimezone} />
+          )}
+          {canReview && (
+            <ReviewDialog
+              facilityId={booking.facilityId}
+              bookingId={id}
+              serviceName={serviceName}
+              facilityName={facilityName}
+            />
           )}
         </div>
       </div>
