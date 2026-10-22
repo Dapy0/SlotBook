@@ -42,17 +42,16 @@ const STEPS = [
 async function Page() {
   const cookieStore = await cookies();
   const local = cookieStore.get("_sb_country")?.value || "PL";
-  const [facilities, categories, citiesList] = await Promise.all([
-    searchFacilities({ country: local, limit: 8, offset: 0 }),
+  const [{ items: facilities }, categories, citiesList] = await Promise.all([
+    searchFacilities({ country: local, pageSize: 8, sort: "rating" }),
     getCategories({ country: local }),
     getCitiesList({ country: local }),
-  ]).catch();
+  ]);
+
 
   const countryLabel = new Intl.DisplayNames(["en"], { type: "region" }).of(local) ?? local;
-  const topRated = [...facilities]
-    .filter((facility) => facility.score != null)
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-    .slice(0, 3);
+  const topRated = facilities.filter((facility) => facility.score != null).slice(0, 3);
+
 
   return (
     <div className="flex flex-col gap-20 pb-8 md:gap-24">

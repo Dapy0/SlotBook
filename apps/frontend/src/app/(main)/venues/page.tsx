@@ -1,42 +1,43 @@
+// ФАЙЛ: apps/frontend/src/app/(main)/venues/page.tsx — заменить файл целиком
 import BigFacilityPreviewCard from "@/components/layout/BigFacilityPreviewCard";
 import BreadCrumbs from "@/components/layout/BreadCrumbs";
 import FiltersSidebar from "@/app/(main)/venues/_components/FiltersSidebar";
-import { getCategories } from "@/services/categories";
-import { getCitiesList, searchFacilities } from "@/services/facilities";
+import ResultsToolbar from "@/app/(main)/venues/_components/ResultsToolbar";
+import ActiveFilters from "@/app/(main)/venues/_components/ActiveFilters";
+import Pagination from "@/app/(main)/venues/_components/Pagination";
+import { getSearchFacets, searchFacilities } from "@/services/facilities";
+import { parseVenueSearch, toVenuesHref } from "@/lib/venueSearch";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import ResultsToolbar from "@/app/(main)/venues/_components/ResultsToolbar";
+import { redirect } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { FacilityListQuery } from "@slotbook/shared";
-import { CATEGORY_BY_SLUG, CATEGORY_METADATA } from "@/app/(main)/_common/types";
+import { CATEGORY_METADATA } from "@/app/(main)/_common/types";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { createParams } from "@/lib/queryStrings";
 import type { Route } from "next";
 
-const PAGE_SIZE = 10;
-const MAX_LIMIT = 50;
+type RawSearchParams = Record<string, string | string[] | undefined>;
 
-async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery> }) {
-  const { category, rating, limit = PAGE_SIZE, offset = 0, q, sort, city } = await searchParams;
+async function Page({ searchParams }: { searchParams: Promise<RawSearchParams> }) {
+  const search = parseVenueSearch(await searchParams);
   const country = (await cookies()).get("_sb_country")?.value || "PL";
 
-  const categoryName = category ? CATEGORY_BY_SLUG[category] : undefined;
-  if (category && !categoryName) notFound();
-
-  const [facilitiesWithServices, categories, cities] = await Promise.all([
-    searchFacilities({ country, limit, offset, category: categoryName, city, q, rating, sort }),
-    getCategories({ country, limit }),
-    getCitiesList({ country }),
+  const [result, facets] = await Promise.all([
+    searchFacilities({ ...search, country }),
+    getSearchFacets({ ...search, country }),
   ]);
 
-  const title = categoryName ? CATEGORY_METADATA[categoryName].label : "All venues";
-  const found = facilitiesWithServices.length;
-  const hasFilters = Boolean(category || rating || q || city);
-  // The API caps one request at 50, so "Show more" grows the page up to that limit.
-  const canShowMore = found >= Number(limit) && Number(limit) < MAX_LIMIT;
+  if (result.totalPages > 0 && search.page > result.totalPages) {
+    redirect(toVenuesHref({ ...search, page: result.totalPages }) as Route);
+  }
+
+  const title = search.category ? CATEGORY_METADATA[search.category].label : "All venues";
+  const { total, items } = result;
+  const from = total === 0 ? 0 : (result.page - 1) * result.pageSize + 1;
+  const to = from === 0 ? 0 : from + items.length - 1;
+  const hasFilters = Boolean(
+    search.category || search.rating !== undefined || search.q || search.city || search.priceMax,
+  );
 
   return (
     <div>
@@ -44,46 +45,39 @@ async function Page({ searchParams }: { searchParams: Promise<FacilityListQuery>
       <div className="mb-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
         <span className="text-muted-foreground nums">
-          {found >= Number(limit) ? `${found}+` : found} {found === 1 ? "venue" : "venues"}
-          {city ? ` in ${city}` : ""}
+          {total} {total === 1 ? "venue" : "venues"}
+          {search.city ? ` in ${search.city}` : ""}
         </span>
       </div>
 
       <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
         <Suspense fallback={<Skeleton className="h-96 w-full lg:w-64" />}>
-          <FiltersSidebar cities={cities} counts={categories} />
+          <FiltersSidebar facets={facets} />
         </Suspense>
 
         <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
           <Suspense fallback={<Skeleton className="h-11 w-full" />}>
             <ResultsToolbar />
           </Suspense>
+          <Suspense fallback={null}>
+            <ActiveFilters currency={facets.price?.currency ?? null} />
+          </Suspense>
 
-          {found > 0 ? (
+          {items.length > 0 ? (
             <div className="flex flex-col gap-4">
-              {facilitiesWithServices.map((facilityWithServices) => (
-                <BigFacilityPreviewCard
-                  facilityWithServices={facilityWithServices}
-                  key={facilityWithServices.id}
-                />
+              <p className="text-sm text-muted-foreground nums">
+                Showing {from}–{to} of {total} venues
+              </p>
+              {items.map((facility) => (
+                <BigFacilityPreviewCard facilityWithServices={facility} key={facility.id} />
               ))}
-              {canShowMore && (
-                <Link
-                  href={
-                    `/venues?${createParams({ category, rating, q, city, sort, limit: Number(limit) + PAGE_SIZE })}` as Route
-                  }
-                  scroll={false}
-                  className={cn(buttonVariants({ variant: "outline", size: "lg" }), "self-center")}
-                >
-                  Show more venues
-                </Link>
-              )}
+              <Pagination search={search} totalPages={result.totalPages} />
             </div>
           ) : (
             <div className="flex flex-col items-start gap-3 rounded-xl border border-dashed border-border bg-card p-8">
               <h2 className="text-xl font-semibold">No venues match these filters</h2>
               <p className="max-w-prose text-muted-foreground">
-                Try another category or city, or lower the minimum rating.
+                Try another category or city, raise the price limit or lower the minimum rating.
               </p>
               {hasFilters && (
                 <Link href="/venues" className={buttonVariants({ variant: "outline" })}>

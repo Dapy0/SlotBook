@@ -3,26 +3,26 @@ import { createParams } from "@/lib/queryStrings";
 import {
   facilityBookingDataResponseSchema,
   facilityCityResponseSchema,
+  facilityFacetsResponseSchema,
   facilityResponseSchema,
   facilityScheduleEntryResponseSchema,
-  facilityWithServicesResponseSchema,
+  facilitySearchResponseSchema,
   serviceResponseSchema,
   type CreateFacilityRequest,
-  type FacilityListQuery,
+  type FacilitySearchInput,
   type UpdateFacilityRequest,
 } from "@slotbook/shared";
 
-export async function getFacilities(params: FacilityListQuery) {
-  const query = createParams(params);
-  const endpoint = query ? `/facilities/?${query}` : "/facilities/";
+export async function searchFacilities(params: FacilitySearchInput) {
+  return await api(`/facilities/search?${createParams(params)}`, facilitySearchResponseSchema);
+}
+export async function getSearchFacets(params: FacilitySearchInput) {
+  return await api(
+    `/facilities/search/facets?${createParams(params)}`,
+    facilityFacetsResponseSchema,
+  );
+}
 
-  return await api(endpoint, facilityResponseSchema.array());
-}
-export async function searchFacilities(params: FacilityListQuery) {
-  const query = createParams(params);
-  const endpoint = query ? `/facilities/search?${query}` : "/facilities/search";
-  return await api(endpoint, facilityWithServicesResponseSchema.array());
-}
 export async function getCitiesList(getParams: { country: string }) {
   const query = createParams(getParams);
   const endpoint = query ? `/facilities/cities?${query}` : "/facilities/cities";

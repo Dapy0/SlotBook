@@ -3,7 +3,6 @@ import { createParams } from "@/lib/queryStrings";
 import {
   facilityCategoryCountResponseSchema,
   type FacilityCategoryQuery,
-  type FacilityListQuery,
 } from "@slotbook/shared";
 
 export async function getCategories(incomingQuery: FacilityCategoryQuery) {

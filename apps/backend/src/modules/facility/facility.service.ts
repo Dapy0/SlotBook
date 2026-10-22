@@ -1,6 +1,5 @@
 import type {
   CreateFacilityRequest,
-  FacilityListQuery,
   FacilityReadinessResponse,
   FacilityResponse,
   FacilityScheduleEntryResponse,
@@ -8,7 +7,6 @@ import type {
 } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import {
-  findAllFacilitiesByParams,
   findFacilitiesByOwnerId,
   findFacilityById,
   insertFacility,
@@ -43,15 +41,6 @@ export async function getFacilityByIdOrThrow(db: DB, facilityId: string): Promis
   const facility = await findFacilityById(db, facilityId);
   assertFound(facility, "Facility not found");
   return facility;
-}
-
-export async function getAllPublicFacilities(
-  db: DB,
-  query: FacilityListQuery,
-): Promise<FacilityResponse[]> {
-  return (await findAllFacilitiesByParams(db, query)).map((facility) =>
-    toFacilityResponse(facility),
-  );
 }
 
 export async function getOwnFacilitiesByUserId(

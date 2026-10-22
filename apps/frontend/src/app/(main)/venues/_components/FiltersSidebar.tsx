@@ -10,8 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { moneyFormatterFromCents } from "@/lib/format";
 import { cn, convertToSelectFormat } from "@/lib/utils";
-import { FACILITY_CATEGORIES, type FacilityCityResponse } from "@slotbook/shared";
+import { priceSteps } from "@/lib/venueSearch";
+import { FACILITY_CATEGORIES, type FacilityFacetsResponse } from "@slotbook/shared";
 import { SlidersHorizontal } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -24,14 +26,8 @@ function FilterHeading({ children }: { children: React.ReactNode }) {
   return <h2 className="mb-2 font-sans text-sm font-semibold">{children}</h2>;
 }
 
-// Only filters the API really applies are shown: category, city and rating.
-function FiltersSidebar({
-  counts,
-  cities,
-}: {
-  counts: Array<{ categoryName: (typeof FACILITY_CATEGORIES)[number]; count: number }>;
-  cities: FacilityCityResponse[];
-}) {
+function FiltersSidebar({ facets }: { facets: FacilityFacetsResponse }) {
+  const { categories: counts, cities, price } = facets;
   const buildHref = useFilterHref();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -40,8 +36,12 @@ function FiltersSidebar({
   const activeCategory = searchParams.get("category");
   const activeRating = searchParams.get("rating");
   const activeCity = searchParams.get("city");
+  const activePriceMax = searchParams.get("priceMax");
   const formattedCities = convertToSelectFormat(cities, "city", "city");
-  const activeCount = [activeCategory, activeRating, activeCity].filter(Boolean).length;
+  const activeCount = [activeCategory, activeRating, activeCity, activePriceMax].filter(
+    Boolean,
+  ).length;
+  const steps = price ? priceSteps(price.minCents, price.maxCents) : [];
 
   const rowClass = (isSelected: boolean) =>
     cn(
@@ -156,6 +156,33 @@ function FiltersSidebar({
             })}
           </div>
         </section>
+
+        {price && steps.length > 0 && (
+          <section>
+            <FilterHeading>Price</FilterHeading>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Maximum price">
+              {[null, ...steps].map((step) => {
+                const value = step === null ? null : String(step);
+                const isActive = activePriceMax === value;
+                return (
+                  <Link
+                    key={value ?? "any"}
+                    href={buildHref({ priceMax: value }) as Route}
+                    aria-current={isActive ? "true" : undefined}
+                    className={cn(
+                      buttonVariants({ size: "sm", variant: isActive ? "default" : "outline" }),
+                      "rounded-full px-3 nums",
+                    )}
+                  >
+                    {step === null
+                      ? "Any"
+                      : `up to ${moneyFormatterFromCents(step, price.currency)}`}
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </aside>
   );

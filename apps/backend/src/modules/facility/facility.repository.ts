@@ -1,4 +1,19 @@
-import { and, asc, avg, count, exists, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  avg,
+  count,
+  exists,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  or,
+  sql,
+  getColumns,
+  type SQL,
+} from "drizzle-orm";
 import type { DB } from "../../db/drizzlePlugin.ts";
 
 import {
@@ -9,7 +24,8 @@ import {
 import type {
   BookingPolicyResponse,
   FacilityCategoryCountResponse,
-  FacilityListQuery,
+  FacilityFacetsResponse,
+  FacilitySearchQuery,
   GeoCountryResponse,
   UpdateBookingPolicyRequest,
   UpdateFacilityRequest,
@@ -23,34 +39,120 @@ import {
   staffSchedules,
   staffServices,
 } from "../../db/schema";
+import { containsPattern } from "../../lib/sql.ts";
+import { minPriceCents, ORDER_BY } from "./facility.search.ts";
 
-export async function findAllFacilitiesByParams(
+type SearchFilterKey = "q" | "city" | "category" | "rating" | "priceMax";
+
+function hasActiveService(db: DB, condition: SQL) {
+  return exists(
+    db
+      .select({ one: sql`1` })
+      .from(services)
+      .where(and(eq(services.facilityId, facilities.id), eq(services.isActive, true), condition)),
+  );
+}
+
+export function buildSearchWhere(
   db: DB,
-  params: FacilityListQuery,
-): Promise<FacilityEntity[]> {
-  const { country, category, rating, q, sort, limit, city } = params;
-  const filters = [eq(facilities.isPublished, true), eq(facilities.country, country)];
+  query: FacilitySearchQuery,
+  options: { except?: SearchFilterKey } = {},
+): SQL[] {
+  const use = (key: SearchFilterKey) => options.except !== key;
 
-  if (category !== undefined) filters.push(eq(facilities.category, category));
-  if (rating !== undefined) filters.push(gte(facilities.score, rating));
-  if (city !== undefined) filters.push(eq(facilities.city, city));
-  if (q !== undefined && q !== "") {
-    filters.push(or(ilike(facilities.name, `%${q}%`), ilike(facilities.description, `%${q}%`))!);
+  const filters: SQL[] = [eq(facilities.isPublished, true), eq(facilities.country, query.country)];
+
+  if (query.q && use("q")) {
+    const pattern = containsPattern(query.q);
+    filters.push(
+      or(
+        ilike(facilities.name, pattern),
+        ilike(facilities.description, pattern),
+        ilike(facilities.city, pattern),
+        hasActiveService(db, ilike(services.name, pattern)),
+      )!,
+    );
+  }
+  if (query.category !== undefined && use("category")) {
+    filters.push(eq(facilities.category, query.category));
+  }
+  if (query.city !== undefined && use("city")) {
+    filters.push(eq(facilities.city, query.city));
+  }
+  if (query.rating !== undefined && use("rating")) {
+    filters.push(gte(facilities.score, query.rating));
+  }
+  if (query.priceMax !== undefined && use("priceMax")) {
+    filters.push(hasActiveService(db, lte(services.priceCents, query.priceMax)));
   }
 
-  const query = db
-    .select()
-    .from(facilities)
-    .where(and(...filters))
-    .$dynamic();
-
-  if (sort === "rating") query.orderBy(sql`${facilities.score} DESC NULLS LAST`);
-  else query.orderBy(asc(facilities.name));
-
-  if (limit !== undefined) query.limit(limit);
-
-  return await query;
+  return filters;
 }
+
+export type FacilitySearchRow = FacilityEntity & { minPriceCents: number | null };
+
+export async function searchFacilities(
+  db: DB,
+  query: FacilitySearchQuery,
+): Promise<{ rows: FacilitySearchRow[]; total: number }> {
+  const where = and(...buildSearchWhere(db, query));
+
+  const [rows, [counted]] = await Promise.all([
+    db
+      .select({ ...getColumns(facilities), minPriceCents })
+      .from(facilities)
+      .where(where)
+      .orderBy(...ORDER_BY[query.sort])
+      .limit(query.pageSize)
+      .offset((query.page - 1) * query.pageSize),
+    db.select({ total: count() }).from(facilities).where(where),
+  ]);
+
+  return { rows, total: counted?.total ?? 0 };
+}
+
+export async function getSearchFacets(
+  db: DB,
+  query: FacilitySearchQuery,
+): Promise<FacilityFacetsResponse> {
+  const [categories, cities, [price]] = await Promise.all([
+    db
+      .select({ categoryName: facilities.category, count: count() })
+      .from(facilities)
+      .where(and(...buildSearchWhere(db, query, { except: "category" })))
+      .groupBy(facilities.category)
+      .orderBy(desc(count())),
+
+    db
+      .select({ city: facilities.city, facilitiesCount: count() })
+      .from(facilities)
+      .where(and(...buildSearchWhere(db, query, { except: "city" })))
+      .groupBy(facilities.city)
+      .orderBy(desc(count()), asc(facilities.city)),
+
+    db
+      .select({
+        minCents: sql<number | null>`min(${services.priceCents})`,
+        maxCents: sql<number | null>`max(${services.priceCents})`,
+        currency: sql<string | null>`mode() within group (order by ${facilities.currency})`,
+      })
+      .from(services)
+      .innerJoin(facilities, eq(facilities.id, services.facilityId))
+      .where(
+        and(eq(services.isActive, true), ...buildSearchWhere(db, query, { except: "priceMax" })),
+      ),
+  ]);
+
+  return {
+    categories,
+    cities,
+    price:
+      price?.minCents != null && price.maxCents != null && price.currency
+        ? { minCents: price.minCents, maxCents: price.maxCents, currency: price.currency }
+        : null,
+  };
+}
+
 export async function findFacilityBySlug(db: DB, slug: string): Promise<FacilityEntity | null> {
   const [facility] = await db.select().from(facilities).where(eq(facilities.slug, slug));
   return facility ?? null;

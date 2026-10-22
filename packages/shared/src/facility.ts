@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { calendarDateSchema, instantSchema, wallTimeSchema } from "./common/codecs";
+import { instantSchema, wallTimeSchema } from "./common/codecs";
 import { serviceResponseSchema, serviceWithStaffMemberIdsResponseSchema } from "./service";
 import { staffMemberPublicResponseSchema } from "./staffMembers";
 import {
@@ -117,20 +117,40 @@ export const facilityWithServicesResponseSchema = facilityResponseSchema.extend(
 });
 export type FacilityWithServicesResponse = z.infer<typeof facilityWithServicesResponseSchema>;
 
-export const facilityListQuerySchema = z.object({
+export const FACILITY_SORTS = [
+  "recommended",
+  "rating",
+  "reviews",
+  "priceAsc",
+  "priceDesc",
+  "newest",
+] as const;
+export const facilitySortSchema = z.enum(FACILITY_SORTS);
+export type FacilitySort = z.infer<typeof facilitySortSchema>;
+export const SEARCH_PAGE_SIZE = 12;
+export const SEARCH_MAX_PAGE_SIZE = 48;
+export const SEARCH_MAX_PAGE = 100;
+const optionalTrimmedSchema = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .optional()
+    .transform((v) => (v ?? undefined));
+export const facilitySearchQuerySchema = z.object({
   country: countryCodeInputSchema,
-  city: z.string().trim().optional(),
-  time: wallTimeSchema.optional(),
-  date: calendarDateSchema.optional(),
+  q: optionalTrimmedSchema(100),
+  city: optionalTrimmedSchema(120),
   category: facilityCategorySchema.optional(),
-  limit: z.coerce.number().int().positive().max(50).default(20),
-  offset: z.coerce.number().int().nonnegative().default(0),
   rating: z.coerce.number().min(0).max(5).optional(),
-  priceMaxCents: z.coerce.number().int().nonnegative().optional(),
-  q: z.string().trim().optional(),
-  sort: z.enum(["rating", "priceAsc", "priceDesc"]).optional(),
+  priceMax: z.coerce.number().int().positive().optional(),
+  sort: facilitySortSchema.default("recommended"),
+  page: z.coerce.number().int().min(1).max(SEARCH_MAX_PAGE).default(1),
+  pageSize: z.coerce.number().int().min(1).max(SEARCH_MAX_PAGE_SIZE).default(SEARCH_PAGE_SIZE),
 });
-export type FacilityListQuery = z.infer<typeof facilityListQuerySchema>;
+export type FacilitySearchQuery = z.infer<typeof facilitySearchQuerySchema>;
+export type FacilitySearchInput = z.input<typeof facilitySearchQuerySchema>;
+
 // booking
 
 export const facilityBookingQuerySchema = z.object({
@@ -148,3 +168,28 @@ export const facilityBookingDataResponseSchema = facilityResponseSchema.extend({
 });
 
 export type FacilityDataForBookingResponse = z.infer<typeof facilityBookingDataResponseSchema>;
+
+export const facilitySearchItemSchema = facilityWithServicesResponseSchema.extend({
+  minPriceCents: z.int().nonnegative().nullable(),
+});
+export type FacilitySearchItem = z.infer<typeof facilitySearchItemSchema>;
+export const facilitySearchResponseSchema = z.object({
+  items: facilitySearchItemSchema.array(),
+  total: z.int().nonnegative(),
+  page: z.int().positive(),
+  pageSize: z.int().positive(),
+  totalPages: z.int().nonnegative(),
+});
+export type FacilitySearchResponse = z.infer<typeof facilitySearchResponseSchema>;
+export const facilityFacetsResponseSchema = z.object({
+  categories: facilityCategoryCountResponseSchema.array(),
+  cities: facilityCityResponseSchema.array(),
+  price: z
+    .object({
+      minCents: z.int().nonnegative(),
+      maxCents: z.int().nonnegative(),
+      currency: z.string().trim().length(3),
+    })
+    .nullable(),
+});
+export type FacilityFacetsResponse = z.infer<typeof facilityFacetsResponseSchema>;

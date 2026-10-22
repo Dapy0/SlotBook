@@ -7,11 +7,12 @@ import {
   facilityCategoryCountResponseSchema,
   facilityCategoryQuerySchema,
   facilityCityResponseSchema,
-  facilityListQuerySchema,
+  facilityFacetsResponseSchema,
   facilityReadinessResponseSchema,
   facilityResponseSchema,
   facilityScheduleEntryResponseSchema,
-  facilityWithServicesResponseSchema,
+  facilitySearchQuerySchema,
+  facilitySearchResponseSchema,
   updateBookingPolicyRequestSchema,
   updateFacilityRequestSchema,
 } from "@slotbook/shared";
@@ -20,10 +21,11 @@ import { bookingRoutes } from "../booking/booking.routes.ts";
 
 import { reviewResponseSchema } from "@slotbook/shared";
 import {
-  findAllFacilitiesByParams,
   findCitiesByCountry,
   findFacilityBookingsPolicy,
   getAllCategories,
+  getSearchFacets,
+  searchFacilities,
   updateFacilityBookingsPolicy,
 } from "./facility.repository.ts";
 import {
@@ -33,7 +35,6 @@ import {
 import {
   changeFacilityWeekSchedule,
   createFacilityByUserId,
-  getAllPublicFacilities,
   getFacilityByIdOrThrow,
   getFacilityBySlugOrThrow,
   getFacilityReadiness,
@@ -58,49 +59,55 @@ import { NotFoundError } from "../../lib/errors";
 import { toFacilityResponse } from "./facility.mapper";
 
 export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
-  fastify.get(
-    "/",
-    {
-      schema: {
-        querystring: facilityListQuerySchema,
-        response: {
-          200: z.array(facilityResponseSchema),
-        },
-      },
-    },
-    async (request, response) => {
-      const facilities = await getAllPublicFacilities(request.server.drizzle, request.query);
-      response.header(
-        "Cache-Control",
-        "public, max-age=60, s-maxage=600, stale-while-revalidate=30",
-      );
-      return response.send(facilities);
-    },
-  );
+  const SEARCH_CACHE = "public, max-age=30, s-maxage=120, stale-while-revalidate=60";
 
   fastify.get(
     "/search",
     {
       schema: {
-        querystring: facilityListQuerySchema,
-        response: { 200: facilityWithServicesResponseSchema.array() },
+        querystring: facilitySearchQuerySchema,
+        response: { 200: facilitySearchResponseSchema },
       },
     },
-    async (request) => {
-      const facilities = await findAllFacilitiesByParams(request.server.drizzle, request.query);
-      const servicesByFacilityIds = await getServicesByFacilityIds(
-        request.server.drizzle,
-        facilities.map((f) => f.id),
-      );
-      const groupedServicesWithFacilities = Object.groupBy(
-        servicesByFacilityIds,
-        (obj) => obj.facilityId,
-      );
+    async (request, response) => {
+      const { query } = request;
+      const db = request.server.drizzle;
 
-      return facilities.map((facility) => ({
-        ...toFacilityResponse(facility),
-        services: groupedServicesWithFacilities[facility.id] ?? [],
-      }));
+      const { rows, total } = await searchFacilities(db, query);
+      const services = rows.length
+        ? await getServicesByFacilityIds(
+            db,
+            rows.map((r) => r.id),
+          )
+        : [];
+      const servicesByFacility = Object.groupBy(services, (s) => s.facilityId);
+
+      response.header("Cache-Control", SEARCH_CACHE);
+      return {
+        items: rows.map(({ minPriceCents, ...facility }) => ({
+          ...toFacilityResponse(facility),
+          minPriceCents,
+          services: servicesByFacility[facility.id] ?? [],
+        })),
+        total,
+        page: query.page,
+        pageSize: query.pageSize,
+        totalPages: Math.ceil(total / query.pageSize),
+      };
+    },
+  );
+
+  fastify.get(
+    "/search/facets",
+    {
+      schema: {
+        querystring: facilitySearchQuerySchema,
+        response: { 200: facilityFacetsResponseSchema },
+      },
+    },
+    async (request, response) => {
+      response.header("Cache-Control", SEARCH_CACHE);
+      return getSearchFacets(request.server.drizzle, request.query);
     },
   );
   fastify.get(
