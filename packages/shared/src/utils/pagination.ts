@@ -9,4 +9,3 @@ export function getPageWindow(current: number, totalPages: number): PageWindowIt
   return [1, "…", current - 1, current, current + 1, "…", totalPages];
 }
 
-console.log(getPageWindow(5, 12));

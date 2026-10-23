@@ -8,7 +8,8 @@ const eslintConfig = defineConfig(
   tseslint.configs.stylisticTypeChecked,
   eslintPluginZod.configs.recommended,
   baseConfig,
-  globalIgnores(["src/codecs.ts", "src/*.test.ts"]),
+  globalIgnores(["vitest.config.ts", "eslint.config.mjs"]),
+
   {
     ignores: ["node_modules"],
     languageOptions: {
@@ -26,6 +27,10 @@ const eslintConfig = defineConfig(
         { selector: "typeAlias", format: ["PascalCase"] },
       ],
     },
+  },
+  {
+    files: ["src/**/*.test.ts"],
+    ...vitest.configs.recommended,
   },
   eslintConfigPrettier,
 );

@@ -1,23 +1,21 @@
-import { startTestDatabase, stopTestDatabase } from "../../test/setup.ts";
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { createServer } from "../../app.ts";
-import { afterEach, beforeEach } from "vitest";
-import { users } from "../../db/schema/user.ts";
+import { beforeEach } from "vitest";
+import { resetDb } from "../../test/db";
+import { buildTestApp } from '../../test/app';
 
 let app: FastifyInstance;
 
 beforeAll(async () => {
-  await startTestDatabase();
-  app = await createServer();
+  ({ app } = await buildTestApp());
 });
-afterEach(async () => {
-  await app.drizzle.delete(users);
+
+beforeEach(async () => {
+  await resetDb(app.drizzle);
 });
 
 afterAll(async () => {
   await app.close();
-  await stopTestDatabase();
 });
 
 describe("POST auth/register", () => {
