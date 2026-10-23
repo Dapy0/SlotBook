@@ -32,7 +32,7 @@ export type FacilityCategory = z.infer<typeof facilityCategorySchema>;
 
 //  Response Category
 export const facilityCategoryQuerySchema = z.object({
-  country: z.string().trim(),
+  country: z.string().trim().length(2),
   limit: z.coerce.number().nonnegative().optional(),
 });
 export type FacilityCategoryQuery = z.infer<typeof facilityCategoryQuerySchema>;
@@ -136,7 +136,7 @@ const optionalTrimmedSchema = (max: number) =>
     .trim()
     .max(max)
     .optional()
-    .transform((v) => (v ?? undefined));
+    .transform((v) => v ?? undefined);
 export const facilitySearchQuerySchema = z.object({
   country: countryCodeInputSchema,
   q: optionalTrimmedSchema(100),
