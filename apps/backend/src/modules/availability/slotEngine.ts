@@ -8,7 +8,9 @@ import {
   type Interval,
   type ScheduleRow,
 } from "./availability.utils";
-import { BOOKING_RULES } from "./booking.rules";
+
+export const BOOKING_RULES = { stepMinutes: 30, leadMinutes: 60, horizonDays: 30 } as const;
+
 type DaySlotsInput = {
   localDate: string;
   timeZone: string;

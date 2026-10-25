@@ -67,7 +67,6 @@ describe("POST auth/register", () => {
 describe("POST auth/login", () => {
   const credentials = { email: "test@test.com", password: "password123" };
 
-  // beforeEach, not beforeAll: the top-level afterEach deletes all users after every test.
   beforeEach(async () => {
     await app.inject({
       method: "POST",

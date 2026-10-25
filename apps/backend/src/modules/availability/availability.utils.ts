@@ -6,27 +6,66 @@ export type ScheduleRow = { dayOfTheWeek: number; startTime: string; endTime: st
 export function overlaps(a: Interval, b: Interval): boolean {
   return a.start < b.end && b.start < a.end;
 }
+export function mergeIntervals(intervals: Interval[]): Interval[] {
+  const valid = intervals.filter((i) => i.start < i.end);
+  const sorted = [...valid].sort((x, y) => x.start.getTime() - y.start.getTime());
 
-export function intersectIntervals(a: Interval[], b: Interval[]): Interval[] {
-  const res: Interval[] = [];
-  for (const x of a) {
-    for (const y of b) {
-      const start = x.start > y.start ? x.start : y.start;
-      const end = x.end < y.end ? x.end : y.end;
-      if (start < end) res.push({ start, end });
+  const result: Interval[] = [];
+  for (const current of sorted) {
+    const last = result[result.length - 1];
+
+    if (last !== undefined && current.start < last.end) {
+      if (current.end > last.end) last.end = current.end;
+    } else {
+      result.push({ start: current.start, end: current.end });
     }
   }
-  return res;
+  return result;
 }
-export function deleteIntersectedIntervals(a: Interval[], b: Interval[]): Interval[] {
-  const newIntervals = [];
-  for (const x of a) {
-    for (const y of b) {
-      const isOverlapping = x.start >= y.start;
-      if (!isOverlapping) newIntervals.push(x);
-    }
+export function intersectIntervals(a: Interval[], b: Interval[]): Interval[] {
+  const left = mergeIntervals(a);
+  const right = mergeIntervals(b);
+
+  const result: Interval[] = [];
+  let i = 0;
+  let j = 0;
+
+  while (i < left.length && j < right.length) {
+    const x = left[i];
+    const y = right[j];
+
+    const start = x.start > y.start ? x.start : y.start;
+    const end = x.end < y.end ? x.end : y.end;
+    if (start < end) result.push({ start, end });
+
+    if (x.end < y.end) i++;
+    else j++;
   }
-  return newIntervals;
+  return result;
+}
+export function subtractIntervals(from: Interval[], remove: Interval[]): Interval[] {
+  const free = mergeIntervals(from);
+  const busy = mergeIntervals(remove);
+
+  const result: Interval[] = [];
+  let j = 0;
+
+  for (const f of free) {
+    while (j < busy.length && busy[j].end <= f.start) j++;
+
+    let cursor = f.start;
+    let k = j;
+
+    while (k < busy.length && busy[k].start < f.end) {
+      const b = busy[k];
+      if (b.start > cursor) result.push({ start: cursor, end: b.start });
+      if (b.end > cursor) cursor = b.end;
+      k++;
+    }
+
+    if (cursor < f.end) result.push({ start: cursor, end: f.end });
+  }
+  return result;
 }
 export function scheduleRowsToIntervals(
   rows: ScheduleRow[],
