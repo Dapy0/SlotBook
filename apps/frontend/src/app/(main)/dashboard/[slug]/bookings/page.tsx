@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  addDaysToIso,
+  addDaysToString,
   BOOKING_STATUSES,
   formatCalendarDate,
   todayInTimeZone,
@@ -49,7 +49,7 @@ export default async function FacilityBookingsPage({
   const tz = facility.timezone;
 
   const from = isIsoDate(query.from) ? query.from : todayInTimeZone(tz);
-  const to = addDaysToIso(from, 6);
+  const to = addDaysToString(from, 6);
 
   const status = isStatus(query.status) ? query.status : undefined;
   const staffId = query.staff || undefined;
@@ -72,8 +72,8 @@ export default async function FacilityBookingsPage({
   };
 
   const rangeLabel = `${formatCalendarDate(from, "d MMM")} – ${formatCalendarDate(to, "d MMM yyyy")}`;
-  const prevFrom = addDaysToIso(from, -7);
-  const nextFrom = addDaysToIso(from, 7);
+  const prevFrom = addDaysToString(from, -7);
+  const nextFrom = addDaysToString(from, 7);
 
   return (
     <div className="flex flex-col gap-6">

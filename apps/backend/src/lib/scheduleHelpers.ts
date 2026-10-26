@@ -1,6 +1,6 @@
 import { BadRequestError, ConflictError } from "./errors.ts";
 import {
-  addDaysToIso,
+  addDaysToString,
   todayInTimeZone,
   type BookingQuery,
   type FacilityResponse,
@@ -112,7 +112,7 @@ export function resolveDateRange(
   now = new Date(),
 ) {
   const from = filters.from ?? todayInTimeZone(facility.timezone, now);
-  const to = filters.to ?? addDaysToIso(from, 6);
+  const to = filters.to ?? addDaysToString(from, 6);
   if (from > to) {
     throw new BadRequestError("`to` must not be before `from`");
   }

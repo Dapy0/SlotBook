@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { addDaysToIso, formatCalendarDate, type BookingStatus } from "@slotbook/shared";
+import { addDaysToString, formatCalendarDate, type BookingStatus } from "@slotbook/shared";
 import { getStaffMe, getStaffMeBookings } from "@/services/staffMe.server";
 import { BookingRow } from "@/components/bookings/BookingRow";
 import { groupByLocalDate } from "@/lib/dates";
@@ -43,7 +43,7 @@ export default async function WorkBookingsPage({
         </div>
         <div className="flex gap-2">
           <Link
-            href={hrefFor({ from: addDaysToIso(from, -7) })}
+            href={hrefFor({ from: addDaysToString(from, -7) })}
             className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             ← Prev
@@ -55,7 +55,7 @@ export default async function WorkBookingsPage({
             This week
           </Link>
           <Link
-            href={hrefFor({ from: addDaysToIso(from, 7) })}
+            href={hrefFor({ from: addDaysToString(from, 7) })}
             className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50"
           >
             Next →

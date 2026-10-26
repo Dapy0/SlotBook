@@ -1,5 +1,5 @@
 import {
-  addDaysToIso,
+  addDaysToString,
   BOOKING_STATUSES,
   todayInTimeZone,
   type BookingStatus,
@@ -18,7 +18,7 @@ export function parseWeekQuery(
   const from = isIsoDate(query.from) ? query.from : todayInTimeZone(timeZone);
   return {
     from,
-    to: addDaysToIso(from, 6),
+    to: addDaysToString(from, 6),
     status: isStatus(query.status) ? query.status : undefined,
   };
 }
