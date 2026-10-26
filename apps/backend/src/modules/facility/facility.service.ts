@@ -1,8 +1,10 @@
 import type {
+  BookingPolicyResponse,
   CreateFacilityRequest,
   FacilityReadinessResponse,
   FacilityResponse,
   FacilityScheduleEntryResponse,
+  UpdateBookingPolicyRequest,
   UpdateFacilityRequest,
 } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
@@ -15,6 +17,8 @@ import {
   findFacilityBySlug,
   countReadinessFacts,
   setFacilityPublished,
+  findFacilityBookingsPolicy,
+  updateFacilityBookingsPolicy,
 } from "./facility.repository.ts";
 import { BadRequestError, ConflictError, NotFoundError } from "../../lib/errors.ts";
 import {
@@ -28,7 +32,7 @@ import type { ChangeWeekScheduleRequest } from "@slotbook/shared";
 import { assertFound } from "../utils";
 import { getPgErrorCode, PG } from "../../lib/pgErrors";
 import { assertFacilityOwner } from "../../lib/authz";
-import { slugifyStr } from "@slotbook/shared";
+import { isLeadWithinHorizon, slugifyStr } from "@slotbook/shared";
 import { findBookingsByFacilityId } from "../booking/booking.repository";
 import { toFacilityResponse } from "./facility.mapper";
 import type { FacilityEntity } from "../../db/schema";
@@ -41,6 +45,27 @@ export async function getFacilityByIdOrThrow(db: DB, facilityId: string): Promis
   const facility = await findFacilityById(db, facilityId);
   assertFound(facility, "Facility not found");
   return facility;
+}
+export async function updateBookingPolicy(
+  db: DB,
+  facilityId: string,
+  userId: string,
+  body: UpdateBookingPolicyRequest,
+): Promise<BookingPolicyResponse> {
+  await assertFacilityOwner(db, facilityId, userId);
+
+  const current = await findFacilityBookingsPolicy(db, facilityId);
+  assertFound(current, "Facility not found");
+
+  const next = { ...current, ...body };
+
+  if (!isLeadWithinHorizon(next.bookingLeadMinutes!, next.bookingHorizonDays!)) {
+    throw new BadRequestError();
+  }
+
+  const updated = await updateFacilityBookingsPolicy(db, facilityId, body);
+  assertFound(updated, "Facility not found");
+  return updated;
 }
 
 export async function getOwnFacilitiesByUserId(

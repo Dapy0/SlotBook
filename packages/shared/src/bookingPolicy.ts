@@ -10,9 +10,11 @@ export const BOOKING_POLICY_LIMITS = {
   bookingLeadMinutes: { min: 0, max: 7 * 24 * 60 },
   bookingHorizonDays: { min: 1, max: 365 },
 } as const;
-
 const L = BOOKING_POLICY_LIMITS;
 
+export function isLeadWithinHorizon(leadMinutes: number, horizonDays: number): boolean {
+  return leadMinutes < horizonDays * 24 * 60;
+}
 export const bookingPolicySchema = z.object({
   confirmationMode: confirmationModeSchema,
   clientCancelCutoffMinutes: z
@@ -23,13 +25,13 @@ export const bookingPolicySchema = z.object({
   bookingHorizonDays: z.int().min(L.bookingHorizonDays.min).max(L.bookingHorizonDays.max),
 });
 
-export const bookingPolicyResponseSchema = bookingPolicySchema;
-export type BookingPolicyResponse = z.infer<typeof bookingPolicyResponseSchema>;
-
 export const updateBookingPolicyRequestSchema = bookingPolicySchema
   .partial()
   .refine(hasAnyField, { error: ANY_FIELD_MESSAGE });
 export type UpdateBookingPolicyRequest = z.infer<typeof updateBookingPolicyRequestSchema>;
+
+export const bookingPolicyResponseSchema = bookingPolicySchema;
+export type BookingPolicyResponse = z.infer<typeof bookingPolicyResponseSchema>;
 
 export const publicBookingPolicySchema = bookingPolicySchema.pick({
   confirmationMode: true,

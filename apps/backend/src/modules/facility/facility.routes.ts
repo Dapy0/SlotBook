@@ -26,7 +26,6 @@ import {
   getAllCategories,
   getSearchFacets,
   searchFacilities,
-  updateFacilityBookingsPolicy,
 } from "./facility.repository.ts";
 import {
   getServicesByFacilityIds,
@@ -45,6 +44,7 @@ import {
   publishFacility,
   removeOwnedFacilityById,
   unPublishFacility,
+  updateBookingPolicy,
   updateOwnedFacility,
 } from "./facility.service.ts";
 import { findStaffByFacilityIdPublic } from "../staff/staff.repository.ts";
@@ -54,7 +54,6 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { getAllFacilityReviews } from "../review/review.service";
 import { facilityParamsSchema, facilitySlugParamsSchema } from "./facility.schema";
 import { toPublicBookingPolicy } from "../../lib/utils";
-import { assertFacilityOwner } from "../../lib/authz";
 import { NotFoundError } from "../../lib/errors";
 import { toFacilityResponse } from "./facility.mapper";
 
@@ -456,15 +455,14 @@ export const facilityRoutes: FastifyPluginAsyncZod = async (fastify) => {
       },
     },
     async (request, response) => {
-      await assertFacilityOwner(request.server.drizzle, request.params.id, request.user.id);
-      const facilityPolicies = await updateFacilityBookingsPolicy(
-        request.server.drizzle,
-        request.params.id,
-        request.body,
+      response.send(
+        await updateBookingPolicy(
+          request.server.drizzle,
+          request.params.id,
+          request.user.id,
+          request.body,
+        ),
       );
-      if (!facilityPolicies)
-        throw new NotFoundError("No facility policies where found and updated.");
-      return response.send(facilityPolicies);
     },
   );
 

@@ -2,10 +2,11 @@
 // Карточка «Booking rules» в Settings: между PublicationCard и FacilityForm.
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type {
-  BookingPolicyResponse,
-  ConfirmationMode,
-  UpdateBookingPolicyRequest,
+import {
+  isLeadWithinHorizon,
+  type BookingPolicyResponse,
+  type ConfirmationMode,
+  type UpdateBookingPolicyRequest,
 } from "@slotbook/shared";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -68,6 +69,7 @@ export function BookingPolicyForm({ facilityId, policy }: Props) {
 
   const changes = getChanges(policy, values);
   const isDirty = Object.keys(changes).length > 0;
+  const leadFits = isLeadWithinHorizon(values.bookingLeadMinutes, values.bookingHorizonDays);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -158,6 +160,11 @@ export function BookingPolicyForm({ facilityId, policy }: Props) {
           options={HORIZON_OPTIONS}
           onChange={(v) => set("bookingHorizonDays", v)}
         />
+        {!leadFits && (
+          <p role="alert" className="text-sm text-destructive">
+            Minimum notice is longer than the booking window, so nobody could book.
+          </p>
+        )}
       </div>
 
       {error && (
@@ -167,7 +174,7 @@ export function BookingPolicyForm({ facilityId, policy }: Props) {
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={!isDirty || isPending}>
+        <Button type="submit" disabled={!isDirty || isPending || !leadFits}>
           {isPending ? "Saving…" : "Save rules"}
         </Button>
         {saved && (
