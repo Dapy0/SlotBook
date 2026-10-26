@@ -1,12 +1,12 @@
 import { describe, test, expect } from "vitest";
-import type z from "zod";
+import * as z from "zod";
 import {
   facilityCategoryQuerySchema,
   facilitySearchQuerySchema,
   SEARCH_MAX_PAGE_SIZE,
   SEARCH_PAGE_SIZE,
 } from "./facility";
-import { number } from "zod";
+
 describe("facilityCategoryQuerySchema", () => {
   test("accepts country without limit", () => {
     const facilityCategoryQueryMock: z.input<typeof facilityCategoryQuerySchema> = {

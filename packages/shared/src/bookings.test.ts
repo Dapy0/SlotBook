@@ -1,9 +1,7 @@
 import { describe, test, expect } from "vitest";
 import {
-  BOOKING_STATUSES,
   canClientCancel,
   checkTransition,
-  type Actors,
   type BookingStatus,
 } from "./bookings";
 const booking = (status: BookingStatus, cancelableUntil: Date) => ({ status, cancelableUntil });
@@ -37,21 +35,6 @@ describe("canClientCancel", () => {
   });
 });
 
-const ACTORS = ["client", "staff", "owner"] as const;
-function subsets<T>(arr: readonly T[]): T[][] {
-  return arr.reduce<T[][]>(
-    (prev, current) => {
-      const withCurrent = prev.map((set) => [...set, current]);
-      return [...prev, ...withCurrent];
-    },
-    [[]],
-  );
-}
-const cases = BOOKING_STATUSES.flatMap((from) =>
-  BOOKING_STATUSES.flatMap((to) =>
-    subsets<Actors>(ACTORS).map((actors) => [from, to, actors] as const),
-  ),
-);
 
 describe("checkTransition", () => {
   test.each([

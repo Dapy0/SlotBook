@@ -18,13 +18,13 @@ describe("addDaysToIso", () => {
 describe("todayInTimeZone", () => {
   test("return YYYY-mm-dd format of date in timezone", () => {
     const date = new Date("2026-11-02T00:00:00Z");
-    expect(todayInTimeZone("Europe/Warsaw", date)).toBe('2026-11-02');
+    expect(todayInTimeZone("Europe/Warsaw", date)).toBe("2026-11-02");
   });
-  test("return YYYY-mm-dd format of date in timezone", () => {
+  test("return YYYY-mm-dd format of date in Europe/Warsaw timezone", () => {
     const date = new Date("2026-11-02T00:00:00Z");
     expect(todayInTimeZone("Europe/Warsaw", date)).toBe("2026-11-02");
   });
-  test("return YYYY-mm-dd format of date in timezone", () => {
+  test("return YYYY-mm-dd format of date in America/New_York timezone", () => {
     const date = new Date("2026-11-02T00:00:00Z");
     expect(todayInTimeZone("America/New_York", date)).toBe("2026-11-01");
   });

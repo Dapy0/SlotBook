@@ -14,7 +14,8 @@ describe("StaffMemberResponse DTO", () => {
     expect(staffMemberResponseSchema.safeParse(fixture).success).toBe(true);
   });
   test("rejects staff member without isActive", () => {
-    const { isActive: _isActive, ...withoutIsActive } = fixture;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { isActive: _, ...withoutIsActive } = fixture;
     expect(staffMemberResponseSchema.safeParse(withoutIsActive).success).toBe(false);
   });
 });

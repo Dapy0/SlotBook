@@ -1,11 +1,10 @@
-import z from "zod";
+import * as z from "zod";
 import { describe, expect, test } from "vitest";
 import {
   canClientReview,
   createReviewRequestSchema,
   REVIEW_WINDOW_DAYS,
   reviewResponseSchema,
-  type ReviewResponse,
 } from "./reviews";
 
 describe("Review Request", () => {

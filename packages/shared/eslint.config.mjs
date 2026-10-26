@@ -3,6 +3,8 @@ import tseslint from "typescript-eslint";
 import eslintPluginZod from "eslint-plugin-zod";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { baseConfig } from "../../eslint.config.mjs";
+import vitest from "@vitest/eslint-plugin";
+
 const eslintConfig = defineConfig(
   tseslint.configs.recommendedTypeChecked,
   tseslint.configs.stylisticTypeChecked,
