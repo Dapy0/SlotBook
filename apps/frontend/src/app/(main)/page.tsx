@@ -48,10 +48,8 @@ async function Page() {
     getCitiesList({ country: local }),
   ]);
 
-
   const countryLabel = new Intl.DisplayNames(["en"], { type: "region" }).of(local) ?? local;
   const topRated = facilities.filter((facility) => facility.score != null).slice(0, 3);
-
 
   return (
     <div className="flex flex-col gap-20 pb-8 md:gap-24">

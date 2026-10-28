@@ -1,9 +1,6 @@
 import { api } from "@/lib/api";
 import { createParams } from "@/lib/queryStrings";
-import {
-  facilityCategoryCountResponseSchema,
-  type FacilityCategoryQuery,
-} from "@slotbook/shared";
+import { facilityCategoryCountResponseSchema, type FacilityCategoryQuery } from "@slotbook/shared";
 
 export async function getCategories(incomingQuery: FacilityCategoryQuery) {
   const query = createParams(incomingQuery);

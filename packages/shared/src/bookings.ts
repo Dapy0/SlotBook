@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { instantSchema } from "./common/codecs";
 import { currencyCodeSchema } from "./common/primitives";
-import { myReviewSchema } from './reviews';
+import { myReviewSchema } from "./reviews";
 
 export const BOOKING_STATUSES = ["pending", "confirmed", "canceled"] as const;
 export const bookingStatusSchema = z.enum(BOOKING_STATUSES);
@@ -86,7 +86,6 @@ export const clientBookingResponseSchema = bookingWithDetailsResponseSchema.exte
   review: myReviewSchema.nullable(),
 });
 export type ClientBookingResponse = z.infer<typeof clientBookingResponseSchema>;
-
 
 //
 

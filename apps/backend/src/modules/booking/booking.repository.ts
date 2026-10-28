@@ -2,7 +2,14 @@ import type { BookingStatus } from "@slotbook/shared";
 import type { DB } from "../../db/drizzlePlugin.ts";
 import { bookings, type BookingEntity } from "../../db/schema/booking.ts";
 import { eq, and, sql, inArray, type SQL, getColumns, asc, desc } from "drizzle-orm";
-import { facilities, reviews, services, staffMembers, users, type ReviewEntity } from "../../db/schema";
+import {
+  facilities,
+  reviews,
+  services,
+  staffMembers,
+  users,
+  type ReviewEntity,
+} from "../../db/schema";
 import { alias } from "drizzle-orm/pg-core";
 import type { BookingsFilter } from "./booking.schema";
 

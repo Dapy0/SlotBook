@@ -6,7 +6,7 @@ import { toVenuesHref, type VenueSearch } from "@/lib/venueSearch";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
-import { getPageWindow } from '@slotbook/shared';
+import { getPageWindow } from "@slotbook/shared";
 
 function Pagination({ search, totalPages }: { search: VenueSearch; totalPages: number }) {
   if (totalPages <= 1) return null;

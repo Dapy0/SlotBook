@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { intersectIntervals, mergeIntervals, overlaps, type Interval } from "./availability.utils";
+import {
+  intersectIntervals,
+  mergeIntervals,
+  overlaps,
+  sliceIntoSlots,
+  type Interval,
+} from "./availability.utils";
 const at = (hhmm: string) => new Date(`2026-11-02T${hhmm}:00Z`);
 const interval = (from: string, to: string) => ({ start: at(from), end: at(to) });
 
@@ -211,5 +217,41 @@ describe("mergeIntervals", () => {
     const result = mergeIntervals(a);
 
     expect(result).toEqual([]);
+  });
+});
+describe("sliceIntoSlots", () => {
+  test("returns slots when given 30-min duration and step → back-to-back slots", () => {
+    const result = sliceIntoSlots(interval("09:00", "10:00"), 30, 30);
+    expect(result).toEqual([interval("09:00", "09:30"), interval("09:30", "10:00")]);
+  });
+
+  test("returns empty array when interval does not fit durationMinutes", () => {
+    const result = sliceIntoSlots(interval("09:00", "09:30"), 31, 30);
+    expect(result).toEqual([]);
+  });
+  test("returns exactly one slot when given 30 min duration out of 30 minutes gap", () => {
+    const result = sliceIntoSlots(interval("09:00", "09:30"), 30, 30);
+    expect(result).toEqual([interval("09:00", "09:30")]);
+  });
+  test("returns slots when step longer than duration → gaps between slots", () => {
+    const result = sliceIntoSlots(interval("09:00", "11:30"), 30, 45);
+    expect(result).toEqual([
+      interval("09:00", "09:30"),
+      interval("09:45", "10:15"),
+
+      interval("10:30", "11:00"),
+    ]);
+  });
+  test("returns slots when duration longer than step → overlapping slots", () => {
+    const result = sliceIntoSlots(interval("09:00", "11:00"), 30, 15);
+    expect(result).toEqual([
+      interval("09:00", "09:30"),
+      interval("09:15", "09:45"),
+      interval("09:30", "10:00"),
+      interval("09:45", "10:15"),
+      interval("10:00", "10:30"),
+      interval("10:15", "10:45"),
+      interval("10:30", "11:00"),
+    ]);
   });
 });

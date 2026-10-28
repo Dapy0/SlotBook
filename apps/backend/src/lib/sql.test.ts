@@ -12,9 +12,9 @@ describe("escapeLike", () => {
     expect(escapeLike("50%")).toBe("50\\%");
   });
 
- test("wraps underscore character", () => {
-   expect(escapeLike("a_b")).toBe("a\\_b");
- });
+  test("wraps underscore character", () => {
+    expect(escapeLike("a_b")).toBe("a\\_b");
+  });
 });
 
 describe("containsPattern", () => {

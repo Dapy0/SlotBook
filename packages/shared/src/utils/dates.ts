@@ -1,6 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
 export function addDaysToString(yyyymmdd: string, amount: number): string {
-  if (!(/^\d{4}-((0[1-9]|1[0-2]))-((0[1-9]|[12]\d|3[01]))$/.exec(yyyymmdd))) {
+  if (!/^\d{4}-((0[1-9]|1[0-2]))-((0[1-9]|[12]\d|3[01]))$/.exec(yyyymmdd)) {
     throw new Error("Wrong format. Need to be YYYY-mm-dd");
   }
   if (amount < 0) {

@@ -1,9 +1,5 @@
 import { describe, test, expect } from "vitest";
-import {
-  canClientCancel,
-  checkTransition,
-  type BookingStatus,
-} from "./bookings";
+import { canClientCancel, checkTransition, type BookingStatus } from "./bookings";
 const booking = (status: BookingStatus, cancelableUntil: Date) => ({ status, cancelableUntil });
 const DEADLINE = new Date("2026-11-02T10:00:00Z");
 const MINUTE = 60_000;
@@ -35,7 +31,6 @@ describe("canClientCancel", () => {
   });
 });
 
-
 describe("checkTransition", () => {
   test.each([
     ["pending", "confirmed", ["staff"], "ok"],
@@ -55,6 +50,6 @@ describe("checkTransition", () => {
 
     ["pending", "confirmed", ["client", "staff"], "ok"],
   ] as const)("%s → %s by %j = %s", (from, to, actors, expected) => {
-     expect(checkTransition(from, to, [...actors])).toBe(expected);
+    expect(checkTransition(from, to, [...actors])).toBe(expected);
   });
 });

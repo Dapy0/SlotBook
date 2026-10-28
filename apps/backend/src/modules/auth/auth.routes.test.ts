@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { beforeEach } from "vitest";
 import { resetDb } from "../../test/db";
-import { buildTestApp } from '../../test/app';
+import { buildTestApp } from "../../test/app";
 
 let app: FastifyInstance;
 

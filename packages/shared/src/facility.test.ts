@@ -79,7 +79,6 @@ describe("facilitySearchQuerySchema", () => {
     });
   });
 
-
   test("trims q", () => {
     expect(parse({ q: "  barber  " }).q).toBe("barber");
   });

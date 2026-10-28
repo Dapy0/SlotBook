@@ -23,23 +23,24 @@ I built SlotBook on my own as a full-stack TypeScript project: a Fastify + Postg
 <details>
 <summary><b>Screenshots</b></summary>
 
-| Home: search and discover venues |
-|---|
+| Home: search and discover venues        |
+| --------------------------------------- |
 | ![Home page](docs/screenshots/main.jpg) |
 
 | Booking: pick a service, specialist and free slot |
-|---|
-| ![Booking flow](docs/screenshots/booking.jpg) |
+| ------------------------------------------------- |
+| ![Booking flow](docs/screenshots/booking.jpg)     |
 
 | Owner dashboard: pending confirmations, today's bookings, revenue |
-|---|
-| ![Owner dashboard](docs/screenshots/dashboard.jpg) |
+| ----------------------------------------------------------------- |
+| ![Owner dashboard](docs/screenshots/dashboard.jpg)                |
 
 </details>
 
 ## Features
 
 ### For clients
+
 - **Catalog search.** Free-text search across venue name, description, city and service names, with filters for city, category, minimum rating and maximum price. Six sort modes, including a "recommended" order that uses a Bayesian average so a venue with one 5-star review does not outrank one with fifty 4.8-star reviews. Filters, sort and page live in the URL, so every result page can be shared.
 - **Venue page.** Photo gallery, description, services with prices and durations, staff, opening hours, an interactive Mapbox map, rating summary and reviews.
 - **Real-time availability.** Pick a service, then a specialist, and see only the slots that are actually free, grouped into morning, afternoon and evening. Lead time and booking horizon come from the venue's own policy.
@@ -47,11 +48,13 @@ I built SlotBook on my own as a full-stack TypeScript project: a Fastify + Postg
 - **My appointments.** Upcoming and past visits, cancellation with a reason (allowed until the venue's cancellation cutoff), and a 1–5 star review for a completed visit.
 
 ### For staff
+
 - **Work area** with a personal schedule and a list of their own bookings.
 - **Confirm or cancel** incoming bookings, with a cancellation reason.
 - **Schedule change requests.** Staff propose a new weekly schedule with a comment; the owner approves or rejects it, and staff can withdraw a pending request.
 
 ### For owners
+
 - **Venue setup.** Create and edit a venue (category, address, map location, IANA timezone), set weekly opening hours with several intervals per day (breaks are allowed, overlaps are rejected).
 - **Readiness check and publishing.** A venue goes live only when it has opening hours, at least one active service, at least one bookable staff member and a location. The dashboard shows which checks are still missing.
 - **Photos.** Upload up to 10 images (JPEG, PNG, WebP, max 5 MB), and reorder them (the first one is the cover). A database check caps the list at 10. File type is checked by content (magic bytes), not by the extension the browser sends.
@@ -74,14 +77,14 @@ A few problems that took the most thought:
 
 ## Tech stack
 
-| Layer | Technologies |
-|---|---|
-| **Backend** | Node.js 24, Fastify 5, Drizzle ORM, PostgreSQL 16, Zod 4 + `fastify-type-provider-zod`, `@fastify/jwt` (HTTP-only cookie), `@fastify/multipart`, bcrypt, date-fns-tz |
+| Layer        | Technologies                                                                                                                                                         |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Backend**  | Node.js 24, Fastify 5, Drizzle ORM, PostgreSQL 16, Zod 4 + `fastify-type-provider-zod`, `@fastify/jwt` (HTTP-only cookie), `@fastify/multipart`, bcrypt, date-fns-tz |
 | **Frontend** | Next.js 16 (App Router, Server Components, Server Actions, typed routes), React 19, Tailwind CSS 4, shadcn/ui on Base UI, React Hook Form + Zod, date-fns, Mapbox GL |
-| **Shared** | `@slotbook/shared`: Zod schemas, inferred types, booking status rules, policy limits, date utilities |
-| **Testing** | Vitest, Testcontainers (real PostgreSQL in Docker for integration tests) |
-| **Tooling** | npm workspaces, strict TypeScript, ESLint, Prettier, GitHub Actions CI, Docker Compose |
-| **Hosting** | Vercel (frontend), Railway (API + PostgreSQL) |
+| **Shared**   | `@slotbook/shared`: Zod schemas, inferred types, booking status rules, policy limits, date utilities                                                                 |
+| **Testing**  | Vitest, Testcontainers (real PostgreSQL in Docker for integration tests)                                                                                             |
+| **Tooling**  | npm workspaces, strict TypeScript, ESLint, Prettier, GitHub Actions CI, Docker Compose                                                                               |
+| **Hosting**  | Vercel (frontend), Railway (API + PostgreSQL)                                                                                                                        |
 
 ---
 
@@ -136,24 +139,25 @@ Venue photos are stored as an ordered list of storage keys on the venue; the fir
 
 JSON over HTTP. Authenticated routes read the JWT from the `token` cookie. Every route has a Zod schema for input and output.
 
-| Area | Routes |
-|---|---|
-| **Auth** | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `DELETE /auth/me`, `GET /auth/logout` |
-| **Catalog** | `GET /facilities/search`, `GET /facilities/search/facets`, `GET /facilities/categories`, `GET /facilities/cities`, `GET /geo/countries` |
-| **Venue (public)** | `GET /facilities/by-slug/:slug`, `GET /facilities/by-slug/:slug/schedule`, `GET /facilities/:slug/bookingData`, `GET /facilities/:id/reviews`, `GET /facilities/:id/staff`, `GET /facilities/:id/services`, `GET /facilities/:id/availability` |
-| **Venue (owner)** | `GET /facilities/mine`, `POST /facilities`, `PATCH` / `DELETE /facilities/:id`, `GET /facilities/:id/manage`, `GET /facilities/:id/readiness`, `POST /facilities/:id/publish`, `POST /facilities/:id/unpublish`, `GET` / `PUT /facilities/:id/schedule`, `GET` / `PATCH /facilities/:id/booking-policy` |
-| **Photos** | `POST` / `PUT` / `DELETE /facilities/:id/images` (upload, reorder, delete) |
-| **Services** | `GET /facilities/:id/services/manage`, `POST /facilities/:id/services`, `GET` / `PATCH` / `DELETE /facilities/:id/services/:serviceId` |
-| **Staff** | `GET /facilities/:id/staff/manage`, `POST /facilities/:id/staff`, `PATCH /facilities/:id/staff/:staffId`, `PUT /facilities/:id/staff/:staffId/services`, `GET` / `PUT /facilities/:id/staff/:staffId/schedule` |
-| **Schedule requests** | Staff: `POST` / `GET /staff/me/schedule-requests`, `POST /staff/me/schedule-requests/:requestId/withdraw`. Owner: `GET /facilities/:id/schedule-requests[/:requestId]`, `POST .../approve`, `POST .../reject` |
-| **Bookings** | `GET` / `POST /facilities/:id/bookings`, `PATCH /facilities/:id/bookings/:bookingId` (confirm / cancel), `POST /facilities/:id/bookings/:bookingId/reviews`, `GET /bookings/mine` |
-| **Staff area** | `GET /staff/me`, `GET /staff/me/bookings` |
+| Area                  | Routes                                                                                                                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Auth**              | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `DELETE /auth/me`, `GET /auth/logout`                                                                                                                                                                                                        |
+| **Catalog**           | `GET /facilities/search`, `GET /facilities/search/facets`, `GET /facilities/categories`, `GET /facilities/cities`, `GET /geo/countries`                                                                                                                                                                 |
+| **Venue (public)**    | `GET /facilities/by-slug/:slug`, `GET /facilities/by-slug/:slug/schedule`, `GET /facilities/:slug/bookingData`, `GET /facilities/:id/reviews`, `GET /facilities/:id/staff`, `GET /facilities/:id/services`, `GET /facilities/:id/availability`                                                          |
+| **Venue (owner)**     | `GET /facilities/mine`, `POST /facilities`, `PATCH` / `DELETE /facilities/:id`, `GET /facilities/:id/manage`, `GET /facilities/:id/readiness`, `POST /facilities/:id/publish`, `POST /facilities/:id/unpublish`, `GET` / `PUT /facilities/:id/schedule`, `GET` / `PATCH /facilities/:id/booking-policy` |
+| **Photos**            | `POST` / `PUT` / `DELETE /facilities/:id/images` (upload, reorder, delete)                                                                                                                                                                                                                              |
+| **Services**          | `GET /facilities/:id/services/manage`, `POST /facilities/:id/services`, `GET` / `PATCH` / `DELETE /facilities/:id/services/:serviceId`                                                                                                                                                                  |
+| **Staff**             | `GET /facilities/:id/staff/manage`, `POST /facilities/:id/staff`, `PATCH /facilities/:id/staff/:staffId`, `PUT /facilities/:id/staff/:staffId/services`, `GET` / `PUT /facilities/:id/staff/:staffId/schedule`                                                                                          |
+| **Schedule requests** | Staff: `POST` / `GET /staff/me/schedule-requests`, `POST /staff/me/schedule-requests/:requestId/withdraw`. Owner: `GET /facilities/:id/schedule-requests[/:requestId]`, `POST .../approve`, `POST .../reject`                                                                                           |
+| **Bookings**          | `GET` / `POST /facilities/:id/bookings`, `PATCH /facilities/:id/bookings/:bookingId` (confirm / cancel), `POST /facilities/:id/bookings/:bookingId/reviews`, `GET /bookings/mine`                                                                                                                       |
+| **Staff area**        | `GET /staff/me`, `GET /staff/me/bookings`                                                                                                                                                                                                                                                               |
 
 ---
 
 ## Getting started
 
 ### Prerequisites
+
 - Node.js 24+
 - Docker (for PostgreSQL and integration tests)
 
@@ -213,23 +217,23 @@ npm run dev
 
 ### Demo accounts
 
-| Role | Email | Password |
-|---|---|---|
+| Role   | Email                  | Password      |
+| ------ | ---------------------- | ------------- |
 | Client | `client@slotbook.test` | `password123` |
-| Owner | `owner@slotbook.test` | `password123` |
+| Owner  | `owner@slotbook.test`  | `password123` |
 
 ---
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Backend and frontend together |
-| `npm test` | Unit and integration tests in every workspace |
-| `npm run typecheck` | TypeScript in every workspace |
-| `npm run lint` / `npm run format:check` | ESLint / Prettier |
-| `npm run backend:generate` | Generate a migration from the Drizzle schema |
-| `npm run db:reset --workspace=apps/backend` | Drop, migrate and reseed the database |
+| Command                                     | What it does                                  |
+| ------------------------------------------- | --------------------------------------------- |
+| `npm run dev`                               | Backend and frontend together                 |
+| `npm test`                                  | Unit and integration tests in every workspace |
+| `npm run typecheck`                         | TypeScript in every workspace                 |
+| `npm run lint` / `npm run format:check`     | ESLint / Prettier                             |
+| `npm run backend:generate`                  | Generate a migration from the Drizzle schema  |
+| `npm run db:reset --workspace=apps/backend` | Drop, migrate and reseed the database         |
 
 CI (GitHub Actions) runs typecheck, format check, lint and tests on every push to `main` and every pull request.
 

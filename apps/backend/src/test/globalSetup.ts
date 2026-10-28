@@ -1,9 +1,9 @@
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import path from 'path';
+import path from "path";
 import { Pool } from "pg";
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 import type { TestProject } from "vitest/node";
 
 declare module "vitest" {
