@@ -15,6 +15,16 @@ export function getLocalWallTime(date: Date, timeZone: string): string {
 }
 export function addDaysToIso(isoDate: string, amount: number): string {
   const [year, month, day] = isoDate.split("-").map(Number);
+  if (
+    day > 31 ||
+    month > 12 ||
+    year < month ||
+    year < day ||
+    year == null ||
+    month == null ||
+    day == null
+  )
+    throw RangeError("Invalid time value");
   return new Date(Date.UTC(year, month - 1, day + amount)).toISOString().slice(0, 10);
 }
 export function getLocalDayOfWeek(date: Date, timeZone: string): number {
@@ -23,6 +33,16 @@ export function getLocalDayOfWeek(date: Date, timeZone: string): number {
 }
 export function getIsoWeekDay(isoDate: string): number {
   const [year, month, day] = isoDate.split("-").map(Number);
+  if (
+    day > 31 ||
+    month > 12 ||
+    year < month ||
+    year < day ||
+    year == null ||
+    month == null ||
+    day == null
+  )
+    throw RangeError("Invalid time value");
   const UTCWeekDay = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
   return UTCWeekDay === 0 ? 7 : UTCWeekDay;
 }
