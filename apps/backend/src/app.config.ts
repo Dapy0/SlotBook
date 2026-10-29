@@ -25,6 +25,7 @@ const envSchema = {
     },
     UPLOAD_DIR: {
       type: "string",
+      default: "uploads",
     },
     FRONTEND_URL: {
       type: "string",
