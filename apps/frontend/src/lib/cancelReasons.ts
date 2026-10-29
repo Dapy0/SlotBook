@@ -16,5 +16,5 @@ export function formatCancelReason(reason: string | null): string | null {
   if (!reason) return null;
   if (!isCancelReasonPreset(reason)) return reason;
 
-  return CANCEL_REASON_LABELS[reason] ?? null;
+  return CANCEL_REASON_LABELS[reason];
 }
