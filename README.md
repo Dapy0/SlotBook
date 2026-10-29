@@ -246,6 +246,15 @@ CI (GitHub Actions) runs typecheck, format check, lint and tests on every push t
 
 ---
 
+## Production & Monitoring
+
+- **Structured logs.** The API logs JSON with pino, which Railway collects. Every request gets an `x-request-id`, which is returned to the client and included in the body of every `500` response, so a user's error report leads straight to the matching log lines. Cookies, auth headers and passwords are redacted.
+- **Error tracking.** Unexpected `5xx` errors are sent to Sentry with the request id, method, URL and user id (no email). Expected `4xx` errors are logged at `info` and never trigger an alert. The frontend reports errors caught by Next.js error boundaries to a separate Sentry project, with uploaded source maps for readable stack traces.
+- **Uptime.** `GET /health` checks the database with `select 1` and returns `503` if it is unreachable. UptimeRobot polls it and sends an alert when the API goes down.
+- **Graceful shutdown.** On `SIGTERM` (sent by Railway on every deploy) the server stops accepting connections, finishes in-flight requests, closes the database pool and the booking-expiry job, and exits with a 10-second safety timeout.
+
+---
+
 ## Design
 
 The UI follows an **"appointment book"** concept, inspired by the paper booking journal at a salon reception: a warm sand-gold accent used only as a fill, an ink-navy color for text, Bricolage Grotesque for headings and Onest for the interface, with tabular figures for every time and price. The selected slot is marked with a gold "highlighter", the same mark used on the landing page headline.

@@ -14,7 +14,7 @@ function jwtVerification(fastify: FastifyInstance, _options = {}, done: () => vo
           throw new UnauthorizedError();
         }
       } catch (err) {
-        request.log.error(err);
+        request.log.info({ err }, "Authentication failed");
         reply.clearCookie("token", { path: "/" });
         return reply.status(401).send({ message: "Unauthorized: Session invalid or expired" });
       }

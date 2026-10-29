@@ -1,4 +1,6 @@
 "use client";
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import "./globals.css";
 import { Button } from "@/components/ui/button";
 
@@ -9,6 +11,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <html lang="en">
       <body className="font-sans">

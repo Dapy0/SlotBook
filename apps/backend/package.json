@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "start": "tsx src/index.ts",
+    "start": "tsx --import ./src/instrument.ts src/index.ts",
     "dev": "tsx watch --watch src src/index.ts",
     "dev:debug": "tsx --inspect-brk=9229 src/index.ts",
     "db:generate": "drizzle-kit generate",
@@ -27,6 +27,8 @@
     "@fastify/jwt": "^10.2.1",
     "@fastify/multipart": "^10.1.4",
     "@fastify/static": "^10.1.6",
+    "@sentry/node": "^11.10.0",
+    "@sentry/profiling-node": "^11.10.0",
     "@slotbook/shared": "*",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",

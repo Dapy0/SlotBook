@@ -38,24 +38,14 @@ import fastifyMultipart from "@fastify/multipart";
 import { FACILITY_IMAGE_MAX_BYTES } from "../../../packages/shared/src/facilityImage";
 import type { FileStorage } from "./lib/storage/FileStorage";
 import { facilityImageRoutes } from "./modules/facilityImage/facilityImage.routes";
-const isDev = process.env.NODE_ENV !== "production";
+import { loggerOptions, requestIdOptions } from "./lib/logger";
+import * as Sentry from '@sentry/node';
+import { healthRoutes } from './modules/health';
 export async function createServer(opts: { storage?: FileStorage } = {}) {
   const app = Fastify({
-    logger: isDev
-      ? {
-          level: "debug",
-          transport: {
-            target: "pino-pretty",
-            options: {
-              colorize: true,
-              translateTime: "HH:MM:ss Z",
-              ignore: "pid,hostname",
-            },
-          },
-        }
-      : {
-          level: "info",
-        },
+    logger: loggerOptions,
+    trustProxy: true,
+    ...requestIdOptions,
   }).withTypeProvider<ZodTypeProvider>();
 
   // validator and serializer
@@ -64,25 +54,17 @@ export async function createServer(opts: { storage?: FileStorage } = {}) {
 
   //Error handler
   app.setErrorHandler<Error>(function (error, request, reply) {
-    request.log.error(error);
-
     if (hasZodFastifySchemaValidationErrors(error)) {
+      request.log.info({ details: error.validation }, "Validation error");
       return reply.status(400).send({
         code: "BAD_REQUEST",
         message: "Validation Error.",
         details: error.validation,
       });
     }
-    if (isResponseSerializationError(error)) {
-      request.log.error(
-        { issues: error.cause.issues, url: request.url },
-        "Response contract violated",
-      );
-      return reply
-        .status(500)
-        .send({ code: "INTERNAL_SERVER_ERROR", message: "Internal server error" });
-    }
-    if (error instanceof AppError) {
+
+    if (error instanceof AppError && error.statusCode < 500) {
+      request.log.info({ code: error.code }, error.message);
       return reply
         .status(error.statusCode)
         .send({ code: error.code, message: error.message, details: error.details });
@@ -90,12 +72,25 @@ export async function createServer(opts: { storage?: FileStorage } = {}) {
 
     const status = (error as { statusCode?: number }).statusCode;
     if (status && status >= 400 && status < 500) {
-      return reply.status(status).send({ code: "BAD_REQUEST", message: error.message });
+      request.log.info({ statusCode: status }, error.message);
+      return reply.status(status).send({ code: status ?? "BAD_REQUEST", message: error.message });
     }
-    request.log.error(error);
-    return reply
-      .status(500)
-      .send({ code: "INTERNAL_SERVER_ERROR", message: "Internal server error" });
+    if (isResponseSerializationError(error)) {
+      request.log.error({ err: error, issues: error.cause.issues }, "Response contract violated");
+    } else {
+      request.log.error({ err: error }, "Unhandled error");
+    }
+    Sentry.withScope((scope) => {
+      scope.setTag("requestId", request.id);
+      scope.setContext("request", { method: request.method, url: request.url });
+      if (request.user?.id) scope.setUser({ id: request.user.id });
+      Sentry.captureException(error);
+    });
+    return reply.status(500).send({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Internal server error",
+      requestId: request.id,
+    });
   });
 
   // Plugins
@@ -120,6 +115,7 @@ export async function createServer(opts: { storage?: FileStorage } = {}) {
   await app.register(storagePlugin, { storage: opts.storage });
   await app.register(bookingExpiry);
   // routes
+  await app.register(healthRoutes);
   await app.register(authRoutes, { prefix: "/auth" });
   await app.register(facilityRoutes, { prefix: "/facilities" });
   await app.register(serviceRoutes, { prefix: "/facilities" });

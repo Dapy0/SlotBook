@@ -23,5 +23,6 @@ export const apiErrorResponseSchema = z.object({
   code: apiErrorCodeSchema,
   message: z.string().trim(),
   details: z.unknown().optional(),
+  requestId: z.string().trim().optional()
 });
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;

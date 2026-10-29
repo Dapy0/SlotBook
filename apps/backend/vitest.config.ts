@@ -7,6 +7,7 @@ export default defineConfig({
       APP_HOST: "127.0.0.1",
       PORT: "0",
       NODE_ENV: "test",
+      LOG_LEVEL: "silent",
     },
     globalSetup: ["./src/test/globalSetup.ts"],
     setupFiles: ["./src/test/setupEnv.ts"],
