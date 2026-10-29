@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from "crypto";
 import type { FastifyServerOptions } from "fastify";
 
 const isProd = process.env.NODE_ENV === "production";

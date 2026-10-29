@@ -44,7 +44,6 @@ describe("computeDaySlots", () => {
     earliestStart: new Date("2026-11-02T00:00:00Z"),
   };
 
-
   test("slots come only from facility ∩ staff hours", () => {
     expect(computeDaySlots(base)).toEqual([
       interval("12:00", "12:30"),
@@ -63,7 +62,6 @@ describe("computeDaySlots", () => {
     const result = computeDaySlots({ ...base, durationMinutes: 121 });
     expect(result).toEqual([]);
   });
-
 
   test("busy booking removes the slots it overlaps", () => {
     const result = computeDaySlots({ ...base, busy: [interval("12:30", "13:00")] });

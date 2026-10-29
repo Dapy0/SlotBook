@@ -39,8 +39,8 @@ import { FACILITY_IMAGE_MAX_BYTES } from "../../../packages/shared/src/facilityI
 import type { FileStorage } from "./lib/storage/FileStorage";
 import { facilityImageRoutes } from "./modules/facilityImage/facilityImage.routes";
 import { loggerOptions, requestIdOptions } from "./lib/logger";
-import * as Sentry from '@sentry/node';
-import { healthRoutes } from './modules/health';
+import * as Sentry from "@sentry/node";
+import { healthRoutes } from "./modules/health";
 export async function createServer(opts: { storage?: FileStorage } = {}) {
   const app = Fastify({
     logger: loggerOptions,

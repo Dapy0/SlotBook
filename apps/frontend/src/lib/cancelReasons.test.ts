@@ -2,7 +2,6 @@ import { formatCancelReason } from "@/lib/cancelReasons";
 import { describe, expect, test } from "vitest";
 
 describe("formatCancelReason", () => {
-
   test.each([
     { reason: null, expected: null },
     { reason: "", expected: null },
