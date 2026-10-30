@@ -48,6 +48,11 @@ export async function createServer(opts: { storage?: FileStorage } = {}) {
     ...requestIdOptions,
   }).withTypeProvider<ZodTypeProvider>();
 
+  await app.register(import("@fastify/rate-limit"), {
+    max: 100,
+    timeWindow: "1 minute",
+  });
+
   // validator and serializer
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
@@ -79,6 +84,10 @@ export async function createServer(opts: { storage?: FileStorage } = {}) {
       request.log.error({ err: error, issues: error.cause.issues }, "Response contract violated");
     } else {
       request.log.error({ err: error }, "Unhandled error");
+    }
+    if (status === 429) {
+      reply.code(429);
+      error.message = "You hit the rate limit! Slow down please!";
     }
     Sentry.withScope((scope) => {
       scope.setTag("requestId", request.id);
