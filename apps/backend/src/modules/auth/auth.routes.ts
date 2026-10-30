@@ -18,6 +18,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
           201: authResponseSchema,
         },
       },
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: "1 minute",
+        },
+      },
     },
     async (request, response) => {
       const { token, user } = await signUpUser(
@@ -37,6 +43,12 @@ export const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
         body: loginRequestSchema,
         response: {
           200: authResponseSchema,
+        },
+      },
+      config: {
+        rateLimit: {
+          max: 10,
+          timeWindow: "1 minute",
         },
       },
     },
