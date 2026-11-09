@@ -16,7 +16,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "db:seed": "tsx src/db/seed.ts",
-    "db:reset": "tsx src/db/dropAll.ts && drizzle-kit migrate && npm run db:seed"
+    "db:reset": "tsx src/db/dropAll.ts && drizzle-kit migrate && npm run db:seed",
+    "seed:images": "tsx src/db/copySeedImages.ts"
   },
   "dependencies": {
     "@fastify/caching": "^9.0.4",
