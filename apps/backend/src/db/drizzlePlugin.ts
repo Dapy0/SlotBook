@@ -3,14 +3,16 @@ import { Pool } from "pg";
 import fp from "fastify-plugin";
 import type { FastifyInstance } from "fastify";
 import { relations } from "./relations.ts";
+import { sslFromUrl } from "./sslConfig";
 
 export type DB = NodePgDatabase<typeof relations>;
 
 function drizzlePlugin(fastify: FastifyInstance, _options: object, done: (err?: Error) => void) {
   if (!fastify.drizzle) {
+    const connectionString = process.env.DATABASE_URL!;
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL!,
-      ssl: false,
+      ssl: sslFromUrl(connectionString),
     });
     const db = drizzle({ client: pool, relations });
     fastify.decorate("drizzle", db);
